@@ -45,32 +45,6 @@ function seriesSugHtml(q) {
     return nq ? `<span class="hint">「${esc(q)}」に一致するシリーズはありません</span>` : `<span class="hint">登録されているシリーズはありません</span>`;
   return `<span class="hint sershd">${nq ? `一致するシリーズ ${names.length}件` : `登録済みのシリーズ ${names.length}件（作品数の多い順）`}</span><div class="serbox">${names.map(n => `<button type="button" data-seradd="${esc(n)}">${esc(n)}<small>${cnt[n]}</small></button>`).join("")}</div>`;
 }
-/* 検索窓の候補（シリーズ検索と同じ仕組み）：候補を最初から並べ、打つと一致するものだけに絞れる。押すとチップになって絞り込みに残る */
-function sugBoxHtml(cands, q, attr) {
-  const nq = norm(q || "");
-  let list = cands.slice();
-  if (nq)
-    list = list
-      .filter(c => norm(c.label).includes(nq) || (c.sub != null && norm(String(c.sub)).includes(nq)))
-      .sort((a, b) => norm(a.label).indexOf(nq) - norm(b.label).indexOf(nq) || (b.n || 0) - (a.n || 0) || a.label.localeCompare(b.label, "ja"));
-  else list.sort((a, b) => (b.n || 0) - (a.n || 0) || a.label.localeCompare(b.label, "ja"));
-  if (!list.length) return `<span class="hint">${nq ? `「${esc(q)}」に一致する候補はありません` : "候補がありません"}</span>`;
-  return `<div class="serbox">${list.map(c => `<button type="button" ${attr}="${esc(c.v)}">${esc(c.label)}${c.sub != null && c.sub !== "" ? `<small>${esc(String(c.sub))}</small>` : ""}</button>`).join("")}</div>`;
-}
-/* 選んだ候補のチップ（シリーズの絞り込みと同じ形） */
-const pickChipsHtml = (chips, delAttr) =>
-  chips.length ? `<div class="chips" style="margin-bottom:8px">${chips.map(c => `<button type="button" aria-pressed="true" ${delAttr}="${esc(c.v)}">${esc(c.label)}${c.sub != null && c.sub !== "" ? `<small>${esc(String(c.sub))}</small>` : ""} ✕</button>`).join("")}</div>` : "";
-/* タイトル検索の候補：今のジャンルの作品（選んだものは除く）。小さい字はシリーズ名か放送年 */
-function qCands() {
-  const sel = state.qSel || [];
-  return items.filter(i => ofKind(i) && !sel.includes(i.id)).map(i => ({ v: i.id, label: i.t || "", sub: i.series || String(i.from || "").slice(0, 4), n: Date.parse(i.from || "") || 0 }));
-}
-const qSugHtml = q => sugBoxHtml(qCands(), q, "data-qpick");
-const qChipsHtml = () =>
-  pickChipsHtml(
-    (state.qSel || []).map(id => items.find(i => i.id === id)).filter(Boolean).map(i => ({ v: i.id, label: i.t || "", sub: i.series || String(i.from || "").slice(0, 4) })),
-    "data-qdel",
-  );
 /* 絞り込みの中身：シリーズ */
 function seriesPanelHtml() {
   const cnt = seriesCounts();
@@ -306,24 +280,6 @@ const FILTER_ACTIONS = [
     },
   ],
   [
-    "[data-qpick]",
-    el => {
-      state.qSel = [...(state.qSel || []), el.dataset.qpick];
-      state.q = "";
-      state.limit = 200;
-      render();
-      if (!TOUCH) $("#q")?.focus();
-    },
-  ],
-  [
-    "[data-qdel]",
-    el => {
-      state.qSel = (state.qSel || []).filter(x => x !== el.dataset.qdel);
-      state.limit = 200;
-      render();
-    },
-  ],
-  [
     "[data-cour]",
     el => {
       state.cour = el.dataset.cour === "すべて" ? [] : toggle(state.cour, el.dataset.cour);
@@ -522,7 +478,7 @@ function fBarHtml() {
     srtLab: SORTS.find(x => x[0] === state.sort)[1],
   });
 }
-const fSearchHtml = () => fshSearch({ id: "q", ph: "タイトルで検索", q: state.q, a: "data-qtog" }) + qChipsHtml() + `<div class="chips" id="qSug">${qSugHtml(state.q)}</div>`;
+const fSearchHtml = () => fshSearch({ id: "q", ph: "タイトルで検索", q: state.q, a: "data-qtog" });
 const fSumHtml = () => fshSum(fConds(), FA);
 function fSubBody(k) {
   if (k === "st") {
@@ -669,7 +625,7 @@ const SHEET_ACTIONS = [
       state.qOpen = on;
       state.fOpen = "";
       state.fSub = "";
-      if (!on) { state.q = ""; state.qSel = []; }
+      if (!on) state.q = "";
       state.limit = 200;
       render();
       if (on) fshFocusQ("#q");
