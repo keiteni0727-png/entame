@@ -422,8 +422,15 @@ function renderWeek() {
 }
 function filtered() {
   let list = items.filter(i => ofKind(i) && vodOk(i) && slotOk(i) && typeOk(i) && courOk(i) && seriesOk(i) && sfOk(i) && eraOk(i) && missOk(i));
-  /* タイトル検索は候補から選んだ作品だけに絞る（シリーズ検索と同じ仕組み） */
-  if (state.qSel && state.qSel.length) list = list.filter(i => state.qSel.includes(i.id));
+  if (state.q) {
+    /* 全角・半角、ひらがな・カタカナ、大文字・小文字、記号のゆれをそろえて探す。空白で区切ると「どれも含む」 */
+    const qs = state.q.split(/[\s　]+/).map(norm).filter(Boolean);
+    list = list.filter(i => {
+      /* 探すのはタイトルだけ（放送局・主題歌などは絞り込みや専用メニューで探す） */
+      const h = norm(i.t || "");
+      return qs.every(q => h.includes(q));
+    });
+  }
   const S = {
     time: (a, b) => (a.dow < 0 ? 9 : a.dow) - (b.dow < 0 ? 9 : b.dow) || mins(a.time) - mins(b.time),
     new: (a, b) => String(b.from || "").localeCompare(String(a.from || "")),
@@ -559,13 +566,13 @@ function renderList() {
   ]);
   /* ★保存・並び順は今までどおりボタンの下に出す。絞り込みはシート（fSheetHtml） */
   const panel = { sv: svPanelHtml, sort: () => sortHtml }[state.fOpen];
-  const searching = state.qOpen || !!(state.qSel && state.qSel.length);
+  const searching = state.qOpen || !!state.q;
   return `${searching ? fSearchHtml() : ""}
     <div class="fwrap">${searching ? "" : fBarHtml()}${fPopHtml(panel ? panel() : "")}</div>
     ${fSumHtml()}
-    ${fshCount(list.length, "件", "").replace("</p>", viewTog(state.view, "data-lview") + "</p>")}
+    ${fshCount(list.length, "件", state.q).replace("</p>", viewTog(state.view, "data-lview") + "</p>")}
     <div id="fshBox">${fSheetHtml()}</div>
-    ${list.length ? groupedHtml(list) : `<p class="empty">条件に合う作品はありません。</p>`}`;
+    ${list.length ? groupedHtml(list) : `<p class="empty">${state.q ? `「${esc(state.q)}」に一致する作品はありません。` : "条件に合う作品はありません。"}</p>`}`;
 }
 let loaded = false;
 /* 検索欄は作り直さない（作り直すと入力中の文字・日本語変換・カーソルが壊れるため） */
@@ -720,7 +727,6 @@ function setMode(m) {
   state.fSub = "";
   state.qOpen = false;
   state.q = "";
-  state.qSel = [];
   if (["w", "yt", "o", "sr", "mu"].includes(m)) return;
   if (m === "m" || m === "s") state.type = [];
   state.limit = 200;
