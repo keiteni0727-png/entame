@@ -441,6 +441,7 @@ const SLOT_ACTIONS = [
       }
       slotEdit = null;
       saveTitle(it.id, { slots: ded }, ded.length ? "放送枠の変更を保存しました" : "放送枠の変更を消しました");
+      refreshSheet();
     },
   ],
 ];
@@ -482,6 +483,7 @@ const ARC_ACTIONS = [
       l.sort((x, y) => x.a - y.a);
       arcEdit = null;
       saveTitle(it.id, { arcs: l }, l.length ? "編を保存しました" : "編を消しました");
+      refreshSheet();
     },
   ],
 ];
