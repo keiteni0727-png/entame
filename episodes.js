@@ -4,6 +4,7 @@ let epMenu = false; // 話数タブの「…」を開いているか
 /* 長編の「〇〇編」：作品の arcs = [{name, a:最初の話, b:最後の話(なし=最後まで)}] */
 let arcEdit = null, // 編集中の下書き
   arcFold = new Map(); // 編ごとの開閉を手で変えたもの（名前#最初の話 → 開いているか）
+let slotEdit = null; // 放送枠の変更の編集中の下書き
 const arcsOf = it => (it.arcs || []).filter(r => r && r.name && r.a != null).slice().sort((x, y) => x.a - y.a);
 const arcKey = r => `${r.name}#${r.a}`;
 const arcRange = r => `#${r.a}–${r.b ?? ""}`;
@@ -44,6 +45,7 @@ function epWarn(it) {
 const warnAny = x => x.n || x.s || x.d || x.gap || x.dup;
 function epListHtml(it, eps) {
   if (arcEdit) return arcEditHtml();
+  if (slotEdit) return slotEditHtml(it);
   const A = it.k === "a";
   if (!eps.length)
     return (
@@ -86,7 +88,8 @@ function epListHtml(it, eps) {
     const whenTx = e.na ? "" : when ? `${when}${fut ? " 放送予定" : " 放送"}` : "";
     const st = e.x ? " skip" : e.w ? " seen" : fut ? " future" : " unseen";
     const wn = warnOf(e, i);
-    const why = wn.d ? Object.keys(wn.d).map(k => (k === "start" ? `開始日（${fmtD(normDate(it.from || ""))}）と違います` : k === "dow" ? `放送曜日（${"日月火水木金土"[new Date(normDate(it.from || "")).getUTCDay()]}）と1日ずれています` : DATE_WHY[k])).join("・") : "";
+    const dowLab = (() => { const sm2 = epSlotMap(it, eps); return sm2[i] && sm2[i].dow >= 0 ? DOW[sm2[i].dow] : "日月火水木金土"[new Date(normDate(it.from || "")).getUTCDay()]; })();
+    const why = wn.d ? Object.keys(wn.d).map(k => (k === "start" ? `開始日（${fmtD(normDate(it.from || ""))}）と違います` : k === "dow" ? `放送曜日（${dowLab}）と1日ずれています` : DATE_WHY[k])).join("・") : "";
     const why2 = [why, wn.dup ? "同じ話数がほかにもあります" : ""].filter(Boolean).join("・");
     const gapRow = wn.gap ? `<div class="tlgap" role="listitem"><span>⚠ ${wn.gap[0] === wn.gap[1] ? `${wn.gap[0]}話` : `${wn.gap[0]}〜${wn.gap[1]}話`}がありません</span><button type="button" class="u-btn sm tlok" data-gapadd="${wn.gap[0]}-${wn.gap[1]}">話数を追加</button><button type="button" class="u-btn sm tlok" data-gapnok="${wn.gap[0]}-${wn.gap[1]}">問題なし</button></div>` : "";
     /* 要確認は「!」だけ出し、押すと補足（理由と「問題なし」）が開く */
@@ -130,7 +133,7 @@ function epListHtml(it, eps) {
   } else rowsHtml = eps.map(epRow).join("");
   /* 上の段：進み具合のバー・話数を編集・その他（あまり使わない操作：まとめてチェック・編の登録） */
   const menu = epMenu
-    ? `<div class="epmenu" role="menu"><button type="button" role="menuitem" id="allAired">放送済みの話を全部チェック</button>${w ? `<button type="button" role="menuitem" id="clearAll">チェックを全部外す</button>` : ""}<button type="button" role="menuitem" id="arcOpenEd">${arcs.length ? "編（〇〇編）を編集" : "編（〇〇編）を登録"}</button></div>`
+    ? `<div class="epmenu" role="menu"><button type="button" role="menuitem" id="allAired">放送済みの話を全部チェック</button>${w ? `<button type="button" role="menuitem" id="clearAll">チェックを全部外す</button>` : ""}<button type="button" role="menuitem" id="arcOpenEd">${arcs.length ? "編（〇〇編）を編集" : "編（〇〇編）を登録"}</button><button type="button" role="menuitem" id="slotOpenEd">${slotsOf(it).length ? "放送枠の変更を編集" : "放送枠の変更を登録"}</button></div>`
     : "";
   return `<div class="ephead">${A ? `<button type="button" class="u-btn sm ephb ephp" id="spOpen" aria-label="各話リストを貼り付け">${PASTE_IC}貼り付け</button>` : ""}<button type="button" class="u-btn sm ephb" id="epEditBtn">話数を編集</button><button type="button" class="u-btn sm ephb" id="epMenuBtn" aria-haspopup="menu" aria-expanded="${epMenu}">その他</button>${menu}</div>
     ${warnN ? `<button type="button" class="epwarn" id="epWarnGo">⚠ 要確認 ${warnN}話<span>押すと最初の話へ</span></button>` : ""}${it.s === "視聴済み" && !upcoming(it) && eps.some(e => !done(e)) ? `<div class="wnn eptop"><p>視聴済みですが、チェックしていない話があります</p></div>` : ""}${arcBar}<div class="eps${A ? "" : " nosub"}" role="list">${rowsHtml}</div>`;
@@ -345,6 +348,105 @@ function erOpenLastArc(it) {
   const r = nn == null ? null : arcsOf(it).find(r => nn >= r.a && (r.b == null || nn <= r.b));
   if (r) erArcFold.set(arcKey(r), false);
 }
+/* 放送枠の変更：日付の並びから「ここから曜日が変わった」候補を1つ見つける（曜日が一貫して変わっているときだけ） */
+function slotSuggest(it) {
+  const l = episodes(it);
+  const f = normDate(it.from || "");
+  if (!f) return null;
+  const fd = (dayNo(f) + 4) % 7;
+  const ds = l.map(e => (e.t ? (dayNo(jst(e.t).day) + 4) % 7 : null));
+  const i0 = ds.findIndex(d => d != null && d !== fd);
+  if (i0 < 0) return null;
+  const w1 = ds[i0];
+  for (let i = i0; i < ds.length; i++) if (ds[i] != null && ds[i] !== w1) return null;
+  const a = epNum(l[i0].n);
+  if (a == null) return null;
+  const j = jst(l[i0].t);
+  return { a, dow: (w1 + 6) % 7, time: j && !l[i0].nt ? j.hm : "" };
+}
+function slotEditHtml(it) {
+  const sug = !slotsOf(it).length && !slotEdit.some(r => r.a != null) ? slotSuggest(it) : null;
+  const row = (r, i) => `<div class="slr" data-sl="${i}">
+      <input class="sl-a" type="number" min="1" inputmode="numeric" value="${r.a ?? ""}" placeholder="話数" aria-label="何話から"><span>話から</span>
+      <select class="sl-dow" aria-label="放送曜日"><option value="-1"${r.dow == null || r.dow < 0 ? " selected" : ""}>曜日は同じ</option>${DOW.map((d, k) => `<option value="${k}"${r.dow === k ? " selected" : ""}>${d}曜</option>`).join("")}</select>
+      <input class="sl-time" type="text" inputmode="numeric" autocomplete="off" value="${esc(r.time || "")}" placeholder="時刻は同じ" aria-label="放送時刻（例：23:00）">
+      <button type="button" class="u-btn icon sm txt del" data-sldel="${i}" aria-label="この変更を削除">✕</button></div>`;
+  return `<div class="spaste arced sled">
+    <p class="hint" style="margin:0 0 8px">途中で放送の曜日・時間が変わった作品に。「○話から」で、その話以降の枠を変えます（曜日チェックと、時刻の自動入力に使います）。</p>
+    ${sug ? `<div class="slsug"><p>日付を見ると、<b>${sug.a}話から${DOW[sug.dow]}曜</b>に変わっているようです。</p><button type="button" class="u-btn sm" id="slotSugGo">この内容で入れる</button></div>` : ""}
+    <div class="sll">${slotEdit.length ? slotEdit.map(row).join("") : `<p class="empty" style="padding:10px 0;text-align:left">まだ変更がありません。下のボタンで追加してください。</p>`}</div>
+    <button type="button" class="u-btn sm" id="slotAdd">＋ 枠の変更を追加</button>
+    <div class="ffoot"><button type="button" class="u-btn" id="slotCancel">キャンセル</button><button type="button" class="u-btn pri primary" id="slotSave">保存</button></div></div>`;
+}
+function slotSync() {
+  if (!slotEdit) return;
+  document.querySelectorAll("[data-sl]").forEach(el => {
+    const r = slotEdit[+el.dataset.sl];
+    if (!r) return;
+    const v = el.querySelector(".sl-a").value.trim();
+    r.a = v === "" ? null : Math.max(1, parseInt(v, 10) || 0) || null;
+    r.dow = +el.querySelector(".sl-dow").value;
+    r.time = el.querySelector(".sl-time").value.trim();
+  });
+}
+/* 放送枠の変更の編集中 */
+const SLOT_ACTIONS = [
+  [
+    "#slotCancel",
+    () => {
+      slotEdit = null;
+      refreshSheet();
+    },
+  ],
+  [
+    "#slotAdd",
+    () => {
+      slotSync();
+      slotEdit.push({ a: null, dow: -1, time: "" });
+      refreshSheet();
+    },
+  ],
+  [
+    "[data-sldel]",
+    el => {
+      slotSync();
+      slotEdit.splice(+el.dataset.sldel, 1);
+      refreshSheet();
+    },
+  ],
+  [
+    "#slotSugGo",
+    (el, it) => {
+      const sug = slotSuggest(it);
+      if (!sug) return;
+      slotEdit = [sug];
+      refreshSheet();
+    },
+  ],
+  [
+    "#slotSave",
+    (el, it) => {
+      slotSync();
+      const l = slotEdit.filter(r => r.a != null || r.dow >= 0 || r.time);
+      if (l.some(r => r.a == null)) return toast("何話からか入れてください");
+      if (l.some(r => r.dow < 0 && !r.time)) return toast("曜日か時刻のどちらかは変えてください");
+      for (const r of l) {
+        if (!r.time) continue;
+        const hm = normHM(r.time);
+        if (hm === null) return toast("時刻は 23:00 のように入力してください");
+        r.time = hm;
+      }
+      l.sort((x, y) => x.a - y.a);
+      const ded = [];
+      for (const r of l) {
+        if (ded.length && ded[ded.length - 1].a === r.a) ded[ded.length - 1] = r;
+        else ded.push(r);
+      }
+      slotEdit = null;
+      saveTitle(it.id, { slots: ded }, ded.length ? "放送枠の変更を保存しました" : "放送枠の変更を消しました");
+    },
+  ],
+];
 /* 編の編集中 */
 const ARC_ACTIONS = [
   [
