@@ -241,7 +241,7 @@ function renderDetail(it) {
   /* スマホ：タイトルの下に配信・公式サイトのボタン（PCは左の列） */
   const lnk = [it.vurl ? `<a class="u-btn dtb vod" href="${esc(it.vurl)}" target="_blank" rel="noopener">${IC_PLAY}<span>${esc(vodName(it))}で見る</span></a>` : "", it.url ? `<a class="u-btn dtb" href="${esc(it.url)}" target="_blank" rel="noopener"><span>公式サイト</span>${IC_EXT}</a>` : ""].join("");
   const nv = navNeighbors(it.id),
-    busy = !!(epEdit || arcEdit || subPaste || epOne != null);
+    busy = !!(epEdit || arcEdit || slotEdit || subPaste || epOne != null);
   const navB = (d, lab, ic) => `<button type="button" class="u-btn icon sm dnav" data-dnav="${d}" aria-label="${lab}" title="${lab}${TOUCH ? "" : `（${d < 0 ? "←" : "→"}キー）`}" ${nv[d < 0 ? 0 : 1] && !busy ? "" : "disabled"}>${ic}</button>`;
   return `<div class="dgrid">${detailSide(it, { eps, w, nx, noEp })}<div class="dmain"><div class="dhead"><div class="hdrow"><div class="meta">${kindTag(it)}${(l => (l ? `<button type="button" class="dmt mtag m-${l[1]}" data-jump="fMedia" title="放送形態を変える">${l[0]}</button>` : ""))(mediaLabOf(it))}${stBtn}${stMs.length ? wnMark("st") : ""}</div><div class="hdrow">${navB(-1, "前の作品", CHEV(-1))}${navB(1, "次の作品", CHEV(1))}<button type="button" class="u-btn sm" id="editItem" aria-label="作品を編集">編集</button><button class="u-btn icon sm soft close" type="button" data-close aria-label="閉じる">✕</button></div></div>${stMs.length ? wnNote("st", stMs.map(x => wnText(it, x)).join("")) : ""}
     <div class="dtit">${it.img ? `<button type="button" class="dtimg" data-imgview="1" aria-label="画像を大きく表示">${imgTag(it, "l", "dtimgi")}</button>` : `<button type="button" class="dtimg none" data-imgadd="1" aria-label="画像を貼り付け">${IMG_ICON}</button>`}<div class="dtc"><h3>${esc(it.t)}<button type="button" class="tcopy" id="copyTitle" aria-label="タイトルをコピー" title="タイトルをコピー"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button></h3>
@@ -316,6 +316,7 @@ function openDetail(id, dir, keepNav) {
   epMenu = false;
   erMore = false;
   arcEdit = null;
+  slotEdit = null;
   arcFold = new Map();
   dmissKeep = false;
   wnOpen.clear();
@@ -662,6 +663,17 @@ const DETAIL_ACTIONS = [
     },
   ],
   [null, (el, it, e) => !!arcEdit && runActions(ARC_ACTIONS, e, it)],
+  /* 放送枠の変更の登録 */
+  [
+    "#slotOpenEd",
+    (el, it) => {
+      epMenu = false;
+      slotEdit = slotsOf(it).map(r => ({ ...r }));
+      if (!slotEdit.length) slotEdit.push({ a: null, dow: -1, time: "" });
+      refreshSheet();
+    },
+  ],
+  [null, (el, it, e) => !!slotEdit && runActions(SLOT_ACTIONS, e, it)],
   /* 編の見出し：開く／たたむ */
   /* 日付のアラート：日付の逆転・半年以上の空きが問題ない話を確認済みにする（その話の日付を変えるまで） */
   [
@@ -756,7 +768,7 @@ document.addEventListener("animationend", e => {
 });
 /* 前・次の作品へ（話数の編集などの途中は移らない） */
 function detailNav(d) {
-  if (!openId || epEdit || arcEdit || subPaste || epOne != null || (form && form.inline)) return;
+  if (!openId || epEdit || arcEdit || slotEdit || subPaste || epOne != null || (form && form.inline)) return;
   const id = navNeighbors(openId)[d < 0 ? 0 : 1];
   if (id) openDetail(id, d);
 }
