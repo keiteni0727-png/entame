@@ -162,6 +162,7 @@ let erMore = false; // 話数の編集の「その他」を開いているか
 let erPanel = null; // 話数の編集：開いている操作パネル（"misc" | null。開くたびに閉じた状態から）
 let erArcFold = new Map(); // 話数の編集：編ごとに見出しをたたんだ状態（編のキー → たたんでいるか。無い編は「見終わった編か」で決める）
 let erShiftOn = true; // 日付を変えたら、後の話も1週間おきにずらすか（話数の編集を開くたびにオンに戻る）
+let erSeqOn = true; // 話数を変えたら、後の話も連番にするか（話数の編集を開くたびにオンに戻る）
 function epEditorHtml(it) {
   const l = epEdit.list;
   const A = it.k === "a";
@@ -178,7 +179,7 @@ function epEditorHtml(it) {
     ${panBtn("misc", "その他")}
     ${erPanel === "misc" ? `<div class="edpan">
     ${n > 1 ? `<div class="edt-t"><span class="edt-tx"><b>番号順に並べ替え</b></span><button type="button" class="u-btn sm" id="erSort">並べ替え</button></div>
-    <div class="edt-t stk"><span class="edt-tx"><b>途中から番号を振り直す</b></span><span class="edt-in"><input id="erReFrom" type="number" min="0" inputmode="numeric" aria-label="振り直しを始める話数"><span>話から</span><input id="erReTo" type="number" min="0" inputmode="numeric" aria-label="新しい開始番号"><span>番で</span></span><button type="button" class="u-btn sm" id="erReGo">振り直す</button></div>
+    <label class="edt-t"><span class="edt-tx"><b>後の話も連番にする</b></span><input type="checkbox" id="erSeq" class="edm-big" ${erSeqOn ? "checked" : ""}></label>
     <label class="edt-t"><span class="edt-tx"><b>後の話も1週間おきにずらす</b></span><input type="checkbox" id="erShift" class="edm-big" ${erShiftOn ? "checked" : ""}></label>
     <div class="edt-t"><span class="edt-tx"><b>全話を1話と同じ日付にする</b></span><button type="button" class="u-btn sm" id="erAlign">そろえる</button></div>` : ""}
     <div class="edt-t"><span class="edt-tx"><b>放送枠の変更を${slotsOf(it).length ? "編集" : "登録"}</b></span><button type="button" class="u-btn sm" id="erSlot">開く</button></div></div>` : ""}
@@ -579,26 +580,6 @@ const EPEDIT_ACTIONS = [
       epEdit.list = keyed.map(x => x.e);
       refreshEditor();
       toast("番号順に並べ替えました");
-    },
-  ],
-  /* 途中から番号を振り直す：指定した話数から後ろの数字の話数を、指定した番号からの連番にする（名前の話はそのまま・数えない） */
-  [
-    "#erReGo",
-    (el, it) => {
-      const from = epVal(($("#erReFrom") || {}).value || "");
-      const toRaw = epVal(($("#erReTo") || {}).value || "");
-      if (from === "" || toRaw === "") return toast("振り直す話数と、新しい番号を入れてください");
-      const l = epEdit.list;
-      const si = l.findIndex(e => epVal(e.n) === from);
-      if (si < 0) return toast(`${from}話が見つかりません`);
-      let nx = +toRaw;
-      for (let k = si; k < l.length; k++) {
-        if (epVal(l[k].n) === "") continue;
-        l[k].n = String(Math.round(nx * 100) / 100);
-        nx += 1;
-      }
-      refreshEditor();
-      toast(`${from}話から番号を振り直しました`);
     },
   ],
   /* 編集画面：抜けている話数を、抜けた場所に足す（保存するまで反映しない） */
