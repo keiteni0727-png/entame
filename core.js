@@ -1219,7 +1219,7 @@ const state = Object.assign(
     fm: {},
   },
   ls.get(K_UI) || {},
-  { q: "", limit: 200, fOpen: "", fSub: "", qOpen: false, wday: "", xser: false },
+  { q: "", qSel: [], limit: 200, fOpen: "", fSub: "", qOpen: false, wday: "", xser: false },
 );
 /* 端末に覚えた表示状態のうち、今は無い値は外す */
 const arrOf = v => (Array.isArray(v) ? v : v && v !== "すべて" ? [v] : []);
