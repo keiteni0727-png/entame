@@ -45,17 +45,6 @@ function seriesSugHtml(q) {
     return nq ? `<span class="hint">「${esc(q)}」に一致するシリーズはありません</span>` : `<span class="hint">登録されているシリーズはありません</span>`;
   return `<span class="hint sershd">${nq ? `一致するシリーズ ${names.length}件` : `登録済みのシリーズ ${names.length}件（作品数の多い順）`}</span><div class="serbox">${names.map(n => `<button type="button" data-seradd="${esc(n)}">${esc(n)}<small>${cnt[n]}</small></button>`).join("")}</div>`;
 }
-/* タイトル検索の候補：入力に一致する作品（検索本体と同じく、タイトルだけをそろえて探す）。押すとその作品を開く */
-function qSugHtml(q) {
-  const qs = String(q || "").split(/[\s　]+/).map(norm).filter(Boolean);
-  if (!qs.length) return "";
-  const hits = items
-    .filter(i => ofKind(i) && qs.every(x => norm(i.t || "").includes(x)))
-    .sort((a, b) => norm(a.t || "").indexOf(qs[0]) - norm(b.t || "").indexOf(qs[0]) || String(b.from || "").localeCompare(String(a.from || "")))
-    .slice(0, 8);
-  if (!hits.length) return `<span class="hint">「${esc(q)}」に一致する作品はありません</span>`;
-  return `<span class="hint sershd">一致する作品 ${hits.length}件</span><div class="serbox">${hits.map(i => `<button type="button" data-qsug="${esc(i.id)}">${esc(i.t || "")}<small>${esc(i.series || String(i.from || "").slice(0, 4))}</small></button>`).join("")}</div>`;
-}
 /* 絞り込みの中身：シリーズ */
 function seriesPanelHtml() {
   const cnt = seriesCounts();
@@ -274,12 +263,6 @@ const FILTER_ACTIONS = [
     },
   ],
   [
-    "[data-qsug]",
-    el => {
-      openDetail(el.dataset.qsug);
-    },
-  ],
-  [
     "[data-seradd]",
     el => {
       state.series = [...state.series, el.dataset.seradd];
@@ -495,7 +478,7 @@ function fBarHtml() {
     srtLab: SORTS.find(x => x[0] === state.sort)[1],
   });
 }
-const fSearchHtml = () => fshSearch({ id: "q", ph: "タイトルで検索", q: state.q, a: "data-qtog" }) + `<div id="qSug">${qSugHtml(state.q)}</div>`;
+const fSearchHtml = () => fshSearch({ id: "q", ph: "タイトルで検索", q: state.q, a: "data-qtog" });
 const fSumHtml = () => fshSum(fConds(), FA);
 function fSubBody(k) {
   if (k === "st") {
