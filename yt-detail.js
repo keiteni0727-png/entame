@@ -400,25 +400,9 @@ const YT_ACTIONS = [
       yst.qOpen = on;
       yst.fp = "";
       yst.fSub = "";
-      if (!on) { yst.q = ""; yst.qSel = []; }
+      if (!on) yst.q = "";
       render();
       if (on) fshFocusQ("#ytq");
-    },
-  ],
-  [
-    "[data-ytqpick]",
-    el => {
-      yst.qSel = [...(yst.qSel || []), el.dataset.ytqpick];
-      yst.q = "";
-      render();
-      if (!TOUCH) $("#ytq")?.focus();
-    },
-  ],
-  [
-    "[data-ytqdel]",
-    el => {
-      yst.qSel = (yst.qSel || []).filter(x => x !== el.dataset.ytqdel);
-      render();
     },
   ],
   [
