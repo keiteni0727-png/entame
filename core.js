@@ -1687,12 +1687,40 @@ const hasTime = it => mins(it.time) < 9999;
 const noTime = (e, it) => e.nt || (e.t % 1440 === 0 && !(it && mins(it.time) === 540));
 /* 番組に放送時間があるとき、日付だけ入っていて時刻が未入力の話に番組の放送時間を入れる（入れた話の数を返す）。
    日付のない話・時刻が入っている話はそのまま */
+/* 放送枠の変更：作品の slots = [{a:その話から, dow:曜日（DOWの番号。-1＝変えない）, time:時刻（""＝変えない）}]。
+   最初の枠は作品の開始日・放送時間のまま。長編で途中に曜日・時間が変わっても、アラートや時刻の自動入力が追いつくようにする */
+const slotsOf = it => (it.slots || []).filter(x => x && x.a != null).slice().sort((x, y) => x.a - y.a);
+/* その話の番号で効いている枠の変更（なければ null） */
+function slotAt(it, n) {
+  if (n == null) return null;
+  let r = null;
+  for (const x of slotsOf(it)) {
+    if (n >= x.a) r = x;
+    else break;
+  }
+  return r;
+}
+/* 話ごとの「その時点で効いている枠の変更」（数字でない話は直前の話と同じ。なければ null） */
+function epSlotMap(it, l) {
+  let cur = null;
+  return l.map(e => {
+    const nn = epNum(e.n);
+    if (nn != null) {
+      const x = slotAt(it, nn);
+      if (x) cur = x;
+    }
+    return cur;
+  });
+}
 function fillEpTime(it, list) {
-  if (!hasTime(it)) return 0;
   let n = 0;
-  list.forEach(e => {
+  const sm = epSlotMap(it, list);
+  list.forEach((e, i) => {
     if (!e.t || !noTime(e, it)) return;
-    e.t = dayTimeToT(jst(e.t).day, it.time);
+    /* その話の時点の枠に時刻があればその時刻、なければ作品の放送時間 */
+    const tm = sm[i] && sm[i].time ? sm[i].time : it.time;
+    if (!(mins(tm) < 9999)) return;
+    e.t = dayTimeToT(jst(e.t).day, tm);
     e.nt = false;
     n++;
   });
@@ -1873,10 +1901,13 @@ function epDateCheck(it) {
   const weekly = !noSched(md) && f && !(it.noF || []).includes("time") && !dated.every(d => d === dated[0]);
   if (weekly) {
     const fd = (dayNo(f) + 4) % 7; // 1970/1/1＝木
+    /* 放送枠の変更が登録されていれば、その話の時点の枠の曜日と比べる */
+    const sm = epSlotMap(it, l);
     ds.forEach((d, i) => {
       /* 「問題なし」を押した話は見ない（途中で放送曜日が変わった作品など） */
       if (!d || (l[i].go && l[i].go === l[i].t)) return;
-      const df = ((dayNo(d) + 4) % 7 - fd + 7) % 7;
+      const bfd = sm[i] && sm[i].dow >= 0 ? (sm[i].dow + 1) % 7 : fd;
+      const df = ((dayNo(d) + 4) % 7 - bfd + 7) % 7;
       if (df === 1 || df === 6) {
         mark(i, "dow", df === 1 ? -1 : 1);
         out.dowN++;
