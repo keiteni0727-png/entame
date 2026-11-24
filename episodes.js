@@ -132,7 +132,7 @@ function epListHtml(it, eps) {
   const menu = epMenu
     ? `<div class="epmenu" role="menu"><button type="button" role="menuitem" id="allAired">放送済みの話を全部チェック</button>${w ? `<button type="button" role="menuitem" id="clearAll">チェックを全部外す</button>` : ""}<button type="button" role="menuitem" id="arcOpenEd">${arcs.length ? "編（〇〇編）を編集" : "編（〇〇編）を登録"}</button></div>`
     : "";
-  return `<div class="ephead"><div class="prog"><i style="width:${(w / wt) * 100}%"></i></div>${A ? `<button type="button" class="u-btn sm ephb ephp" id="spOpen" aria-label="各話リストを貼り付け">${PASTE_IC}貼り付け</button>` : ""}<button type="button" class="u-btn sm ephb" id="epEditBtn">話数を編集</button><button type="button" class="u-btn sm ephb" id="epMenuBtn" aria-haspopup="menu" aria-expanded="${epMenu}">その他</button>${menu}</div>
+  return `<div class="ephead">${A ? `<button type="button" class="u-btn sm ephb ephp" id="spOpen" aria-label="各話リストを貼り付け">${PASTE_IC}貼り付け</button>` : ""}<button type="button" class="u-btn sm ephb" id="epEditBtn">話数を編集</button><button type="button" class="u-btn sm ephb" id="epMenuBtn" aria-haspopup="menu" aria-expanded="${epMenu}">その他</button>${menu}</div>
     ${warnN ? `<button type="button" class="epwarn" id="epWarnGo">⚠ 要確認 ${warnN}話<span>押すと最初の話へ</span></button>` : ""}${it.s === "視聴済み" && !upcoming(it) && eps.some(e => !done(e)) ? `<div class="wnn eptop"><p>視聴済みですが、チェックしていない話があります</p></div>` : ""}${arcBar}<div class="eps${A ? "" : " nosub"}" role="list">${rowsHtml}</div>`;
 }
 /* 年なしの日付を入れたときに使う年：直前の話の日付（1話目は作品の開始日） */
@@ -162,6 +162,7 @@ function epNumInput(cls, n, sp) {
   return `<input class="${cls}${bad ? " epbad" : ""}" type="text" value="${esc(v && !sp ? v : n)}" data-orig="${esc(n)}" placeholder="話数" aria-label="話数（数字か、SP・総集編などの名前）" autocomplete="off" autocapitalize="off" spellcheck="false"${bad ? ' title="数字以外の古い書き方の話数です。数字か名前を入れ直してください"' : ""}>`;
 }
 let erMore = false; // 話数の編集の「その他」を開いているか
+let erArcFold = new Map(); // 話数の編集：編ごとに見出しをたたんだ状態（編のキー → たたんでいるか。無い編は「見終わった編か」で決める）
 let erShiftOn = true; // 日付を変えたら、後の話も1週間おきにずらすか（話数の編集を開くたびにオンに戻る）
 function epEditorHtml(it) {
   const l = epEdit.list;
@@ -170,13 +171,20 @@ function epEditorHtml(it) {
   const n = l.length;
   /* 上の操作：追加（1話・まとめて）／並び替え・番号／日付。畳まず全部出し、グループ名を付ける。
      貼り付けは話数タブの上の段にだけ出す（編集画面では出さない） */
+  /* 操作は形がばらばらだと分かりにくいので、全部「名前＋何が起きるかの説明＋操作」の同じ形の行にそろえる */
   const top = `<div class="edmore">
-    <div class="edt-g"><span class="edt-lab">話を追加</span><button type="button" class="u-btn sm" id="erAdd">＋ 1話追加</button><span class="edt-in"><input id="erBulk" type="number" min="1" max="200" value="${n ? 4 : 12}" inputmode="numeric" aria-label="まとめて追加する話数"><span>話</span></span><button type="button" class="u-btn sm" id="erBulkGo">まとめて追加</button></div>
-    ${n > 1 ? `<div class="edt-g"><span class="edt-lab">並び替え・番号</span><button type="button" class="u-btn sm" id="erSort">番号順に並べ替え</button><span class="edt-in"><input id="erReFrom" type="number" min="0" inputmode="numeric" aria-label="振り直しを始める話数"><span>話から</span><input id="erReTo" type="number" min="0" inputmode="numeric" aria-label="新しい開始番号"><span>番で</span></span><button type="button" class="u-btn sm" id="erReGo">振り直す</button></div>
-    <div class="edt-g"><span class="edt-lab">日付</span><label class="edm-chk"><input type="checkbox" id="erShift" ${erShiftOn ? "checked" : ""}>日付を変えたら、後の話も1週間おきにずらす</label><button type="button" class="u-btn sm" id="erAlign" title="一挙配信の作品などで、全話の放送日時を1話と同じにします">全話を1話と同じ日付にする</button></div>` : ""}
+    <div class="edt-g"><span class="edt-lab">話を追加</span>
+    <div class="edt-t"><span class="edt-tx"><b>1話追加</b><small>最後に1話足します</small></span><button type="button" class="u-btn sm" id="erAdd">＋ 1話追加</button></div>
+    <div class="edt-t"><span class="edt-tx"><b>まとめて追加</b><small>最後にまとめて足します</small></span><span class="edt-in"><input id="erBulk" type="number" min="1" max="200" value="${n ? 4 : 12}" inputmode="numeric" aria-label="まとめて追加する話数"><span>話</span></span><button type="button" class="u-btn sm" id="erBulkGo">追加</button></div></div>
+    ${n > 1 ? `<div class="edt-g"><span class="edt-lab">並び替え・番号</span>
+    <div class="edt-t"><span class="edt-tx"><b>番号順に並べ替え</b><small>数字の小さい順に並べます（SPなどは直前の話の後ろ）</small></span><button type="button" class="u-btn sm" id="erSort">並べ替え</button></div>
+    <div class="edt-t stk"><span class="edt-tx"><b>途中から番号を振り直す</b><small>指定した話から後ろを、別の番号からの連番に付け直します</small></span><span class="edt-in"><input id="erReFrom" type="number" min="0" inputmode="numeric" aria-label="振り直しを始める話数"><span>話から</span><input id="erReTo" type="number" min="0" inputmode="numeric" aria-label="新しい開始番号"><span>番で</span></span><button type="button" class="u-btn sm" id="erReGo">振り直す</button></div></div>
+    <div class="edt-g"><span class="edt-lab">日付</span>
+    <label class="edt-t"><span class="edt-tx"><b>後の話も1週間おきにずらす</b><small>日付を変えたとき、後ろの話の日付も一緒にずらします</small></span><input type="checkbox" id="erShift" class="edm-big" ${erShiftOn ? "checked" : ""}></label>
+    <div class="edt-t"><span class="edt-tx"><b>全話を1話と同じ日付にする</b><small>一挙配信など、全話の放送日を1話にそろえます</small></span><button type="button" class="u-btn sm" id="erAlign">そろえる</button></div></div>` : ""}
   </div>`;
   const head = n ? `<div class="erh${A ? "" : " nosub"}" aria-hidden="true"><span></span><span>話数</span>${A ? "<span>サブタイトル</span>" : ""}<span>放送日</span><span></span></div>` : "";
-  const rows = n
+  const rowArr = n
     ? l
         .map((e, i) => {
           const j = jst(e.t);
@@ -188,8 +196,49 @@ function epEditorHtml(it) {
             `<div class="er${e.moved ? " moved" : ""}${gd.dup.has(i) ? " dup" : ""}" data-er="${i}" data-sortrow>${GRIP("ep")}${epNumInput("er-n", e.n, e.sp)}${A ? `<input class="er-s" value="${esc(e.sub)}" placeholder="サブタイトル" aria-label="サブタイトル" autocomplete="off">` : ""}${e.na ? `<span class="er-na">未放送</span>` : `<input class="er-d dtx" type="text" inputmode="numeric" autocomplete="off" placeholder="2018/08/25" data-ref="${epRef(it, l, i)}" value="${j ? dtShow(j.day) : ""}" aria-label="放送日（例：2018/08/25）">`}<button type="button" class="u-btn icon sm txt del" data-erdel="${i}" aria-label="${esc(e.n)}を削除">✕</button>${gd.dup.has(i) ? `<span class="erwhy">⚠ 同じ話数がほかにもあります</span>` : ""}</div>`
           );
         })
-        .join("")
-    : `<p class="empty" style="padding:14px">話がありません。${A ? "各話リストを貼り付けるか、" : ""}「＋ 1話追加」で追加してください。</p>`;
+    : null;
+  /* 編がある作品は、編集でも編ごとに見出しを入れる（見終わった編は最初たたむ。見出しを押すと開閉できる） */
+  let rows;
+  if (!n) rows = `<p class="empty" style="padding:14px">話がありません。${A ? "各話リストを貼り付けるか、" : ""}「＋ 1話追加」で追加してください。</p>`;
+  else if (!arcsOf(it).length) rows = `<div class="epgrp">${rowArr.join("")}</div>`;
+  else {
+    const arcs = arcsOf(it);
+    const arcOfNum = e => {
+      const nn = epNum(e.n);
+      return nn == null ? null : arcs.findIndex(r => nn >= r.a && (r.b == null || nn <= r.b));
+    };
+    /* 数字でない話は直前の話と同じ編（先頭なら次の話の編）。話数リストと同じ振り分け */
+    const raw = l.map(arcOfNum);
+    const keys = [];
+    let prev = null;
+    raw.forEach((k, i) => {
+      if (k == null) k = prev ?? raw.slice(i + 1).find(x => x != null) ?? -1;
+      keys.push(k);
+      prev = k;
+    });
+    const parts = [];
+    l.forEach((e, i) => {
+      const g = parts[parts.length - 1];
+      if (g && g.k === keys[i]) g.idx.push(i);
+      else parts.push({ k: keys[i], idx: [i] });
+    });
+    rows = parts
+      .map(g => {
+        /* 行は編ごとにひとまとめの箱に入れる（ドラッグの並び替えは同じ親の中でだけ動くので、編を超えて動かせなくなる） */
+        const grp = `<div class="epgrp">${g.idx.map(i => rowArr[i]).join("")}</div>`;
+        if (g.k < 0) return grp;
+        const r = arcs[g.k],
+          key = arcKey(r),
+          gl = g.idx.map(i => l[i]),
+          wn = watchable(gl).length,
+          ww = watchable(gl).filter(e => e.w).length,
+          done = wn > 0 && ww === wn,
+          folded = erArcFold.has(key) ? erArcFold.get(key) : done;
+        const hd = `<button type="button" class="archd${done ? " done" : ""}" data-erarc="${esc(key)}" data-erfold="${folded ? 1 : 0}" aria-expanded="${!folded}"><span class="arcar">${FOLD_IC}</span><span class="arcnm">${esc(r.name)}</span><span class="arcrg">${arcRange(r)}</span><span class="arcct">${done ? "✓ " : ""}${ww}/${wn}</span></button>`;
+        return hd + (folded ? "" : grp);
+      })
+      .join("");
+  }
   return `${top}${head}<div class="eped${A ? "" : " nosub"}">${rows}</div>
     ${n ? `<div class="edaddb"><button type="button" class="u-btn edaddbtn" id="erAddB">＋ 1話追加</button></div>` : ""}
     <div class="ffoot"><button type="button" class="u-btn" id="erCancel">キャンセル</button><button type="button" class="u-btn pri primary" id="erSave">話数を保存</button></div>`;
@@ -287,6 +336,15 @@ function nextEp(it, list) {
   const t = last ? (last.t && !ova ? last.t + WEEK : 0) : it.from ? dayTimeToT(it.from, it.time) : 0;
   return { n: `${n != null ? Math.floor(n) + 1 : list.length + 1}話`, sub: "", t, w: false, nt: last ? !!last.nt : !hasTime(it) };
 }
+/* 末尾に足した話の編がたたまれていたら開いておく（足した行が見えるように） */
+function erOpenLastArc(it) {
+  const l = epEdit.list,
+    e = l[l.length - 1];
+  if (!e) return;
+  const nn = epNum(e.n);
+  const r = nn == null ? null : arcsOf(it).find(r => nn >= r.a && (r.b == null || nn <= r.b));
+  if (r) erArcFold.set(arcKey(r), false);
+}
 /* 編の編集中 */
 const ARC_ACTIONS = [
   [
@@ -368,6 +426,7 @@ const EPEDIT_ACTIONS = [
     "#erAdd",
     (el, it) => {
       epEdit.list.push(nextEp(it, epEdit.list));
+      erOpenLastArc(it);
       refreshEditor();
     },
   ],
@@ -376,6 +435,7 @@ const EPEDIT_ACTIONS = [
     "#erAddB",
     (el, it) => {
       epEdit.list.push(nextEp(it, epEdit.list));
+      erOpenLastArc(it);
       refreshEditor();
       document.querySelector(`#epArea .er[data-er="${epEdit.list.length - 1}"]`)?.scrollIntoView({ block: "nearest" });
     },
@@ -435,6 +495,14 @@ const EPEDIT_ACTIONS = [
     (el, it) => {
       const [a, b] = el.dataset.ergap.split("-").map(Number);
       gapFill(it, epEdit.list, a, b);
+      refreshEditor();
+    },
+  ],
+  /* 編の見出し：その編をたたむ／開く */
+  [
+    "[data-erarc]",
+    el => {
+      erArcFold.set(el.dataset.erarc, el.dataset.erfold !== "1");
       refreshEditor();
     },
   ],
@@ -510,6 +578,14 @@ function saveEpOne(it) {
 SORT_DONE.ep = (box, rows) => {
   if (!epEdit) return;
   const l = epEdit.list;
-  epEdit.list = rows.map(r => l[+r.dataset.er]).filter(Boolean);
+  /* たたんだ編の行は画面に出ていないので、動かした行が元あった場所同士だけで並べ替える（出ていない行はそのまま残る） */
+  const items = rows.map(r => l[+r.dataset.er]).filter(Boolean);
+  const pos = rows
+    .map(r => +r.dataset.er)
+    .filter(i => l[i])
+    .sort((a, b) => a - b);
+  const nl = l.slice();
+  pos.forEach((p, j) => (nl[p] = items[j]));
+  epEdit.list = nl;
   refreshEditor();
 };
