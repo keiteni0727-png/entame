@@ -425,13 +425,37 @@ const INPUT_ACTIONS = [
       m.textContent = v && v !== t.value.trim() ? "→ " + v : "";
     },
   ],
-  /* 検索窓：どれも同じ動き（下の SEARCHES）。日本語の変換中は待ち、確定したら絞り込む */
+  /* 検索窓：打つと候補だけが絞られる（シリーズ検索の #seriesQ と同じ。入力欄は作り直さないので変換中でも安全） */
   [
-    "#q,#ytq,#lq,#mq",
-    (t, e) => {
-      const s = SEARCHES[t.id];
-      s.set(t.value);
-      if (!e.isComposing) s.run();
+    "#q",
+    t => {
+      state.q = t.value;
+      const b = $("#qSug");
+      if (b) b.innerHTML = qSugHtml(t.value);
+    },
+  ],
+  [
+    "#lq",
+    t => {
+      lui.q = t.value;
+      const b = $("#lqSug");
+      if (b) b.innerHTML = lqSugHtml(t.value);
+    },
+  ],
+  [
+    "#ytq",
+    t => {
+      yst.q = t.value;
+      const b = $("#ytqSug");
+      if (b) b.innerHTML = ytqSugHtml(t.value);
+    },
+  ],
+  [
+    "#mq",
+    t => {
+      setQ = t.value;
+      const b = $("#mqSug");
+      if (b) b.innerHTML = mqSugHtml(t.value);
     },
   ],
   /* 話数の編集：話数・サブタイトル */
@@ -542,5 +566,9 @@ const KEY_ACTIONS = [
   [null, (t, e) => (e.key === "Escape" && yform && yform.inline ? ytCloseInline() || true : false)],
   [null, (t, e) => (e.key === "Escape" ? close() : false)],
   ["#seriesQ", enterClick("#serSug [data-seradd]")],
+  ["#q", enterClick("#qSug [data-qpick]")],
+  ["#lq", enterClick("#lqSug [data-lqpick]")],
+  ["#ytq", enterClick("#ytqSug [data-ytqpick]")],
+  ["#mq", enterClick("#mqSug [data-mqpick]")],
 ];
 document.addEventListener("keydown", e => runInputs(KEY_ACTIONS, e));
