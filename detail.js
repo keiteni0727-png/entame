@@ -249,7 +249,7 @@ function renderDetail(it) {
     ${noEp ? "" : `<div class="dtabs" role="tablist"><button type="button" role="tab" data-dtab="info">番組情報</button><button type="button" role="tab" data-dtab="ep">話数${eps.length ? ` <small>${w}/${watchable(eps).length}</small>` : ""}${epMs ? `<span class="wnt" aria-label="要確認あり">!</span>` : ""}</button></div>`}</div>
     <div class="dpane dp-info">${infoCards(it, { md, ns, mv, stv, cs, songRows })}
     <div class="links">${typeof alChkOpen === "function" ? `<button type="button" class="u-chip add dlb" data-alcheck="1">${it.k === "a" ? "AniList" : "TMDB"}で確認</button>` : ""}${noEp ? `<button type="button" class="u-chip add dlb" id="epAddMv">＋ 話数を追加</button>` : ""}<button type="button" class="u-btn sm txt danger delsm" id="delItem">削除</button></div></div>
-    <div class="dpane dp-ep"><h4><span class="h4l">話数</span> <small>${eps.length && !epEdit ? `${w} / ${watchable(eps).length}話${nx ? `<span class="nxt">次は ${esc(nx.n)}</span>` : ""}` : ""}</small></h4>
+    <div class="dpane dp-ep"><h4><span class="h4l">話数</span>${eps.length && !epEdit ? `<span class="progrow"><span class="progn"><b>${w}</b> / ${watchable(eps).length}話</span><span class="prog"><i style="width:${Math.round((w / (watchable(eps).length || 1)) * 100)}%"></i></span>${nx ? `<span class="nxt">次は ${esc(nx.n)}</span>` : ""}</span>` : ""}</h4>
     <div id="epArea">${subPaste ? subPasteHtml(it) : epEdit ? epEditorHtml(it) : epListHtml(it, eps)}</div></div></div></div>`;
 }
 /* 詳細のアラート：ふだんは1行に畳み、開くと項目ボタン。ボタンを押すとその項目だけの編集画面へ */
@@ -709,6 +709,7 @@ const DETAIL_ACTIONS = [
       epOne = null;
       epMenu = false;
       erMore = false;
+      erArcFold = new Map();
       erShiftOn = true;
       epEdit = { list: episodes(it).map(x => ({ ...x })) };
       refreshSheet();
@@ -720,6 +721,7 @@ const DETAIL_ACTIONS = [
     (el, it) => {
       subPaste = null;
       epOne = null;
+      erArcFold = new Map();
       erShiftOn = true;
       epEdit = { list: episodes(it).map(x => ({ ...x })) };
       refreshSheet();
