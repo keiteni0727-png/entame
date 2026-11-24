@@ -6,7 +6,6 @@ const PASTE_IC = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" st
 /* 「貼り付け」：コピーした文字をそのまま読み取り、確認画面へ（読めないとき・許可されないときは貼り付け欄を出す） */
 async function openPaste(it) {
   epOne = null;
-  epMenu = false;
   subPaste = { text: "" };
   let t = "";
   try {
