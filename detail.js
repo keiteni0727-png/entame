@@ -55,7 +55,7 @@ function detailSide(it, { eps, w, nx, noEp }) {
   const nl = nx && (epVal(nx.n) ? epVal(nx.n) + "話" : nx.n);
   const when = nx ? epWhen(nx, it) : "";
   const next = nx && !noEp ? `<button type="button" class="dnext" data-dtab="ep"><small>次に見る</small><b>${esc(nl)}${nx.sub ? `<span>「${esc(nx.sub)}」</span>` : ""}</b>${when ? `<em class="inum">${esc(when)}</em>` : ""}</button>` : "";
-  return `<aside class="dside">${posterSlot(it)}${prog}${vod || off ? `<div class="dpbs">${vod}${off}</div>` : ""}${next}${missDetail(it)}${chkHtml(it)}</aside>`;
+  return `<aside class="dside">${posterSlot(it)}${prog}${vod || off ? `<div class="dpbs">${vod}${off}</div>` : ""}${next}${chkHtml(it)}</aside>`;
 }
 /* ---------- 確認チェック（PCの左の列・一時的な機能。設定で消せる） ----------
    1作品ずつ内容を確かめるためのチェックリスト。チェックは作品データの chk（項目キーの配列）に保存。
@@ -254,24 +254,6 @@ function renderDetail(it) {
 }
 /* 詳細のアラート：ふだんは1行に畳み、開くと項目ボタン。ボタンを押すとその項目だけの編集画面へ */
 let dmissKeep = false;
-function missDetail(it) {
-  const l = missingOf(it);
-  if (!l.length) return "";
-  const hot = l.some(x => x.k === "話数");
-  /* 項目ボタン（話数は話数タブへ、ステータスは上のボタンで選ぶ）＋「なし」ボタン */
-  const main = x =>
-    x.k === "話数"
-      ? `<button type="button" data-dtab="ep">話数を登録</button>`
-      : ["サブタイトル", "話数の表記", "話数の抜け", "話数の重複", "日付の確認", "未チェックの話"].includes(x.k)
-        ? `<button type="button" data-dtab="ep">✎ ${x.k}</button>`
-        : x.j
-        ? `<button type="button" data-jump="${x.j}">✎ ${esc(x.k)}</button>`
-        : `<button type="button" class="st" tabindex="-1">${esc(x.k)}（上で選択）</button>`;
-  const btn = x =>
-    `<span class="mi">${main(x)}${x.ns ? `<button type="button" class="nb" data-nosong="all" title="OP・ED・主題歌を「なし」にする">なし</button>` : x.n ? `<button type="button" class="nb" data-nof="${x.n}" title="${esc(x.k)}を「なし」にする">なし</button>` : ""}</span>`;
-  /* たたまずに、足りない項目のボタンを最初から全部出す */
-  return `<div class="dmiss${hot ? " hot" : ""}" role="group" aria-label="要確認 ${l.length}項目"><div class="dmh">⚠ 要確認 ${l.length}項目</div><div class="mbtns">${l.map(btn).join("")}</div></div>`;
-}
 function refreshSheet() {
   if (form && form.inline) return;
   const it = items.find(x => x.id === openId);
