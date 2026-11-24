@@ -229,6 +229,32 @@ const CHANGE_ACTIONS = [
       erShiftOn = !!t.checked;
     },
   ],
+  /* 話数の編集：話数を変えたとき、後の話も連番にするか */
+  [
+    "#erSeq",
+    t => {
+      erSeqOn = !!t.checked;
+    },
+  ],
+  /* 話数の編集：話数を変えたら、その後の数字の話を連番にする（名前の話はそのまま・数えない） */
+  [
+    ".er-n",
+    t => {
+      if (!epEdit) return false;
+      /* 連番スイッチがオフのときは、この話だけ変える */
+      if (!erSeqOn) return;
+      const i = +t.closest("[data-er]").dataset.er;
+      const l = epEdit.list;
+      const nv = epVal(l[i].n);
+      if (nv === "" || epVal(t.dataset.orig || "") === nv) return;
+      let nx = +nv;
+      for (let k = i + 1; k < l.length; k++) {
+        if (epVal(l[k].n) === "") continue;
+        nx += 1;
+        l[k].n = String(Math.round(nx * 100) / 100);
+      }
+    },
+  ],
   /* 編へ移動：その編を開いて先頭までスクロール */
   [
     "#arcJump",
@@ -399,6 +425,15 @@ const INPUT_ACTIONS = [
       m.textContent = v && v !== t.value.trim() ? "→ " + v : "";
     },
   ],
+  /* タイトル検索：候補だけ先に差し替える（絞り込み自体は下の SEARCHES が行うので false を返して続ける） */
+  [
+    "#q",
+    t => {
+      const b = $("#qSug");
+      if (b) b.innerHTML = qSugHtml(t.value);
+      return false;
+    },
+  ],
   /* 検索窓：どれも同じ動き（下の SEARCHES）。日本語の変換中は待ち、確定したら絞り込む */
   [
     "#q,#ytq,#lq,#mq",
@@ -516,5 +551,6 @@ const KEY_ACTIONS = [
   [null, (t, e) => (e.key === "Escape" && yform && yform.inline ? ytCloseInline() || true : false)],
   [null, (t, e) => (e.key === "Escape" ? close() : false)],
   ["#seriesQ", enterClick("#serSug [data-seradd]")],
+  ["#q", enterClick("#qSug [data-qsug]")],
 ];
 document.addEventListener("keydown", e => runInputs(KEY_ACTIONS, e));
