@@ -1,6 +1,5 @@
 /* ===================== 作品の詳細：話数タブ（視聴チェック・1話だけ編集・話数の編集・〇〇編） ===================== */
 let epOne = null; // 1話だけ編集中の話の番号
-let epMenu = false; // 話数タブの「…」を開いているか
 /* 長編の「〇〇編」：作品の arcs = [{name, a:最初の話, b:最後の話(なし=最後まで)}] */
 let arcEdit = null, // 編集中の下書き
   arcFold = new Map(); // 編ごとの開閉を手で変えたもの（名前#最初の話 → 開いているか）
@@ -131,12 +130,7 @@ function epListHtml(it, eps) {
       .join("");
     arcBar = `<div class="arcbar"><select id="arcJump" aria-label="編へ移動">${arcs.map((r, k) => `<option value="${k}" ${k === curK ? "selected" : ""}>${esc(r.name)}（${arcRange(r)}）${stat[k].w}/${stat[k].n}</option>`).join("")}</select></div>`;
   } else rowsHtml = eps.map(epRow).join("");
-  /* 上の段：進み具合のバー・話数を編集・その他（あまり使わない操作：まとめてチェック・編の登録） */
-  const menu = epMenu
-    ? `<div class="epmenu" role="menu"><button type="button" role="menuitem" id="allAired">放送済みの話を全部チェック</button>${w ? `<button type="button" role="menuitem" id="clearAll">チェックを全部外す</button>` : ""}<button type="button" role="menuitem" id="arcOpenEd">${arcs.length ? "編（〇〇編）を編集" : "編（〇〇編）を登録"}</button><button type="button" role="menuitem" id="slotOpenEd">${slotsOf(it).length ? "放送枠の変更を編集" : "放送枠の変更を登録"}</button></div>`
-    : "";
-  return `<div class="ephead">${A ? `<button type="button" class="u-btn sm ephb ephp" id="spOpen" aria-label="各話リストを貼り付け">${PASTE_IC}貼り付け</button>` : ""}<button type="button" class="u-btn sm ephb" id="epEditBtn">話数を編集</button><button type="button" class="u-btn sm ephb" id="epMenuBtn" aria-haspopup="menu" aria-expanded="${epMenu}">その他</button>${menu}</div>
-    ${warnN ? `<button type="button" class="epwarn" id="epWarnGo">⚠ 要確認 ${warnN}話<span>押すと最初の話へ</span></button>` : ""}${it.s === "視聴済み" && !upcoming(it) && eps.some(e => !done(e)) ? `<div class="wnn eptop"><p>視聴済みですが、チェックしていない話があります</p></div>` : ""}${arcBar}<div class="eps${A ? "" : " nosub"}" role="list">${rowsHtml}</div>`;
+  return `${warnN ? `<button type="button" class="epwarn" id="epWarnGo">⚠ 要確認 ${warnN}話<span>押すと最初の話へ</span></button>` : ""}${it.s === "視聴済み" && !upcoming(it) && eps.some(e => !done(e)) ? `<div class="wnn eptop"><p>視聴済みですが、チェックしていない話があります</p></div>` : ""}${arcBar}<div class="epacts"><button type="button" class="u-btn sm" id="allAired">放送済み全チェック</button>${eps.some(e => e.w) ? `<button type="button" class="u-btn sm" id="clearAll">全て外す</button>` : ""}</div><div class="eps${A ? "" : " nosub"}" role="list">${rowsHtml}</div>`;
 }
 /* 年なしの日付を入れたときに使う年：直前の話の日付（1話目は作品の開始日） */
 function epRef(it, list, i) {
@@ -165,6 +159,7 @@ function epNumInput(cls, n, sp) {
   return `<input class="${cls}${bad ? " epbad" : ""}" type="text" value="${esc(v && !sp ? v : n)}" data-orig="${esc(n)}" placeholder="話数" aria-label="話数（数字か、SP・総集編などの名前）" autocomplete="off" autocapitalize="off" spellcheck="false"${bad ? ' title="数字以外の古い書き方の話数です。数字か名前を入れ直してください"' : ""}>`;
 }
 let erMore = false; // 話数の編集の「その他」を開いているか
+let erPanel = null; // 話数の編集：開いている操作パネル（"misc" | null。開くたびに閉じた状態から）
 let erArcFold = new Map(); // 話数の編集：編ごとに見出しをたたんだ状態（編のキー → たたんでいるか。無い編は「見終わった編か」で決める）
 let erShiftOn = true; // 日付を変えたら、後の話も1週間おきにずらすか（話数の編集を開くたびにオンに戻る）
 function epEditorHtml(it) {
@@ -175,18 +170,19 @@ function epEditorHtml(it) {
   /* 上の操作：追加（1話・まとめて）／並び替え・番号／日付。畳まず全部出し、グループ名を付ける。
      貼り付けは話数タブの上の段にだけ出す（編集画面では出さない） */
   /* 操作は形がばらばらだと分かりにくいので、全部「名前＋何が起きるかの説明＋操作」の同じ形の行にそろえる */
-  const top = `<div class="edmore">
-    <div class="edt-g"><span class="edt-lab">話を追加</span>
-    <div class="edt-t"><span class="edt-tx"><b>1話追加</b><small>最後に1話足します</small></span><button type="button" class="u-btn sm" id="erAdd">＋ 1話追加</button></div>
-    <div class="edt-t"><span class="edt-tx"><b>まとめて追加</b><small>最後にまとめて足します</small></span><span class="edt-in"><input id="erBulk" type="number" min="1" max="200" value="${n ? 4 : 12}" inputmode="numeric" aria-label="まとめて追加する話数"><span>話</span></span><button type="button" class="u-btn sm" id="erBulkGo">追加</button></div></div>
-    ${n > 1 ? `<div class="edt-g"><span class="edt-lab">並び替え・番号</span>
-    <div class="edt-t"><span class="edt-tx"><b>番号順に並べ替え</b><small>数字の小さい順に並べます（SPなどは直前の話の後ろ）</small></span><button type="button" class="u-btn sm" id="erSort">並べ替え</button></div>
-    <div class="edt-t stk"><span class="edt-tx"><b>途中から番号を振り直す</b><small>指定した話から後ろを、別の番号からの連番に付け直します</small></span><span class="edt-in"><input id="erReFrom" type="number" min="0" inputmode="numeric" aria-label="振り直しを始める話数"><span>話から</span><input id="erReTo" type="number" min="0" inputmode="numeric" aria-label="新しい開始番号"><span>番で</span></span><button type="button" class="u-btn sm" id="erReGo">振り直す</button></div></div>
-    <div class="edt-g"><span class="edt-lab">日付</span>
-    <label class="edt-t"><span class="edt-tx"><b>後の話も1週間おきにずらす</b><small>日付を変えたとき、後ろの話の日付も一緒にずらします</small></span><input type="checkbox" id="erShift" class="edm-big" ${erShiftOn ? "checked" : ""}></label>
-    <div class="edt-t"><span class="edt-tx"><b>全話を1話と同じ日付にする</b><small>一挙配信など、全話の放送日を1話にそろえます</small></span><button type="button" class="u-btn sm" id="erAlign">そろえる</button></div></div>` : ""}
+  /* 操作はボタンを並べ、中身の要るもの（並び替え・日付など）は押すと下に開く形にする */
+  const panBtn = (key, lab) => `<button type="button" class="u-btn sm edact" data-erpanel="${key}" aria-expanded="${erPanel === key}">${lab}<span class="chev" aria-hidden="true">${FOLD_IC}</span></button>`;
+  const top = `<div class="edacts">
+    ${it.k === "a" ? `<button type="button" class="u-btn sm edact edic" id="erPaste" aria-label="貼り付け" title="貼り付け">${PASTE_IC}</button>` : ""}
+    <button type="button" class="u-btn sm edact" id="erArc">編を${arcsOf(it).length ? "編集" : "追加"}</button>
+    ${panBtn("misc", "その他")}
+    ${erPanel === "misc" ? `<div class="edpan">
+    ${n > 1 ? `<div class="edt-t"><span class="edt-tx"><b>番号順に並べ替え</b></span><button type="button" class="u-btn sm" id="erSort">並べ替え</button></div>
+    <div class="edt-t stk"><span class="edt-tx"><b>途中から番号を振り直す</b></span><span class="edt-in"><input id="erReFrom" type="number" min="0" inputmode="numeric" aria-label="振り直しを始める話数"><span>話から</span><input id="erReTo" type="number" min="0" inputmode="numeric" aria-label="新しい開始番号"><span>番で</span></span><button type="button" class="u-btn sm" id="erReGo">振り直す</button></div>
+    <label class="edt-t"><span class="edt-tx"><b>後の話も1週間おきにずらす</b></span><input type="checkbox" id="erShift" class="edm-big" ${erShiftOn ? "checked" : ""}></label>
+    <div class="edt-t"><span class="edt-tx"><b>全話を1話と同じ日付にする</b></span><button type="button" class="u-btn sm" id="erAlign">そろえる</button></div>` : ""}
+    <div class="edt-t"><span class="edt-tx"><b>放送枠の変更を${slotsOf(it).length ? "編集" : "登録"}</b></span><button type="button" class="u-btn sm" id="erSlot">開く</button></div></div>` : ""}
   </div>`;
-  const head = n ? `<div class="erh${A ? "" : " nosub"}" aria-hidden="true"><span></span><span>話数</span>${A ? "<span>サブタイトル</span>" : ""}<span>放送日</span><span></span></div>` : "";
   const rowArr = n
     ? l
         .map((e, i) => {
@@ -202,7 +198,7 @@ function epEditorHtml(it) {
     : null;
   /* 編がある作品は、編集でも編ごとに見出しを入れる（見終わった編は最初たたむ。見出しを押すと開閉できる） */
   let rows;
-  if (!n) rows = `<p class="empty" style="padding:14px">話がありません。${A ? "各話リストを貼り付けるか、" : ""}「＋ 1話追加」で追加してください。</p>`;
+  if (!n) rows = `<p class="empty" style="padding:14px">話がありません。${A ? "各話リストを貼り付けるか、" : ""}下の「話を追加」で追加してください。</p>`;
   else if (!arcsOf(it).length) rows = `<div class="epgrp">${rowArr.join("")}</div>`;
   else {
     const arcs = arcsOf(it);
@@ -242,8 +238,8 @@ function epEditorHtml(it) {
       })
       .join("");
   }
-  return `${top}${head}<div class="eped${A ? "" : " nosub"}">${rows}</div>
-    ${n ? `<div class="edaddb"><button type="button" class="u-btn edaddbtn" id="erAddB">＋ 1話追加</button></div>` : ""}
+  return `${top}<div class="eped${A ? "" : " nosub"}">${rows}</div>
+    <div class="edaddb"><span class="edt-in"><input id="erAddN" type="number" min="1" max="200" value="1" inputmode="numeric" aria-label="追加する話数"><span>話</span></span><button type="button" class="u-btn edaddbtn" id="erAddGo">話を追加</button></div>
     <div class="ffoot"><button type="button" class="u-btn" id="erCancel">キャンセル</button><button type="button" class="u-btn pri primary" id="erSave">話数を保存</button></div>`;
 }
 function epsChanged(it, msg) {
@@ -490,6 +486,35 @@ const ARC_ACTIONS = [
 ];
 /* 話数の編集中 */
 const EPEDIT_ACTIONS = [
+  /* 操作パネルの開閉（開けるのは1つだけ） */
+  [
+    "[data-erpanel]",
+    el => {
+      const k = el.dataset.erpanel;
+      erPanel = erPanel === k ? null : k;
+      refreshEditor();
+    },
+  ],
+  /* 貼り付け：下書きと比べて読み取り、反映すると下書きごと保存して編集を閉じる（epaste.js） */
+  ["#erPaste", (el, it) => openPaste(it)],
+  /* 編・放送枠の編集：下書き（epEdit）は残したまま開き、閉じると話数の編集に戻る */
+  [
+    "#erArc",
+    (el, it) => {
+      arcEdit = arcsOf(it).map(r => ({ ...r }));
+      if (!arcEdit.length) arcEdit.push({ name: "", a: 1, b: null });
+      refreshSheet();
+    },
+  ],
+  [
+    "#erSlot",
+    (el, it) => {
+      slotEdit = slotsOf(it).map(r => ({ ...r }));
+      if (!slotEdit.length) slotEdit.push({ a: null, dow: -1, time: "" });
+      refreshSheet();
+    },
+  ],
+  /* まとめてチェック（下書きに付ける。保存は「話数を保存」） */
   [
     "#erCancel",
     () => {
@@ -524,19 +549,12 @@ const EPEDIT_ACTIONS = [
       refreshEditor();
     },
   ],
-  [
-    "#erAdd",
-    (el, it) => {
-      epEdit.list.push(nextEp(it, epEdit.list));
-      erOpenLastArc(it);
-      refreshEditor();
-    },
-  ],
   /* 一番下の話数の下にも「＋ 1話追加」（長いリストで下まで来たとき、その場で足せるように。足したら新しい行が見える位置まで寄せる） */
   [
-    "#erAddB",
+    "#erAddGo",
     (el, it) => {
-      epEdit.list.push(nextEp(it, epEdit.list));
+      const cnt = Math.min(200, Math.max(1, +($("#erAddN") || {}).value || 1));
+      for (let k = 0; k < cnt; k++) epEdit.list.push(nextEp(it, epEdit.list));
       erOpenLastArc(it);
       refreshEditor();
       document.querySelector(`#epArea .er[data-er="${epEdit.list.length - 1}"]`)?.scrollIntoView({ block: "nearest" });
@@ -581,14 +599,6 @@ const EPEDIT_ACTIONS = [
       }
       refreshEditor();
       toast(`${from}話から番号を振り直しました`);
-    },
-  ],
-  [
-    "#erBulkGo",
-    (el, it) => {
-      const n = Math.min(200, +$("#erBulk").value || 0);
-      for (let k = 0; k < n; k++) epEdit.list.push(nextEp(it, epEdit.list));
-      refreshEditor();
     },
   ],
   /* 編集画面：抜けている話数を、抜けた場所に足す（保存するまで反映しない） */
