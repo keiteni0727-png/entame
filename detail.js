@@ -371,6 +371,11 @@ async function saveTitle(id, patch, msg) {
     saveEps(it, l, `${msg || "保存しました"}（${n}話に時刻を入れました）`);
     msg = "";
   }
+  /* ステータスを視聴済み／未視聴に変えたら、視聴チェックもそろえる */
+  if (patch.s === "視聴済み" || patch.s === "未視聴") {
+    const sit = items.find(x => x.id === id);
+    if (sit) syncWatchToStatus(sit, patch.s);
+  }
   render();
   if (openId === id && !epEdit) refreshSheet();
   if (msg) toast(msg);
@@ -402,6 +407,27 @@ function applyAutoStatus(it, list, msg) {
   rebuild();
   mergeDoc("titles", it.id, { s: ns }).catch(fail);
   return (msg ? msg + "・" : "") + `「${ns}」にしました`;
+}
+/* ステータスに合わせて視聴チェックをそろえる：視聴済み→全話チェック、未視聴→全部外す（自動ステータスは挟まない） */
+function syncWatchToStatus(it, s) {
+  if (s !== "視聴済み" && s !== "未視聴") return;
+  const l = episodes(it);
+  if (!l.length) return;
+  const on = s === "視聴済み",
+    ch = [];
+  l.forEach((x, i) => {
+    if (on && !done(x)) {
+      x.w = true;
+      /* まとめて付けた印：押した日時に0.5を足して区別する */
+      x.wt = Date.now() + 0.5;
+      ch.push(i);
+    } else if (!on && x.w) {
+      x.w = false;
+      x.wt = 0;
+      ch.push(i);
+    }
+  });
+  if (ch.length) saveWatch(it, l, ch, on ? "全話チェックしました" : "チェックを全部外しました", true);
 }
 /* 作品の詳細画面（it＝開いている作品） */
 const DETAIL_ACTIONS = [
@@ -649,38 +675,6 @@ const DETAIL_ACTIONS = [
     el => {
       arcFold.set(el.dataset.arc, el.getAttribute("aria-expanded") !== "true");
       refreshSheet();
-    },
-  ],
-  /* 放送済みを全部チェック／全部外す（一覧側のボタン） */
-  [
-    "#allAired",
-    (el, it) => {
-      const l = episodes(it),
-        ch = [];
-      l.forEach((x, i) => {
-        if (aired(x) && !done(x)) {
-          x.w = true;
-          /* まとめて付けた印：押した日時に0.5を足して区別する（1話ずつ見た印と見分けられるように、データの形はこのまま残す） */
-          x.wt = Date.now() + 0.5;
-          ch.push(i);
-        }
-      });
-      saveWatch(it, l, ch, "放送済みの話を全部チェックしました");
-    },
-  ],
-  [
-    "#clearAll",
-    (el, it) => {
-      const l = episodes(it),
-        ch = [];
-      l.forEach((x, i) => {
-        if (x.w) {
-          x.w = false;
-          x.wt = 0;
-          ch.push(i);
-        }
-      });
-      saveWatch(it, l, ch, "チェックを全部外しました");
     },
   ],
   /* 各話リスト（サブタイトル）の貼り付け */
