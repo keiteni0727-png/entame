@@ -425,15 +425,6 @@ const INPUT_ACTIONS = [
       m.textContent = v && v !== t.value.trim() ? "→ " + v : "";
     },
   ],
-  /* タイトル検索：候補だけ先に差し替える（絞り込み自体は下の SEARCHES が行うので false を返して続ける） */
-  [
-    "#q",
-    t => {
-      const b = $("#qSug");
-      if (b) b.innerHTML = qSugHtml(t.value);
-      return false;
-    },
-  ],
   /* 検索窓：どれも同じ動き（下の SEARCHES）。日本語の変換中は待ち、確定したら絞り込む */
   [
     "#q,#ytq,#lq,#mq",
@@ -551,6 +542,5 @@ const KEY_ACTIONS = [
   [null, (t, e) => (e.key === "Escape" && yform && yform.inline ? ytCloseInline() || true : false)],
   [null, (t, e) => (e.key === "Escape" ? close() : false)],
   ["#seriesQ", enterClick("#serSug [data-seradd]")],
-  ["#q", enterClick("#qSug [data-qsug]")],
 ];
 document.addEventListener("keydown", e => runInputs(KEY_ACTIONS, e));
