@@ -425,13 +425,13 @@ const INPUT_ACTIONS = [
       m.textContent = v && v !== t.value.trim() ? "→ " + v : "";
     },
   ],
-  /* 検索窓：どれも同じ動き（下の SEARCHES）。日本語の変換中は待ち、確定したら絞り込む */
+  /* 検索窓：どれも同じ動き（下の SEARCHES）。シリーズ検索と同じく、変換の途中でも一覧を絞る（入力欄は描き直しで残る作りなので変換は邪魔されない）。設定の検索だけは入力欄が作り直されるため、変換が確定してから絞る */
   [
     "#q,#ytq,#lq,#mq",
     (t, e) => {
       const s = SEARCHES[t.id];
       s.set(t.value);
-      if (!e.isComposing) s.run();
+      if (t.id !== "mq" || !e.isComposing) s.run();
     },
   ],
   /* 話数の編集：話数・サブタイトル */
