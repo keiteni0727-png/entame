@@ -1,6 +1,7 @@
 /* ===================== 設定：各種マスタの追加・名前変更・削除・並び替え、ログアウト ===================== */
 let setKey = "series",
   setQ = "",
+  setSel = [],
   setDel = null,
   setRen = null;
 function commitRename(cancel) {
@@ -35,19 +36,30 @@ function commitRename(cancel) {
 let setSerG = "all",
   setSerSort = "kana";
 /* シリーズの管理：検索・ジャンル・並び順は1行に収める。名前を押すと作品一覧、✎で名前の変更、削除は右上の「編集」を押したときだけ */
+/* 設定のシリーズ検索候補（シリーズ検索と同じ仕組み） */
+function mqCands() {
+  const cnt = usedNames("series");
+  const smap = seriesMainMap().map;
+  return M("series")
+    .filter(n => (setSerG === "all" || smap[n] === setSerG) && !setSel.includes(n))
+    .map(n => ({ v: n, label: n, sub: cnt[n] || 0, n: cnt[n] || 0 }));
+}
+const mqSugHtml = q => sugBoxHtml(mqCands(), q, "data-mqpick");
+const mqChipsHtml = () => pickChipsHtml(setSel.map(n => ({ v: n, label: n, sub: usedNames("series")[n] || 0 })), "data-mqdel");
 function seriesSettingsHtml() {
   const cnt = usedNames("series");
   const smap = seriesMainMap().map;
   const q = norm(setQ);
   const all = M("series");
   const nG = g => all.filter(n => g === "all" || smap[n] === g).length;
-  let rows = all.filter(n => (setSerG === "all" || smap[n] === setSerG) && (!q || norm(n).includes(q)));
+  let rows = all.filter(n => (setSerG === "all" || smap[n] === setSerG) && (!setSel.length || setSel.includes(n)));
   rows.sort(setSerSort === "count" ? (a, b) => (cnt[b] || 0) - (cnt[a] || 0) || a.localeCompare(b, "ja") : (a, b) => a.localeCompare(b, "ja"));
   return `<div class="smbar">
       <div class="sseg" role="radiogroup" aria-label="ジャンル">${[["all", "すべて"], ["a", "アニメ"], ["d", "ドラマ"]].map(([v, l]) => `<button type="button" role="radio" data-serg="${v}" aria-checked="${setSerG === v}">${l}<small>${nG(v)}</small></button>`).join("")}</div>
       <button type="button" class="smsort" data-sersort="${setSerSort === "count" ? "name" : "count"}" aria-label="並び順を切り替え">${SORT_IC}<span>${setSerSort === "count" ? "作品数" : "名前"}</span></button>
     </div>
-    <div class="ftools mqbox"><input id="mq" type="search" class="u-input mq" enterkeyhint="search" placeholder="シリーズ名で検索" value="${esc(setQ)}" autocomplete="off" aria-label="シリーズ名で検索">${setQ ? `<button type="button" class="u-btn txt fq-x" data-mqclr="1">キャンセル</button>` : ""}</div>
+    <div class="ftools mqbox"><input id="mq" type="search" class="u-input mq" enterkeyhint="search" placeholder="シリーズ名で検索" value="${esc(setQ)}" autocomplete="off" aria-label="シリーズ名で検索">${setQ || setSel.length ? `<button type="button" class="u-btn txt fq-x" data-mqclr="1">キャンセル</button>` : ""}</div>
+    ${mqChipsHtml()}<div class="chips" id="mqSug">${mqSugHtml(setQ)}</div>
     <div class="mlist slist">${
       rows.length
         ? rows
@@ -452,6 +464,23 @@ const SETTINGS_ACTIONS = [
     "[data-mqclr]",
     () => {
       setQ = "";
+      setSel = [];
+      refreshSettings(false);
+    },
+  ],
+  [
+    "[data-mqpick]",
+    el => {
+      setSel = [...setSel, el.dataset.mqpick];
+      setQ = "";
+      refreshSettings(false);
+      if (!TOUCH) $("#mq")?.focus();
+    },
+  ],
+  [
+    "[data-mqdel]",
+    el => {
+      setSel = setSel.filter(x => x !== el.dataset.mqdel);
       refreshSettings(false);
     },
   ],
