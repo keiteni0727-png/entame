@@ -130,7 +130,7 @@ function epListHtml(it, eps) {
       .join("");
     arcBar = `<div class="arcbar"><select id="arcJump" aria-label="編へ移動">${arcs.map((r, k) => `<option value="${k}" ${k === curK ? "selected" : ""}>${esc(r.name)}（${arcRange(r)}）${stat[k].w}/${stat[k].n}</option>`).join("")}</select></div>`;
   } else rowsHtml = eps.map(epRow).join("");
-  return `${warnN ? `<button type="button" class="epwarn" id="epWarnGo">⚠ 要確認 ${warnN}話<span>押すと最初の話へ</span></button>` : ""}${it.s === "視聴済み" && !upcoming(it) && eps.some(e => !done(e)) ? `<div class="wnn eptop"><p>視聴済みですが、チェックしていない話があります</p></div>` : ""}${arcBar}<div class="epacts"><button type="button" class="u-btn sm" id="allAired">放送済み全チェック</button>${eps.some(e => e.w) ? `<button type="button" class="u-btn sm" id="clearAll">全て外す</button>` : ""}</div><div class="eps${A ? "" : " nosub"}" role="list">${rowsHtml}</div>`;
+  return `${warnN ? `<button type="button" class="epwarn" id="epWarnGo">⚠ 要確認 ${warnN}話<span>押すと最初の話へ</span></button>` : ""}${arcBar}<div class="eps${A ? "" : " nosub"}" role="list">${rowsHtml}</div>`;
 }
 /* 年なしの日付を入れたときに使う年：直前の話の日付（1話目は作品の開始日） */
 function epRef(it, list, i) {
@@ -266,7 +266,7 @@ async function saveEps(it, list, msg) {
   }
 }
 /* 「見た」の印だけを話ごとに保存（idxs＝変えた話の番号）。ほかの端末で同時にチェックしても消し合わない */
-async function saveWatch(it, list, idxs, msg) {
+async function saveWatch(it, list, idxs, msg, noAuto) {
   const p = prog[it.id];
   /* 前の形のままの作品は、まとめて保存して今の形にする */
   if (!hasWMap(p) || !db) return saveEps(it, list, msg);
@@ -274,7 +274,7 @@ async function saveWatch(it, list, idxs, msg) {
     patch = {};
   idxs.forEach(i => (patch[ks[i]] = list[i].w ? list[i].wt || 1 : null));
   if (!Object.keys(patch).length) return;
-  msg = applyAutoStatus(it, list, msg);
+  msg = noAuto ? msg : applyAutoStatus(it, list, msg);
   const at = Date.now();
   prog[it.id] = { ...p, w: { ...p.w, ...patch }, _at: at };
   lastAt = at;
