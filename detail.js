@@ -249,8 +249,8 @@ function renderDetail(it) {
     ${noEp ? "" : `<div class="dtabs" role="tablist"><button type="button" role="tab" data-dtab="info">番組情報</button><button type="button" role="tab" data-dtab="ep">話数${eps.length ? ` <small>${w}/${watchable(eps).length}</small>` : ""}${epMs ? `<span class="wnt" aria-label="要確認あり">!</span>` : ""}</button></div>`}</div>
     <div class="dpane dp-info">${infoCards(it, { md, ns, mv, stv, cs, songRows })}
     <div class="links">${typeof alChkOpen === "function" ? `<button type="button" class="u-chip add dlb" data-alcheck="1">${it.k === "a" ? "AniList" : "TMDB"}で確認</button>` : ""}${noEp ? `<button type="button" class="u-chip add dlb" id="epAddMv">＋ 話数を追加</button>` : ""}<button type="button" class="u-btn sm txt danger delsm" id="delItem">削除</button></div></div>
-    <div class="dpane dp-ep"><h4><span class="h4l">話数</span>${eps.length && !epEdit ? `<span class="progrow"><span class="progn"><b>${w}</b> / ${watchable(eps).length}話</span><span class="prog"><i style="width:${Math.round((w / (watchable(eps).length || 1)) * 100)}%"></i></span>${nx ? `<span class="nxt">次は ${esc(nx.n)}</span>` : ""}</span>` : ""}</h4>
-    <div id="epArea">${subPaste ? subPasteHtml(it) : epEdit ? epEditorHtml(it) : epListHtml(it, eps)}</div></div></div></div>`;
+    <div class="dpane dp-ep"><h4><span class="h4l">話数</span>${eps.length && !epEdit ? `<span class="progrow"><span class="progn"><b>${w}</b> / ${watchable(eps).length}話</span><span class="prog"><i style="width:${Math.round((w / (watchable(eps).length || 1)) * 100)}%"></i></span></span>` : ""}${eps.length && !epEdit && !arcEdit && !slotEdit && !subPaste ? `<button type="button" class="u-btn sm iedit" id="epEditBtn">編集</button>` : ""}</h4>
+    <div id="epArea">${subPaste ? subPasteHtml(it) : arcEdit ? arcEditHtml() : slotEdit ? slotEditHtml(it) : epEdit ? epEditorHtml(it) : epListHtml(it, eps)}</div></div></div></div>`;
 }
 /* 詳細のアラート：ふだんは1行に畳み、開くと項目ボタン。ボタンを押すとその項目だけの編集画面へ */
 let dmissKeep = false;
@@ -299,7 +299,7 @@ function noTabInfo() {
 function refreshEditor() {
   const it = items.find(x => x.id === openId);
   const a = $("#epArea");
-  if (it && a && epEdit && !subPaste) a.innerHTML = epEditorHtml(it);
+  if (it && a && epEdit && !subPaste && !arcEdit && !slotEdit) a.innerHTML = epEditorHtml(it);
 }
 function openDetail(id, dir, keepNav) {
   const it = items.find(x => x.id === id);
@@ -313,7 +313,6 @@ function openDetail(id, dir, keepNav) {
   epEdit = null;
   subPaste = null;
   epOne = null;
-  epMenu = false;
   erMore = false;
   arcEdit = null;
   slotEdit = null;
@@ -612,67 +611,9 @@ const DETAIL_ACTIONS = [
       toggleEp(it, i, !episodes(it)[i].w);
     },
   ],
-  [
-    "#epMenuBtn",
-    () => {
-      epMenu = !epMenu;
-      refreshSheet();
-    },
-  ],
-  [
-    "#allAired",
-    (el, it) => {
-      epMenu = false;
-      const l = episodes(it),
-        ch = [];
-      l.forEach((x, i) => {
-        if (aired(x) && !done(x)) {
-          x.w = true;
-          /* まとめて付けた印：押した日時に0.5を足して区別する（1話ずつ見た印と見分けられるように、データの形はこのまま残す） */
-          x.wt = Date.now() + 0.5;
-          ch.push(i);
-        }
-      });
-      saveWatch(it, l, ch, "放送済みの話を全部チェックしました");
-    },
-  ],
-  [
-    "#clearAll",
-    (el, it) => {
-      epMenu = false;
-      const l = episodes(it),
-        ch = [];
-      l.forEach((x, i) => {
-        if (x.w) {
-          x.w = false;
-          x.wt = 0;
-          ch.push(i);
-        }
-      });
-      saveWatch(it, l, ch, "チェックを全部外しました");
-    },
-  ],
   /* 編（〇〇編）の登録 */
-  [
-    "#arcOpenEd",
-    (el, it) => {
-      epMenu = false;
-      arcEdit = arcsOf(it).map(r => ({ ...r }));
-      if (!arcEdit.length) arcEdit.push({ name: "", a: 1, b: null });
-      refreshSheet();
-    },
-  ],
   [null, (el, it, e) => !!arcEdit && runActions(ARC_ACTIONS, e, it)],
   /* 放送枠の変更の登録 */
-  [
-    "#slotOpenEd",
-    (el, it) => {
-      epMenu = false;
-      slotEdit = slotsOf(it).map(r => ({ ...r }));
-      if (!slotEdit.length) slotEdit.push({ a: null, dow: -1, time: "" });
-      refreshSheet();
-    },
-  ],
   [null, (el, it, e) => !!slotEdit && runActions(SLOT_ACTIONS, e, it)],
   /* 編の見出し：開く／たたむ */
   /* 日付のアラート：日付の逆転・半年以上の空きが問題ない話を確認済みにする（その話の日付を変えるまで） */
@@ -710,6 +651,38 @@ const DETAIL_ACTIONS = [
       refreshSheet();
     },
   ],
+  /* 放送済みを全部チェック／全部外す（一覧側のボタン） */
+  [
+    "#allAired",
+    (el, it) => {
+      const l = episodes(it),
+        ch = [];
+      l.forEach((x, i) => {
+        if (aired(x) && !done(x)) {
+          x.w = true;
+          /* まとめて付けた印：押した日時に0.5を足して区別する（1話ずつ見た印と見分けられるように、データの形はこのまま残す） */
+          x.wt = Date.now() + 0.5;
+          ch.push(i);
+        }
+      });
+      saveWatch(it, l, ch, "放送済みの話を全部チェックしました");
+    },
+  ],
+  [
+    "#clearAll",
+    (el, it) => {
+      const l = episodes(it),
+        ch = [];
+      l.forEach((x, i) => {
+        if (x.w) {
+          x.w = false;
+          x.wt = 0;
+          ch.push(i);
+        }
+      });
+      saveWatch(it, l, ch, "チェックを全部外しました");
+    },
+  ],
   /* 各話リスト（サブタイトル）の貼り付け */
   ["#spOpen", (el, it) => openPaste(it)],
   [null, (el, it, e) => !!subPaste && runActions(PASTE_ACTIONS, e, it)],
@@ -719,8 +692,8 @@ const DETAIL_ACTIONS = [
     (el, it) => {
       subPaste = null;
       epOne = null;
-      epMenu = false;
-      erMore = false;
+          erMore = false;
+      erPanel = null;
       erArcFold = new Map();
       erShiftOn = true;
       epEdit = { list: episodes(it).map(x => ({ ...x })) };
@@ -733,6 +706,7 @@ const DETAIL_ACTIONS = [
     (el, it) => {
       subPaste = null;
       epOne = null;
+      erPanel = null;
       erArcFold = new Map();
       erShiftOn = true;
       epEdit = { list: episodes(it).map(x => ({ ...x })) };
