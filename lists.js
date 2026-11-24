@@ -7,7 +7,7 @@ const lst = Object.assign(
 );
 lst.sr = Object.assign({ g: "all", prog: "all", sort: "count", grp: "none" }, lst.sr);
 lst.mu = Object.assign({ t: "all", dl: "all", k: "all", grp: "ar", ord: "old" }, lst.mu);
-const lui = { q: "", qOpen: false, fp: "", fSub: "", qSelSr: [], qSelMu: [] }; // 端末に覚えない
+const lui = { q: "", qOpen: false, fp: "", fSub: "" }; // 端末に覚えない
 const saveLists = () => ls.set("adb.v3.lists", { sr: lst.sr, mu: lst.mu });
 const LA = { sheet: 'data-lsheet="1"', sort: 'data-lpop="sort"', q: "data-lqtog", reset: 'data-lreset="1"', close: 'data-lshclose="1"', sub: "data-lfsub", miss: "data-lnomiss" };
 /* 選択肢の中身：[値, 名前, 件数] の並び */
@@ -31,33 +31,10 @@ function lSortPop() {
         ];
   return `<div class="fpop-scrim"></div><div class="fsdrop fpop k-sort" role="dialog" aria-label="並び替え"><div class="fpop-h"><b>並び替え</b><button type="button" class="u-btn sm" data-lpop="sort">完了</button></div>${sortSteps(steps)}</div>`;
 }
-/* リスト画面の検索（シリーズ検索と同じ仕組み）：候補から選んだものだけに絞る */
-const lqSel = () => (state.mode === "sr" ? lui.qSelSr : lui.qSelMu);
-function lqCandsAll() {
-  if (state.mode === "sr") return seriesStats().map(x => ({ v: x.name, label: x.name, sub: x.l.length, n: x.l.length }));
-  const cnt = new Map();
-  const add = (v, label, sub) => {
-    const c = cnt.get(v) || { v, label, sub, n: 0 };
-    c.n++;
-    cnt.set(v, c);
-  };
-  songRows().forEach(r => {
-    if (r.st) add("s:" + r.st, r.st, r.ar || "");
-    if (r.ar) add("a:" + r.ar, r.ar, "アーティスト");
-    if (r.it && r.it.t) add("w:" + r.it.t, r.it.t, "作品");
-  });
-  return [...cnt.values()];
-}
-const lqSugHtml = q => sugBoxHtml(lqCandsAll().filter(c => !lqSel().includes(c.v)), q, "data-lqpick");
-const lqChipsHtml = () =>
-  pickChipsHtml(
-    lqSel().map(v => lqCandsAll().find(c => c.v === v) || { v, label: state.mode === "sr" ? v : v.slice(2), sub: "" }),
-    "data-lqdel",
-  );
 const lHead = (bar, conds, n, unit) =>
-  `${lui.qOpen || lqSel().length ? fshSearch({ id: "lq", ph: state.mode === "sr" ? "シリーズ名で検索" : "曲名・アーティスト・作品名で検索", q: lui.q, a: "data-lqtog" }) + lqChipsHtml() + `<div class="chips" id="lqSug">${lqSugHtml(lui.q)}</div>` : ""}
-  <div class="fwrap">${lui.qOpen || lqSel().length ? "" : bar}${lSortPop()}</div>
-  ${fshSum(conds, LA)}${fshCount(n, unit, "")}`;
+  `${lui.qOpen || lui.q ? fshSearch({ id: "lq", ph: state.mode === "sr" ? "シリーズ名で検索" : "曲名・アーティスト・作品名で検索", q: lui.q, a: "data-lqtog" }) : ""}
+  <div class="fwrap">${lui.qOpen || lui.q ? "" : bar}${lSortPop()}</div>
+  ${fshSum(conds, LA)}${fshCount(n, unit, lui.q)}`;
 
 /* ---------- シリーズ ---------- */
 const SR_GRPS = [["none", "分けない"], ["genre", "ジャンル別"]];
@@ -79,9 +56,10 @@ function seriesStats() {
 function renderSeries() {
   const all = seriesStats();
   const f = lst.sr;
+  const nq = norm(lui.q);
   const gOk = x => f.g === "all" || x.main === f.g;
   const pOk = x => f.prog === "all" || (f.prog === "left" ? x.want + x.now > 0 : f.prog === "done" ? x.want + x.now === 0 && x.done > 0 : true);
-  const qOk = x => !lui.qSelSr.length || lui.qSelSr.includes(x.name);
+  const qOk = x => !nq || norm(x.name).includes(nq);
   const S = { count: (a, b) => b.l.length - a.l.length, name: (a, b) => a.name.localeCompare(b.name, "ja"), new: (a, b) => b.last.localeCompare(a.last), left: (a, b) => b.want + b.now - (a.want + a.now) };
   const list = all.filter(x => gOk(x) && pOk(x) && qOk(x)).sort((a, b) => S[f.sort](a, b) || a.name.localeCompare(b.name, "ja"));
   const GL = { all: "すべて", a: "アニメ", d: "ドラマ・実写" };
@@ -136,11 +114,11 @@ function songRows() {
 function renderSongs() {
   const all = songRows();
   const f = lst.mu;
+  const nq = norm(lui.q);
   const tOk = r => f.t === "all" || r.type === f.t;
   const dOk = r => f.dl === "all" || (f.dl === "yes" ? r.dl : !r.dl);
   const kOk = r => f.k === "all" || (f.k === "a" ? r.it.k === "a" : r.it.k !== "a");
-  const qOk = r =>
-    !lui.qSelMu.length || lui.qSelMu.some(v => (v.startsWith("s:") ? r.st === v.slice(2) : v.startsWith("a:") ? r.ar === v.slice(2) : r.it.t === v.slice(2)));
+  const qOk = r => !nq || norm(r.st + " " + r.ar + " " + r.it.t).includes(nq);
   /* ② その中の順番：古い順＝放送が古い作品から（同じ作品は種類→話数の順） */
   const TO = t => (MU_TYPES.indexOf(t) + 9) % 9;
   const dt = r => String(r.it.from || "");
@@ -245,27 +223,9 @@ const LIST_ACTIONS = [
       const on = el.dataset.lqtog === "1";
       lui.qOpen = on;
       lui.fp = "";
-      if (!on) { lui.q = ""; lui.qSelSr = []; lui.qSelMu = []; }
+      if (!on) lui.q = "";
       render();
       if (on) fshFocusQ("#lq");
-    },
-  ],
-  [
-    "[data-lqpick]",
-    el => {
-      lqSel().push(el.dataset.lqpick);
-      lui.q = "";
-      render();
-      if (!TOUCH) $("#lq")?.focus();
-    },
-  ],
-  [
-    "[data-lqdel]",
-    el => {
-      const sel = lqSel();
-      const i = sel.indexOf(el.dataset.lqdel);
-      if (i >= 0) sel.splice(i, 1);
-      render();
     },
   ],
   /* シリーズを押すと、アニメ・ドラマ・映画をまたいでその作品を一覧に */
