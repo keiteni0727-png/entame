@@ -37,7 +37,7 @@ const yst = Object.assign(
     view: "list",
   },
   ls.get("adb.v3.yt") || {},
-  { q: "", fSub: "", qOpen: false },
+  { q: "", qSel: [], fSub: "", qOpen: false },
 );
 /* 端末に覚えた表示状態のうち、今は無い値は外す */
 yst.pri = [...new Set(arrOf(yst.pri))].filter(p => [UNSEEN, ...YT_STATUS].includes(p));
@@ -204,10 +204,20 @@ function ytPopHtml(panels) {
   const T = { genre: "ジャンル", sort: "並び替え" };
   return `<div class="fpop-scrim"></div><div class="fsdrop fpop k-${k}" role="dialog" aria-label="${T[k]}"><div class="fpop-h"><b>${T[k]}</b><button type="button" class="u-btn sm" data-ytpop="${k}">完了</button></div>${panels[k]}</div>`;
 }
+/* YouTube検索の候補（シリーズ検索と同じ仕組み）：動画タイトル（小さい字は投稿者） */
+function ytqCands() {
+  const sel = yst.qSel || [];
+  return ytItems.filter(x => !sel.includes(x.id)).map(x => ({ v: x.id, label: x.t || "", sub: x.a || "", n: 0 }));
+}
+const ytqSugHtml = q => sugBoxHtml(ytqCands(), q, "data-ytqpick");
+const ytqChipsHtml = () =>
+  pickChipsHtml(
+    (yst.qSel || []).map(id => ytItems.find(x => x.id === id)).filter(Boolean).map(x => ({ v: x.id, label: x.t || "", sub: x.a || "" })),
+    "data-ytqdel",
+  );
 function renderYt() {
-  /* 検索：全角・半角などのゆれをそろえ、空白で区切ると「どれも含む」 */
-  const qs = yst.q ? yst.q.split(/[\s　]+/).map(norm).filter(Boolean) : [];
-  const qOk = x => !qs.length || (h => qs.every(q => h.includes(q)))(norm(x.t + " " + x.a + " " + x.g + " " + ytCat(x)));
+  /* 検索は候補から選んだ動画だけに絞る（シリーズ検索と同じ仕組み） */
+  const qOk = x => !(yst.qSel && yst.qSel.length) || yst.qSel.includes(x.id);
   const priOk = x => !yst.pri.length || yst.pri.includes(ytSt(x) || UNSEEN);
   const pre = ytItems.filter(x => (yst.author === "すべて" || x.a === yst.author) && ytGenreOk(x) && qOk(x));
   /* 未入力あり：オンのときは項目ごとの件数ボタンで、さらに1項目に絞れる（作品と同じ） */
@@ -245,7 +255,7 @@ function renderYt() {
   const srt = [srt0[0], (yst.grp === "year" ? "年別・" : "ジャンル別・") + srt0[1]];
   /* アニメ・ドラマと同じ形：絞り込み（シート）・並び順・検索、条件のラベル、件数 */
   const conds = [...(yst.author !== "すべて" ? [yst.author] : []), ...yst.pri.map(stLabel), ...(yst.genre !== "すべて" ? [yst.genre] : []), ...(yst.sub !== "すべて" ? [yst.sub] : []), ...(yst.missOnly ? [yst.missKey ? `要確認：${yst.missKey}` : "要確認あり"] : [])];
-  const searching = yst.qOpen || !!yst.q;
+  const searching = yst.qOpen || !!(yst.qSel && yst.qSel.length);
   const grpOpts = yst.genre === SOLO ? M("soloGroups") : ytSubs();
   const all = ytItems.filter(x => ytGenreOk(x) && qOk(x));
   const rows = [
@@ -261,10 +271,10 @@ function renderYt() {
     yst.fp === "all"
       ? fshShell({ id: "yt", a: YA, rows, sub: yst.fSub, nConds: conds.length, n: list.length, unit: "本" })
       : fshClosed();
-  return `${searching ? fshSearch({ id: "ytq", ph: "動画タイトル・投稿者で検索", q: yst.q, a: "data-ytqtog" }) : ""}
+  return `${searching ? fshSearch({ id: "ytq", ph: "動画タイトル・投稿者で検索", q: yst.q, a: "data-ytqtog" }) + ytqChipsHtml() + `<div class="chips" id="ytqSug">${ytqSugHtml(yst.q)}</div>` : ""}
     <div class="fwrap">${searching ? "" : fshBar({ a: YA, n: conds.length, open: yst.fp === "all", srtOn: yst.sort !== "new" || yst.grp !== "genre", srtOpen: yst.fp === "sort", srtLab: srt[1] })}${ytPopHtml({ sort: sBody })}</div>
     ${fshSum(conds, YA)}
-    ${fshCount(list.length, "本", yst.q).replace("</p>", viewTog(yst.view, "data-yview") + "</p>")}
+    ${fshCount(list.length, "本", "").replace("</p>", viewTog(yst.view, "data-yview") + "</p>")}
     <div id="fshBox">${sheet}</div>
     ${
       !list.length
