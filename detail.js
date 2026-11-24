@@ -690,6 +690,7 @@ const DETAIL_ACTIONS = [
       erPanel = null;
       erArcFold = new Map();
       erShiftOn = true;
+      erSeqOn = true;
       epEdit = { list: episodes(it).map(x => ({ ...x })) };
       refreshSheet();
     },
@@ -703,6 +704,7 @@ const DETAIL_ACTIONS = [
       erPanel = null;
       erArcFold = new Map();
       erShiftOn = true;
+      erSeqOn = true;
       epEdit = { list: episodes(it).map(x => ({ ...x })) };
       refreshSheet();
       setDTab("ep");
