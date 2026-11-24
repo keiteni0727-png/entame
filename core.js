@@ -1983,17 +1983,9 @@ const MISS_CHECKS = [
   { g: "話数", k: "サブタイトル", test: c => c.i.k === "a" && !(c.ns && c.eps.length < 2) && !coursOf(c.i).some(x => x === ALLYEAR || x === nowCour()) && c.eps.some(e => !(e.sub || "").trim()) },
   { g: "話数", k: "話数の表記", test: c => c.eps.some(e => !epVal(e.n) && !e.sp) },
   { g: "話数", k: "日付の確認", test: c => epDateCheck(c.i).n > 0 },
-  /* 「視聴済み」なのにチェックが付いていない話がある（勝手には付けない。話数タブで自分で付ける） */
-  { g: "話数", k: "未チェックの話", test: c => c.i.s === "視聴済み" && c.eps.some(e => !done(e)) },
   /* 話数の抜け（1・2・4話…）・重複（同じ話数が2つ）。数字の話数だけ見る（5.5話などは抜けに数えない） */
   { g: "話数", k: "話数の抜け", test: c => c.gd.gap.size > 0 },
   { g: "話数", k: "話数の重複", test: c => c.gd.dup.size > 0 },
-  /* ステータスのずれ：視聴中なのにチェック0話／未視聴なのにチェックあり */
-  {
-    g: "ずれ",
-    k: "ステータスのずれ",
-    test: ({ i, eps }) => (i.s === "視聴中" && watchable(eps).length && !eps.some(e => e.w)) || (i.s === "未視聴" && eps.some(e => e.w)),
-  },
   { g: "基本情報", k: ["開始日", "公開日", "発売日", "放送日"], j: "f-from", test: c => !c.i.from && ({ movie: "公開日", ova: "発売日", sp: "放送日" }[c.md] || "開始日") },
   { g: "基本情報", k: ["放送時間", "配信時間"], j: "f-time", n: "time", test: c => !c.ns && !(c.i.time || "").trim() && (c.md === "stream" ? "配信時間" : "放送時間") },
   { g: "基本情報", k: "放送局", j: "fMedia", n: "st", test: c => hasSt(c.md) && !c.m.stations.length },
