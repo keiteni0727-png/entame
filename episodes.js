@@ -174,7 +174,6 @@ function epEditorHtml(it) {
   /* 操作はボタンを並べ、中身の要るもの（並び替え・日付など）は押すと下に開く形にする */
   const panBtn = (key, lab) => `<button type="button" class="u-btn sm edact" data-erpanel="${key}" aria-expanded="${erPanel === key}">${lab}<span class="chev" aria-hidden="true">${FOLD_IC}</span></button>`;
   const top = `<div class="edacts">
-    ${it.k === "a" ? `<button type="button" class="u-btn sm edact edic" id="erPaste" aria-label="貼り付け" title="貼り付け">${PASTE_IC}</button>` : ""}
     <button type="button" class="u-btn sm edact" id="erArc">編を${arcsOf(it).length ? "編集" : "追加"}</button>
     ${panBtn("misc", "その他")}
     ${erPanel === "misc" ? `<div class="edpan">
@@ -498,8 +497,6 @@ const EPEDIT_ACTIONS = [
       refreshEditor();
     },
   ],
-  /* 貼り付け：下書きと比べて読み取り、反映すると下書きごと保存して編集を閉じる（epaste.js） */
-  ["#erPaste", (el, it) => openPaste(it)],
   /* 編・放送枠の編集：下書き（epEdit）は残したまま開き、閉じると話数の編集に戻る */
   [
     "#erArc",
