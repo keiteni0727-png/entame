@@ -1690,23 +1690,19 @@ const noTime = (e, it) => e.nt || (e.t % 1440 === 0 && !(it && mins(it.time) ===
 /* 放送枠の変更：作品の slots = [{a:その話から, dow:曜日（DOWの番号。-1＝変えない）, time:時刻（""＝変えない）}]。
    最初の枠は作品の開始日・放送時間のまま。長編で途中に曜日・時間が変わっても、アラートや時刻の自動入力が追いつくようにする */
 const slotsOf = it => (it.slots || []).filter(x => x && x.a != null).slice().sort((x, y) => x.a - y.a);
-/* その話の番号で効いている枠の変更（なければ null） */
-function slotAt(it, n) {
-  if (n == null) return null;
-  let r = null;
-  for (const x of slotsOf(it)) {
-    if (n >= x.a) r = x;
-    else break;
-  }
-  return r;
-}
 /* 話ごとの「その時点で効いている枠の変更」（数字でない話は直前の話と同じ。なければ null） */
 function epSlotMap(it, l) {
+  const sl = slotsOf(it);
+  if (!sl.length) return l.map(() => null);
   let cur = null;
   return l.map(e => {
     const nn = epNum(e.n);
     if (nn != null) {
-      const x = slotAt(it, nn);
+      let x = null;
+      for (const r of sl) {
+        if (nn >= r.a) x = r;
+        else break;
+      }
       if (x) cur = x;
     }
     return cur;

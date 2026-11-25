@@ -120,13 +120,6 @@ function infoCards(it, { md, ns, mv, stv, cs, songRows }) {
     rows.push(row("配信サイト", labsOr(m.vods, m.vods.map(vlab).join(""), "vods"), "fMedia", "", ["配信サイト"]));
   }
   /* シリーズ・公式サイト・配信URLも、放送の項目と同じ並びの行で（押すとシリーズの作品一覧・サイトを開く） */
-  const host = u => {
-    try {
-      return new URL(u).hostname.replace(/^www\./, "");
-    } catch (e) {
-      return u;
-    }
-  };
   /* アニメのシリーズは下の SERIES の枠に出す（AniListのつながりと一緒に） */
   if (it.k !== "a") rows.push(row("シリーズ", it.series ? `<button type="button" class="ilnk" data-series="${esc(it.series)}">${esc(it.series)}<span class="ilar" aria-hidden="true">›</span></button>` : nofHas(it, "ser") ? nn("なし") : un("未設定")));
   /* 公式サイト・配信URLはタイトルの下（PCは左の列）のボタンで開く。ここには要確認のときだけ行を出す */
@@ -253,7 +246,6 @@ function renderDetail(it) {
     <div id="epArea">${subPaste ? subPasteHtml(it) : arcEdit ? arcEditHtml() : slotEdit ? slotEditHtml(it) : epEdit ? epEditorHtml(it) : epListHtml(it, eps)}</div></div></div></div>`;
 }
 /* 詳細のアラート：ふだんは1行に畳み、開くと項目ボタン。ボタンを押すとその項目だけの編集画面へ */
-let dmissKeep = false;
 function refreshSheet() {
   if (form && form.inline) return;
   const it = items.find(x => x.id === openId);
@@ -295,11 +287,9 @@ function openDetail(id, dir, keepNav) {
   epEdit = null;
   subPaste = null;
   epOne = null;
-  erMore = false;
   arcEdit = null;
   slotEdit = null;
   arcFold = new Map();
-  dmissKeep = false;
   wnOpen.clear();
   if (sh) {
     const tab = sh.classList.contains("t-ep") ? "ep" : "info";
@@ -342,6 +332,7 @@ function fail(e) {
   console.warn(e);
 }
 async function saveTitle(id, patch, msg) {
+  const prevS = (items.find(x => x.id === id) || {}).s;
   const o = { ...(over[id] || {}), ...patch };
   over[id] = o;
   rebuild();
@@ -356,7 +347,7 @@ async function saveTitle(id, patch, msg) {
   /* ステータスを視聴済み／未視聴に変えたら、視聴チェックもそろえる */
   if (patch.s === "視聴済み" || patch.s === "未視聴") {
     const sit = items.find(x => x.id === id);
-    if (sit) syncWatchToStatus(sit, patch.s);
+    if (sit && prevS !== patch.s) syncWatchToStatus(sit, patch.s, prevS);
   }
   render();
   if (openId === id && !epEdit) refreshSheet();
@@ -391,25 +382,52 @@ function applyAutoStatus(it, list, msg) {
   return (msg ? msg + "・" : "") + `「${ns}」にしました`;
 }
 /* ステータスに合わせて視聴チェックをそろえる：視聴済み→全話チェック、未視聴→全部外す（自動ステータスは挟まない） */
-function syncWatchToStatus(it, s) {
+function syncWatchToStatus(it, s, prevS) {
   if (s !== "視聴済み" && s !== "未視聴") return;
   const l = episodes(it);
   if (!l.length) return;
   const on = s === "視聴済み",
-    ch = [];
+    ch = [],
+    old = [];
+  const now = Date.now();
   l.forEach((x, i) => {
-    if (on && !done(x)) {
+    /* 視聴済み：放送済みの話だけ付ける（未放送・放送予定の話は付けない） */
+    if (on && !done(x) && !x.na && aired(x)) {
+      old.push([i, x.w, x.wt]);
       x.w = true;
       /* まとめて付けた印：押した日時に0.5を足して区別する */
-      x.wt = Date.now() + 0.5;
+      x.wt = now + 0.5;
       ch.push(i);
     } else if (!on && x.w) {
+      old.push([i, x.w, x.wt]);
       x.w = false;
       x.wt = 0;
       ch.push(i);
     }
   });
-  if (ch.length) saveWatch(it, l, ch, on ? "全話チェックしました" : "チェックを全部外しました", true);
+  if (!ch.length) return;
+  saveWatch(it, l, ch, "", true);
+  /* 誤タップでも戻せるように「元に戻す」を出す（チェックとステータスの両方を戻す） */
+  toastUndo(on ? `放送済みの${ch.length}話をチェックしました` : `チェックを${ch.length}話外しました（見た日時も消えます）`, () => {
+    const cur = items.find(x => x.id === it.id);
+    if (!cur) return;
+    const cl = episodes(cur);
+    const idx = [];
+    old.forEach(([i, w, wt]) => {
+      if (!cl[i]) return;
+      cl[i].w = w;
+      cl[i].wt = wt;
+      idx.push(i);
+    });
+    if (prevS !== undefined) {
+      over[it.id] = { ...(over[it.id] || {}), s: prevS };
+      rebuild();
+      mergeDoc("titles", it.id, { s: prevS }).catch(fail);
+    }
+    saveWatch(cur, cl, idx, "", true);
+    render();
+    if (openId === it.id && !epEdit) refreshSheet();
+  });
 }
 /* 作品の詳細画面（it＝開いている作品） */
 const DETAIL_ACTIONS = [
@@ -504,14 +522,12 @@ const DETAIL_ACTIONS = [
     "[data-nof]",
     (el, it) => {
       const k = el.dataset.nof;
-      dmissKeep = true;
       saveTitle(it.id, { noF: [...new Set([...(it.noF || []), k])] }, `${NOF_LAB[k]}を「なし」にしました`);
     },
   ],
   [
     "[data-nosong]",
     (el, it) => {
-      dmissKeep = true;
       saveTitle(it.id, { noSongs: ["OP", "ED", "主題歌"] }, "OP・ED・主題歌を「なし」にしました");
     },
   ],
@@ -549,7 +565,7 @@ const DETAIL_ACTIONS = [
     (el, it) => {
       const [a, b] = el.dataset.gapadd.split("-").map(Number);
       const l = episodes(it);
-      const n = gapFill(it, l, a, b);
+      gapFill(it, l, a, b);
       saveEps(it, l, `${a === b ? a : `${a}〜${b}`}話を追加しました`);
     },
   ],
@@ -665,7 +681,6 @@ const DETAIL_ACTIONS = [
     (el, it) => {
       subPaste = null;
       epOne = null;
-          erMore = false;
       erPanel = null;
       erArcFold = new Map();
       erShiftOn = true;

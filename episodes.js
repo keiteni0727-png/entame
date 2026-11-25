@@ -52,9 +52,6 @@ function epListHtml(it, eps) {
         ? `<p class="empty" style="padding:12px 0;text-align:left">話数がまだ登録されていません。各話リストをコピーして「貼り付け」を押すか、「話数を登録」から1話ずつ追加できます。</p><div class="ephead"><button type="button" class="u-btn sm pri ephb ephp" id="spOpen">${PASTE_IC}貼り付け</button><button type="button" class="u-btn sm ephb" id="epEditBtn">話数を登録</button></div>`
         : `<p class="empty" style="padding:12px 0;text-align:left">話数がまだ登録されていません。「話数を登録」から追加できます。</p><div class="ephead"><button type="button" class="u-btn sm pri ephb" id="epEditBtn">話数を登録</button></div>`)
     );
-  /* 進み具合は見ない話を除いて数える */
-  const w = watchable(eps).filter(e => e.w).length,
-    wt = watchable(eps).length || 1;
   const nx = nextIdx(eps);
   const arcs = arcsOf(it);
   const warnOf = epWarn(it);
@@ -78,6 +75,9 @@ function epListHtml(it, eps) {
   /* 1話の行：押すと視聴チェック（見た話は番号の丸を塗る）、右端の ✎ でその話だけ編集。2行目は放送日（見た日は出さない） */
   /* 1話の行（タイムライン）：左の印を押したときだけ視聴チェック（行のほかの所では付かない）。右端の ✎ でその話だけ編集
      見た話は印を塗る・次の話は大きな輪・放送前は点線・特別話（数字以外の話数）はひし形 */
+  /* 放送枠の変更（話ごと）と開始日の曜日は、行ごとに計算し直さず最初に1回だけ */
+  const slotMap = epSlotMap(it, eps),
+    fromDow = "日月火水木金土"[new Date(normDate(it.from || "")).getUTCDay()];
   const epRow = (e, i) => {
     if (epOne === i) return epOneHtml(it, e, i);
     const fut = !aired(e);
@@ -87,7 +87,7 @@ function epListHtml(it, eps) {
     const whenTx = e.na ? "" : when ? `${when}${fut ? " 放送予定" : " 放送"}` : "";
     const st = e.x ? " skip" : e.w ? " seen" : fut ? " future" : " unseen";
     const wn = warnOf(e, i);
-    const dowLab = (() => { const sm2 = epSlotMap(it, eps); return sm2[i] && sm2[i].dow >= 0 ? DOW[sm2[i].dow] : "日月火水木金土"[new Date(normDate(it.from || "")).getUTCDay()]; })();
+    const dowLab = slotMap[i] && slotMap[i].dow >= 0 ? DOW[slotMap[i].dow] : fromDow;
     const why = wn.d ? Object.keys(wn.d).map(k => (k === "start" ? `開始日（${fmtD(normDate(it.from || ""))}）と違います` : k === "dow" ? `放送曜日（${dowLab}）と1日ずれています` : DATE_WHY[k])).join("・") : "";
     const why2 = [why, wn.dup ? "同じ話数がほかにもあります" : ""].filter(Boolean).join("・");
     const gapRow = wn.gap ? `<div class="tlgap" role="listitem"><span>⚠ ${wn.gap[0] === wn.gap[1] ? `${wn.gap[0]}話` : `${wn.gap[0]}〜${wn.gap[1]}話`}がありません</span><button type="button" class="u-btn sm tlok" data-gapadd="${wn.gap[0]}-${wn.gap[1]}">話数を追加</button><button type="button" class="u-btn sm tlok" data-gapnok="${wn.gap[0]}-${wn.gap[1]}">問題なし</button></div>` : "";
@@ -158,7 +158,6 @@ function epNumInput(cls, n, sp) {
   const bad = !v && !sp;
   return `<input class="${cls}${bad ? " epbad" : ""}" type="text" value="${esc(v && !sp ? v : n)}" data-orig="${esc(n)}" placeholder="話数" aria-label="話数（数字か、SP・総集編などの名前）" autocomplete="off" autocapitalize="off" spellcheck="false"${bad ? ' title="数字以外の古い書き方の話数です。数字か名前を入れ直してください"' : ""}>`;
 }
-let erMore = false; // 話数の編集の「その他」を開いているか
 let erPanel = null; // 話数の編集：開いている操作パネル（"misc" | null。開くたびに閉じた状態から）
 let erArcFold = new Map(); // 話数の編集：編ごとに見出しをたたんだ状態（編のキー → たたんでいるか。無い編は「見終わった編か」で決める）
 let erShiftOn = true; // 日付を変えたら、後の話も1週間おきにずらすか（話数の編集を開くたびにオンに戻る）

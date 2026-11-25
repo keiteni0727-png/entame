@@ -93,12 +93,6 @@ function mediaLabels(i, tag) {
   );
 }
 const SEASON_CLS = { 冬: "wi", 春: "sp", 夏: "su", 秋: "au" };
-const courLab = c =>
-  c === ALLYEAR
-    ? `<span class="lab c al">通年</span>`
-    : /^\d{4}/.test(c)
-      ? `<span class="lab c ${SEASON_CLS[c.slice(4)] || ""}">${esc(c.slice(4))}<b>${esc(c.slice(0, 4))}</b></span>`
-      : "";
 const stPill = i =>
   `<span class="pill s-${esc(i.s)}" ${i.s ? "" : "style='background:var(--u-chip);color:var(--u-sub)'"}>${esc(stLabel(i.s || "未設定"))}</span>`;
 const fmtD = d => (d ? d.slice(0, 10).replace(/-/g, "/") : "");
