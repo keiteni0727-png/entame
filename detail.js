@@ -57,7 +57,7 @@ function detailSide(it, { eps, w, nx, noEp }) {
   const next = nx && !noEp ? `<button type="button" class="dnext" data-dtab="ep"><small>次に見る</small><b>${esc(nl)}${nx.sub ? `<span>「${esc(nx.sub)}」</span>` : ""}</b>${when ? `<em class="inum">${esc(when)}</em>` : ""}</button>` : "";
   return `<aside class="dside">${posterSlot(it)}${prog}${vod || off ? `<div class="dpbs">${vod}${off}</div>` : ""}${next}${chkHtml(it)}</aside>`;
 }
-/* ---------- 確認チェック（PCの左の列・一時的な機能。設定で消せる） ----------
+/* ---------- チェックリスト（PCの左の列・一時的な機能。設定で消せる） ----------
    1作品ずつ内容を確かめるためのチェックリスト。チェックは作品データの chk（項目キーの配列）に保存。
    go＝押したときに開く場所（ON AIR・MUSICの編集、AniListで確認、話数タブ）、ks＝その項目に関係する要確認 */
 function chkItems(it) {
@@ -80,10 +80,10 @@ function chkHtml(it) {
   const n = l.filter(x => on.has(x.k)).length;
   const row = x => {
     const w = ms.filter(m => x.ks.includes(m.k)).map(m => m.k);
-    const syo = x.k === "ep" ? `<a class="chsyo" href="https://cal.syoboi.jp/find?kw=${encodeURIComponent(it.t)}" target="_blank" rel="noopener" title="しょぼいカレンダーで「${esc(it.t)}」を検索">しょぼいカレンダー ↗</a>` : "";
-    return `<div class="chr${on.has(x.k) ? " done" : ""}"><button type="button" class="chcb" role="checkbox" aria-checked="${on.has(x.k)}" data-chk="${x.k}" aria-label="${esc(x.lab)}">${on.has(x.k) ? "✓" : ""}</button><span class="cht">${esc(x.lab)}${w.length ? `<small>⚠ ${esc(w.join("・"))}</small>` : ""}</span><button type="button" class="chgo" ${x.go}>${x.goLab || "開く"} ›</button>${syo}</div>`;
+    return `<div class="chr${on.has(x.k) ? " done" : ""}"><span class="cht">${esc(x.lab)}${w.length ? `<small>⚠ ${esc(w.join("・"))}</small>` : ""}</span></div>`;
   };
-  return `<div class="chk"><div class="chh">✓ 確認チェック<small>${n === l.length ? "確認済み" : `${n} / ${l.length}`}</small></div><div class="chbar"><i style="width:${Math.round((n / l.length) * 100)}%"></i></div>${l.map(row).join("")}</div>`;
+  const allOn = n === l.length;
+  return `<div class="chk"><div class="chh"><button type="button" class="chcb${allOn ? " on" : ""}" role="checkbox" aria-checked="${allOn}" id="chkAll" aria-label="全部チェック">${allOn ? "✓" : ""}</button>チェックリスト</div>${l.map(row).join("")}</div>`;
 }
 function infoCards(it, { md, ns, mv, stv, cs, songRows }) {
   const un = t => `<span class="unset">${t}</span>`;
@@ -249,7 +249,7 @@ function renderDetail(it) {
     ${noEp ? "" : `<div class="dtabs" role="tablist"><button type="button" role="tab" data-dtab="info">番組情報</button><button type="button" role="tab" data-dtab="ep">話数${eps.length ? ` <small>${w}/${watchable(eps).length}</small>` : ""}${epMs ? `<span class="wnt" aria-label="要確認あり">!</span>` : ""}</button></div>`}</div>
     <div class="dpane dp-info">${infoCards(it, { md, ns, mv, stv, cs, songRows })}
     <div class="links">${typeof alChkOpen === "function" ? `<button type="button" class="u-chip add dlb" data-alcheck="1">${it.k === "a" ? "AniList" : "TMDB"}で確認</button>` : ""}${noEp ? `<button type="button" class="u-chip add dlb" id="epAddMv">＋ 話数を追加</button>` : ""}<button type="button" class="u-btn sm txt danger delsm" id="delItem">削除</button></div></div>
-    <div class="dpane dp-ep"><h4><span class="h4l">話数</span>${eps.length && !epEdit ? `<span class="progrow"><span class="progn"><b>${w}</b> / ${watchable(eps).length}話</span><span class="prog"><i style="width:${Math.round((w / (watchable(eps).length || 1)) * 100)}%"></i></span></span>` : ""}${eps.length && !epEdit && !arcEdit && !slotEdit && !subPaste ? `<button type="button" class="u-btn sm iedit" id="epEditBtn">編集</button>` : ""}</h4>
+    <div class="dpane dp-ep"><h4><span class="h4l">話数</span>${eps.length && !epEdit ? `<span class="progrow"><span class="progn"><b>${w}</b> / ${watchable(eps).length}話</span><span class="prog"><i style="width:${Math.round((w / (watchable(eps).length || 1)) * 100)}%"></i></span></span>` : ""}${eps.length && it.k === "a" && !epEdit && !arcEdit && !slotEdit && !subPaste ? `<button type="button" class="u-btn sm hpaste" id="spOpen" aria-label="貼り付け" title="貼り付け">${PASTE_IC}</button>` : ""}${eps.length && !epEdit && !arcEdit && !slotEdit && !subPaste ? `<button type="button" class="u-btn sm iedit" id="epEditBtn">編集</button>` : ""}</h4>
     <div id="epArea">${subPaste ? subPasteHtml(it) : arcEdit ? arcEditHtml() : slotEdit ? slotEditHtml(it) : epEdit ? epEditorHtml(it) : epListHtml(it, eps)}</div></div></div></div>`;
 }
 /* 詳細のアラート：ふだんは1行に畳み、開くと項目ボタン。ボタンを押すとその項目だけの編集画面へ */
@@ -432,19 +432,16 @@ const DETAIL_ACTIONS = [
       refreshSheet();
     },
   ],
-  /* 確認チェック：チェックを付ける・外す */
+  /* チェックリスト：見出しのチェックボックスで全部まとめて付ける・外す */
   [
-    "[data-chk]",
+    "#chkAll",
     (el, it) => {
-      const k = el.dataset.chk,
-        s = new Set(it.chk || []);
-      if (s.has(k)) s.delete(k);
-      else s.add(k);
-      const all = chkItems(it).every(x => s.has(x.k));
-      saveTitle(it.id, { chk: [...s] }, all ? "確認済みにしました" : "");
+      const l = chkItems(it),
+        all = l.every(x => (it.chk || []).includes(x.k));
+      saveTitle(it.id, { chk: all ? [] : l.map(x => x.k) }, all ? "" : "確認済みにしました");
     },
   ],
-  /* 確認チェック・SERIES の「開く」：本文のカードの「編集」と同じ場所で編集する（左の列の中に出さない） */
+  /* チェックリスト・SERIES の「開く」：本文のカードの「編集」と同じ場所で編集する（左の列の中に出さない） */
   [
     "[data-chkgo]",
     (el, it) => {
