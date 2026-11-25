@@ -206,8 +206,13 @@ function formHtml() {
     let [lab, keys] = ONLY_A[f.only];
     /* OP・ED・主題歌の「なし」は見出しの行の右に（曲が1曲もないときだけ） */
     const sgNone = f.only === "sgList" ? sgNoneBox() : "";
+    /* ON AIRの編集は、全体編集のON AIRの枠とまったく同じ作り（枠・項目の並び・表形式）にそろえる */
+    const body =
+      f.only === "onair"
+        ? `<section class="fsec ftbl"><h4><span class="ilamp onair">ON AIR</span></h4><div class="fgrid">${P.mtype + P.mst + P.from + P.time + P.cours + P.mvod + P.vurl + P.series + P.url}</div></section>`
+        : `<div class="fgrid only">${keys.map(k => P[k]).join("")}</div>`;
     return `<div class="hdrow"><h3 class="onlyh"><small>${esc(f.t)}</small>${lab}を編集</h3>${sgNone}<button class="u-btn icon sm soft close" type="button" data-back="1" aria-label="戻る">✕</button></div>
-    <form id="titleF"${upcoming(f) ? ' class="fup"' : ""} novalidate><div class="fgrid only">${keys.map(k => P[k]).join("")}</div>
+    <form id="titleF"${upcoming(f) ? ' class="fup"' : ""} novalidate>${body}
     <div class="ffoot">${f.only === "relb" && f.rbK !== "new" ? `<button type="button" class="u-btn sm txt danger delsm" id="rbDel" aria-label="この関連作品を削除">削除</button>` : ""}<button type="button" class="u-btn" data-back="1">キャンセル</button><button class="u-btn pri primary" type="submit">保存する</button></div></form>`;
   }
   /* 上：タイトル、その下にジャンル・ステータス（色付きの札。押すと選択肢が開く） */
@@ -421,7 +426,7 @@ function openInlineForm(target, el) {
   document.querySelectorAll("#sheetIn .icard[hidden]").forEach(x => (x.hidden = false));
   /* カードの「編集」ボタンから開いたときは、そのカードの場所がそのまま編集画面になる（元の表示は隠す） */
   const inCard = !!(el && el.closest && el.closest(".iedit") && anc.classList.contains("icard"));
-  anc.insertAdjacentHTML(inCard ? "beforebegin" : "afterend", `<div class="ined${inCard ? " incard" : ""}" id="formIn">${formHtml()}</div>`);
+  anc.insertAdjacentHTML(inCard ? "beforebegin" : "afterend", `<div class="ined${inCard ? " incard" : ""}${target === "onair" ? " insec" : ""}" id="formIn">${formHtml()}</div>`);
   if (inCard) anc.hidden = true;
   readForm();
   form.init = JSON.stringify({ ...form, init: 0 });
@@ -436,7 +441,7 @@ function openInlineForm(target, el) {
     sh.scrollTop += d;
   } else if (typeof navScroll === "function") navScroll(box);
   else box.scrollIntoView({ block: "nearest" });
-  const i = box.querySelector(".fgrid.only input:not([type=date]):not([type=checkbox]):not([type=file])");
+  const i = box.querySelector(".fgrid input:not([type=date]):not([type=checkbox]):not([type=file])");
   if (i && !TOUCH) i.focus({ preventScroll: true });
 }
 function closeInlineForm() {
