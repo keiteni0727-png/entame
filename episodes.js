@@ -160,8 +160,8 @@ function epNumInput(cls, n, sp) {
 }
 let erPanel = null; // 話数の編集：開いている操作パネル（"misc" | null。開くたびに閉じた状態から）
 let erArcFold = new Map(); // 話数の編集：編ごとに見出しをたたんだ状態（編のキー → たたんでいるか。無い編は「見終わった編か」で決める）
-let erShiftOn = true; // 日付を変えたら、後の話も1週間おきにずらすか（話数の編集を開くたびにオンに戻る）
-let erSeqOn = true; // 話数を変えたら、後の話も連番にするか（話数の編集を開くたびにオンに戻る）
+let erShiftOn = false; // 日付を変えたら、後の話も1週間おきにずらすか（話数の編集を開くたびにオフに戻る）
+let erSeqOn = false; // 話数を変えたら、後の話も連番にするか（話数の編集を開くたびにオフに戻る）
 function epEditorHtml(it) {
   const l = epEdit.list;
   const A = it.k === "a";
