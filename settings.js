@@ -132,7 +132,7 @@ function settingsHtml() {
     <div class="setsec">選択肢の管理</div>
     <div class="setgrp">${MKEYS.map(([k, l]) => row(k, l, M(k).length)).join("")}</div>
     <div class="setsec">データ</div>
-    <div class="setgrp">${row("bk", "バックアップ", "書き出す・戻す")}${row("trash", "ゴミ箱", tl ? `${tl}件` : "空")}<div class="setrow static">${setIc("chk")}<span class="setl">確認チェック<small class="setsm">PCの作品詳細</small></span><div class="u-seg hseg3 setthm3" role="radiogroup" aria-label="確認チェック">${[["0", "表示"], ["1", "消す"]].map(([v, l]) => `<button type="button" role="radio" data-chkoff="${v}" aria-selected="${!!master.chkOff === (v === "1")}" aria-checked="${!!master.chkOff === (v === "1")}">${l}</button>`).join("")}</div></div></div>
+    <div class="setgrp">${row("bk", "バックアップ", "書き出す・戻す")}${row("trash", "ゴミ箱", tl ? `${tl}件` : "空")}<div class="setrow static">${setIc("chk")}<span class="setl">チェックリスト<small class="setsm">PCの作品詳細</small></span><div class="u-seg hseg3 setthm3" role="radiogroup" aria-label="チェックリスト">${[["0", "表示"], ["1", "消す"]].map(([v, l]) => `<button type="button" role="radio" data-chkoff="${v}" aria-selected="${!!master.chkOff === (v === "1")}" aria-checked="${!!master.chkOff === (v === "1")}">${l}</button>`).join("")}</div></div></div>
     <div class="setsec">連携</div>
     <div class="setgrp"><div class="setrow static">${setIc("key")}<span class="setl">TMDB APIキー<small class="setsm">ドラマ・映画の情報取得</small></span><input id="tmKey" class="u-input setkey" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" data-1p-ignore data-lpignore="true" placeholder="貼り付け" value="${esc(master.tmdbKey || "")}" aria-label="TMDB APIキー"></div></div>
     <div class="setsec">アカウント</div>
@@ -437,7 +437,7 @@ const SETTINGS_ACTIONS = [
       refreshSettings();
     },
   ],
-  /* 確認チェック（一時的な機能）を出す・消す。チェックした内容は作品に残る */
+  /* チェックリスト（一時的な機能）を出す・消す。チェックした内容は作品に残る */
   [
     "[data-chkoff]",
     el => {
