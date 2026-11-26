@@ -305,8 +305,11 @@ function openDetail(id, dir, keepNav) {
   if (!it) return;
   /* 前・次の作品へ移るときはシートを作り直さず中身だけ入れかえ、今のタブもそのまま */
   const sh = dir && $("#layer .sheet");
-  /* 編集画面から戻るときは前の並びのまま（編集で絞り込みから外れても、前・次へ移れるように） */
-  if (!dir && !(keepNav && navIds.includes(id))) navIds = screenIds();
+  /* 並びは今の画面のもの。編集画面から戻ったときに、編集で絞り込みから外れて画面にない作品なら前の並びのまま（前・次へ移れるように） */
+  if (!dir) {
+    const ids = screenIds();
+    if (ids.includes(id) || !(keepNav && navIds.includes(id))) navIds = ids;
+  }
   openId = id;
   stMenu = false;
   epEdit = null;
