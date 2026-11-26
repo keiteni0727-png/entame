@@ -52,35 +52,7 @@ function detailSide(it, { eps, w, noEp }) {
   const prog = eps.length && !noEp ? `<div class="dprog"><span class="dpn"><b>${w}</b> / ${wn}話</span><span class="dpbar"><i style="width:${Math.round((w / (wn || 1)) * 100)}%"></i></span></div>` : "";
   const vod = it.vurl ? `<a class="u-btn dpb vod" href="${esc(it.vurl)}" target="_blank" rel="noopener">${IC_PLAY}${esc(vodName(it))}で見る</a>` : "";
   const off = it.url ? `<a class="u-btn dpb" href="${esc(it.url)}" target="_blank" rel="noopener">公式サイト${IC_EXT}</a>` : "";
-  return `<aside class="dside">${posterSlot(it)}${prog}${vod || off ? `<div class="dpbs">${vod}${off}</div>` : ""}${chkHtml(it)}</aside>`;
-}
-/* ---------- チェックリスト（PCの左の列・一時的な機能。設定で消せる） ----------
-   1作品ずつ内容を確かめるためのチェックリスト。チェックは作品データの chk（項目キーの配列）に保存。
-   go＝押したときに開く場所（ON AIR・MUSICの編集、AniListで確認、話数タブ）、ks＝その項目に関係する要確認 */
-function chkItems(it) {
-  const md = mediaOf(it).media;
-  const per = md === "movie" ? "公開" : md === "ova" ? "発売" : md === "sp" ? "放送日" : "放送期間";
-  return [
-    { k: "al", lab: it.k === "a" ? "AniListで確認" : "TMDBで確認", go: 'data-alcheck="1"', ks: [] },
-    { k: "per", lab: per, go: 'data-chkgo="onair"', ks: ["開始日", "公開日", "発売日", "放送日", "放送時間", "配信時間", "放送クール", "クールのずれ"] },
-    { k: "url", lab: "公式サイト", go: 'data-chkgo="onair"', ks: ["公式サイト"] },
-    { k: "vod", lab: "配信サイト・配信URL", go: 'data-chkgo="onair"', ks: ["配信サイト", "配信URL", "配信URLのずれ"] },
-    { k: "song", lab: "主題歌", go: 'data-chkgo="sgList"', ks: ["OP・ED・主題歌", "アーティスト", "曲名", "曲の話数"] },
-    { k: "ep", lab: "話数リスト", go: 'data-dtab="ep"', goLab: "話数へ", ks: ["話数", "サブタイトル", "話数の表記", "日付の確認", "話数の抜け", "話数の重複", "未チェックの話"] },
-  ].filter(Boolean);
-}
-function chkHtml(it) {
-  if (master.chkOff) return "";
-  const l = chkItems(it),
-    on = new Set(it.chk || []),
-    ms = missingOf(it);
-  const n = l.filter(x => on.has(x.k)).length;
-  const row = x => {
-    const w = ms.filter(m => x.ks.includes(m.k)).map(m => m.k);
-    return `<div class="chr${on.has(x.k) ? " done" : ""}"><span class="cht">${esc(x.lab)}${w.length ? `<small>⚠ ${esc(w.join("・"))}</small>` : ""}</span></div>`;
-  };
-  const allOn = n === l.length;
-  return `<div class="chk"><div class="chh"><button type="button" class="chcb${allOn ? " on" : ""}" role="checkbox" aria-checked="${allOn}" id="chkAll" aria-label="全部チェック">${allOn ? "✓" : ""}</button>チェックリスト</div>${l.map(row).join("")}</div>`;
+  return `<aside class="dside">${posterSlot(it)}${prog}${vod || off ? `<div class="dpbs">${vod}${off}</div>` : ""}</aside>`;
 }
 function infoCards(it, { md, ns, mv, stv, cs, songRows }) {
   const un = t => `<span class="unset">${t}</span>`;
@@ -455,20 +427,11 @@ const DETAIL_ACTIONS = [
       refreshSheet();
     },
   ],
-  /* チェックリスト：見出しのチェックボックスで全部まとめて付ける・外す */
+  /* SERIES の「シリーズを登録」：本文のカードの「編集」と同じ場所で編集する */
   [
-    "#chkAll",
+    "[data-cardgo]",
     (el, it) => {
-      const l = chkItems(it),
-        all = l.every(x => (it.chk || []).includes(x.k));
-      saveTitle(it.id, { chk: all ? [] : l.map(x => x.k) }, all ? "" : "確認済みにしました");
-    },
-  ],
-  /* チェックリスト・SERIES の「開く」：本文のカードの「編集」と同じ場所で編集する（左の列の中に出さない） */
-  [
-    "[data-chkgo]",
-    (el, it) => {
-      const t = el.dataset.chkgo;
+      const t = el.dataset.cardgo;
       const b = [...document.querySelectorAll(`#sheetIn .dmain [data-jump="${t}"]`)].find(x => x.offsetParent !== null);
       if (b) b.click();
       else openForm(it, t);

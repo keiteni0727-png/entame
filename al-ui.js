@@ -593,7 +593,7 @@ function seriesCardHtml(it) {
   const head = `<div class="ich"><span class="ilamp series">SERIES</span>${
     ser
       ? `<b class="sern">${esc(ser)}</b>`
-      : `<span class="sertag w">シリーズ未登録</span><button type="button" class="serbtn" data-chkgo="fSeries">シリーズを登録</button>`
+      : `<span class="sertag w">シリーズ未登録</span><button type="button" class="serbtn" data-cardgo="fSeries">シリーズを登録</button>`
   }<button type="button" class="u-btn sm iedit" data-jump="fSeries" aria-label="シリーズを編集">編集</button></div>${ser ? `<div class="serlkr"><button type="button" class="serlk" data-series="${esc(ser)}">このシリーズの作品一覧 ›</button></div>` : ""}`;
   let body;
   if (!serRelOpen) body = "";

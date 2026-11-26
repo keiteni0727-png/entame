@@ -2016,17 +2016,6 @@ html[data-gsz="l"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(240px,1f
 .edaddbtn{flex:1}
 .edt-in span{font-size:var(--fs-s);color:var(--u-sub)}
 
-/* ===== チェックリスト（PCの作品詳細の左の列・一時的な機能） ===== */
-.chk{border:1px solid var(--u-line);border-radius:var(--r-m);padding:9px 10px 7px}
-.chh small{margin-left:auto;color:var(--u-sub);font-weight:700}
-.chr{display:grid;grid-template-columns:minmax(0,1fr);align-items:start;padding:6px 0;border-top:1px solid var(--u-line);font-size:var(--fs-s)}
-.chh{display:flex;align-items:center;font-size:var(--fs-s);font-weight:800;gap:8px}
-.chcb.on{background:var(--u-ok);border-color:var(--u-ok)}
-.chr:first-of-type{border-top:0}
-.chcb{width:17px;height:17px;margin-top:1px;padding:0;border:1.5px solid var(--u-sub);border-radius:4px;background:none;color:var(--u-on);font:900 11px/1 var(--u-num);display:grid;place-items:center;cursor:pointer}
-.chr.done .chcb{background:var(--u-ok);border-color:var(--u-ok)}
-.chr.done .cht{color:var(--u-sub);text-decoration:line-through}
-.cht small{display:block;margin-top:1px;color:var(--u-warn);font-size:var(--fs-xs);text-decoration:none}
 .setkey{margin-left:auto;width:min(52%,300px);height:var(--h-in);font-family:var(--u-num);font-size:var(--fs-base)!important}
 .setsm{display:block;font-size:var(--fs-xs);color:var(--u-sub);font-weight:500}
 
