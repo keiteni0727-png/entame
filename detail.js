@@ -11,6 +11,18 @@ function screenIds() {
   const ids = xserAllIds() || [...document.querySelectorAll("#main [data-id]")].map(el => el.dataset.id);
   return ids.filter(id => !seen.has(id) && seen.add(id) && items.some(x => x.id === id));
 }
+/* 詳細を開いたまま一覧が変わったとき（シリーズの絞り込みの解除・絞り込みや並び替えの変更など）：
+   開いている作品が新しい一覧にあれば、前・次の並びを新しい一覧にそろえ、矢印の押せる／押せないも直す */
+function navResync() {
+  const nav = (ids, cur, set, busy) => {
+    if (!cur || !ids.includes(cur)) return;
+    set(ids);
+    const i = ids.indexOf(cur);
+    document.querySelectorAll("#layer .dnav").forEach(b => (b.disabled = busy || !ids[+b.dataset.dnav < 0 ? i - 1 : i + 1]));
+  };
+  if (openId && $("#sheetIn")) nav(screenIds(), openId, l => (navIds = l), !!(epEdit || arcEdit || slotEdit || subPaste || epOne != null || (form && form.inline)));
+  else if (typeof ytOpen !== "undefined" && ytOpen && $("#ytIn")) nav(ytScreenIds(), ytOpen, l => (ytNavIds = l), !!(yform && yform.inline));
+}
 function navNeighbors(id) {
   const i = navIds.indexOf(id);
   return i < 0 ? [null, null] : [navIds[i - 1] || null, navIds[i + 1] || null];

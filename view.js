@@ -711,6 +711,7 @@ function render() {
   }
   setMain(navTabsHtml() + body);
   markSel();
+  navResync();
   /* 上の大きな文字のタブ：選んでいるタブが画面の外なら横にずらして見せる（YouTube を選ぶと大きな文字が右にはみ出すため） */
   const gt = document.querySelector(".gtabs"),
     gs = gt && gt.querySelector('[aria-selected="true"]');
