@@ -1636,7 +1636,8 @@ select#arcJump{cursor:pointer;-webkit-appearance:none;appearance:none;padding-ri
 .sg-f2 input{min-width:0;width:100%;height:var(--h-in);border:1px solid var(--u-line);color:var(--u-ink);border-radius:var(--r-m);padding:0 9px;font:inherit;font-size:var(--fs-base)}
 .sg-f2 input::placeholder{font-size:var(--fs-s)}
 .sg-r{display:flex;align-items:center;gap:5px;font-size:var(--fs-m);color:var(--u-sub);white-space:nowrap}
-.sg-r input{width:58px;height:var(--h-in);flex:none;border:1px solid var(--u-line);background:var(--u-bg);color:var(--u-ink);border-radius:var(--r-m);padding:0 6px;font:inherit;font-size:var(--fs-base)}
+/* 編集画面の中（.field の中）でも、話数の入力欄は小さいまま（.field input の幅100%に負けないよう .sglist から書く） */
+.sglist .sg-r input:not([type=checkbox]){width:58px;height:var(--h-in);flex:none;border:1px solid var(--u-line);background:var(--u-bg);color:var(--u-ink);border-radius:var(--r-m);padding:0 6px;font:inherit;font-size:var(--fs-base)}
 .sg-r input::placeholder{font-size:var(--fs-xs)}
 .sg-r .sg-all{font-size:var(--fs-s);font-weight:700;color:var(--sgc);margin-left:4px}
 .sg-bw{display:inline-flex;align-items:center;gap:5px}
