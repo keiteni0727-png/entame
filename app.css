@@ -2181,6 +2181,8 @@ html[data-gsz="s"] .pgrid{--gc:3}
 .tk-yb{flex:none;height:28px;padding:0 10px;border:2px solid var(--k);border-radius:10px;background:var(--pop);color:var(--onpop);font:inherit;font-size:12px;font-weight:900;box-shadow:2px 2px 0 var(--ks);white-space:nowrap;cursor:pointer}
 /* 詳細の上に出すシート（AniListで確認など）の下のボタンの行：地はシートと同じ色（白い帯にしない） */
 .sheet:not(.form) .ffoot{background:var(--u-bg)}
+/* 詳細の上に出す編集のカード（白）の中のボタンの行は、地の色を付けない */
+.sheet:not(.form) .ined .ffoot{background:none}
 /* 見出しの行だけのカード（PROGRESS でパート数がないときなど）：上下のすき間をそろえる */
 .icard>.ich:last-child{margin-bottom:0}
 /* 種類の札：日本語（主題歌・挿入歌）は字の高さが違うので少し下げる */
