@@ -330,8 +330,13 @@ const viewTog = (cur, attr) =>
     })
     .join("")}</span>`;
 /* グリッドの1マス：太枠と影の縦長の画像（1枚ずつ少し傾ける）とタイトル。作品は左上に斜めのステータスのシール、下に進み具合 */
-const gridSeal = (it, attr) => (attr === "data-id" && it.s ? `<span class="pseal s-${esc(it.s)}">${esc(stLabel(it.s))}</span>` : "");
+const gridSeal = (it, attr) => (s => (s ? `<span class="pseal s-${esc(s)}">${esc(stLabel(s))}</span>` : ""))(attr === "data-yt" ? ytSt(it) || UNSEEN : attr === "data-id" ? it.s : "");
 const gridProg = (it, attr) => {
+  if (attr === "data-yt") {
+    const n = +it.n || 0,
+      w = Math.min(n, +it.pw || 0);
+    return n ? `<span class="pprog"><span class="pbar"><i style="width:${Math.round((w / n) * 100)}%"></i></span><b class="inum">${w}/${n}本</b></span>` : "";
+  }
   if (attr !== "data-id") return "";
   const l = watchable(episodes(it));
   if (!l.length) return "";
@@ -364,5 +369,5 @@ document.addEventListener("click", e => {
 /* 一覧の行のサムネ（横長） */
 const ytThumbHtml = x => thumbHtml(ytImgIt(x));
 /* 詳細：上に横長で大きく（YouTube は横長の画像が多いので、設定に関係なくこの形） */
-const ytHeroHtml = x => (x.img ? `<div class="dheroW"><button type="button" class="dhero" data-imgview="1" aria-label="画像を大きく表示">${imgTag(ytImgIt(x), "l", "dheroi")}</button></div>` : "");
+const ytHeroHtml = x => (x.img ? `<button type="button" class="yimg" data-imgview="1" aria-label="画像を大きく表示">${imgTag(ytImgIt(x), "l", "yimgi")}</button>` : "");
 const ytImgAddChip = x => (x.img ? "" : `<button type="button" class="u-chip add" data-imgadd="p">＋ 画像を追加</button>`);

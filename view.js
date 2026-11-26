@@ -711,6 +711,10 @@ function render() {
   }
   setMain(navTabsHtml() + body);
   markSel();
+  /* 上の大きな文字のタブ：選んでいるタブが画面の外なら横にずらして見せる（YouTube を選ぶと大きな文字が右にはみ出すため） */
+  const gt = document.querySelector(".gtabs"),
+    gs = gt && gt.querySelector('[aria-selected="true"]');
+  if (gs && gs.offsetLeft + gs.offsetWidth > gt.scrollLeft + gt.clientWidth) gt.scrollLeft = gs.offsetLeft + gs.offsetWidth - gt.clientWidth + 16;
   if (xserY != null) {
     scrollTo(0, xserY);
     xserY = null;

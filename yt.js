@@ -138,14 +138,6 @@ function ytMissingOf(x) {
 function ytMissBadge(x) {
   return missPill(ytMissingOf(x).map(m => m.k), false);
 }
-/* 詳細のアラート（作品の詳細と同じ）：たたまずに、足りない項目のボタンを最初から全部出す。ボタンを押すとその項目だけ詳細の中で編集 */
-function ytMissDetail(x) {
-  const l = ytMissingOf(x);
-  if (!l.length) return "";
-  const btn = m =>
-    `<span class="mi"><button type="button" data-jump="${m.j}">✎ ${esc(m.k)}</button>${m.n ? `<button type="button" class="nb" data-ynof="${m.n}" title="${esc(m.k)}を「なし」にする">なし</button>` : ""}</span>`;
-  return `<div class="dmiss" role="group" aria-label="要確認 ${l.length}項目"><div class="dmh">⚠ 要確認 ${l.length}項目</div><div class="mbtns">${l.map(btn).join("")}</div></div>`;
-}
 function ytRow(x) {
   const pw = +x.pw || 0,
     n = +x.n || 0;

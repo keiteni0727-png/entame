@@ -615,19 +615,6 @@ input[type=date]::-webkit-date-and-time-value{text-align:left}
 .miss.pconly{display:none}
 .miss .mh{font-family:var(--u-num);font-weight:600}
 @media (min-width:900px){.miss.pconly{display:inline-flex}}
-/* 詳細：1行に畳んだアラート。開くと項目ごとのボタン（押すとその項目の編集へ） */
-@media (min-width:0px){
-  .dmiss{display:block;margin:10px 0 0;border-radius:var(--r-m);background:var(--u-warn2);color:var(--u-warn);font-size:var(--fs-m)}
-  .dmiss.hot{background:var(--u-danger2);color:var(--u-danger)}
-  .dmiss .dmh{padding:7px 12px 6px;font-weight:700}
-  .dmiss .mbtns{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 10px}
-  .dmiss .mbtns button{border:1px solid currentColor;background:var(--u-surface);color:inherit;border-radius:var(--r-full);padding:3px 11px;font:inherit;font-size:var(--fs-s);font-weight:700}
-  .dmiss .mbtns button:not(.st):hover{background:var(--u-soft)}
-  .dmiss .mbtns .st{border-style:dashed;cursor:default;background:none}
-  .dmiss .mi{display:inline-flex}
-  .dmiss .mi button:first-child:not(:last-child){border-radius:999px 0 0 999px}
-  .dmiss .mi .nb{border-left:0;border-radius:0 999px 999px 0;padding:3px 9px;font-weight:500;opacity:.85}
-}
 /* 絞り込み：未入力ありスイッチ（ライブラリ・YouTube）と項目ごとの絞り込み */
 
 /* PC：検索窓の上の切り替え＋歯車（ヘッダーの番組表／ライブラリ・投稿者は出さない） */
@@ -922,7 +909,6 @@ header .hbar{box-sizing:border-box;height:56px;padding-block:0}
 
 .idl dd[data-inl]:hover{background:var(--u-chip)}
 
-.iprog .prog{margin:2px 0 10px}
 /* バックアップ */
 .bkdata{display:grid;gap:4px}
 .bkdata .hint{margin:0;font-size:var(--fs-s)}
@@ -951,7 +937,6 @@ header .hbar{box-sizing:border-box;height:56px;padding-block:0}
 @media (max-width:899px){
   .miss .mh{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-width:0}
   .count{flex-wrap:wrap}
-  .dmiss summary{padding:8px 12px}
 }
 /* ---- 詳細：カードの「編集」ボタン（中身を押しても編集しない） ---- */
 .idl dt,.idl dd{cursor:default}
@@ -1020,8 +1005,6 @@ header .hbar{box-sizing:border-box;height:56px;padding-block:0}
 /* ---- 折りたたみの印（FOLD_IC）：どこでも同じ。たたむと右向き、開くと下向き ---- */
 .fic{display:inline-block;flex:none;vertical-align:-1px;transition:transform .15s;color:var(--u-sub)}
 [aria-expanded="true"]>.fic,[aria-expanded="true"] .chev>.fic,[aria-expanded="true"] .arcar>.fic,details[open]>summary .ar>.fic{transform:rotate(90deg)}
-.dmiss summary .ar{display:inline-flex;align-items:center}
-.dmiss summary .ar .fic{color:currentColor}
 .archd .arcar{flex:none;font-size:var(--fs-xs);color:var(--u-sub);width:14px;display:inline-flex;align-items:center;justify-content:center}
 .gtog .chev .fic{color:currentColor}
 .sugbtn .fic,.u-btn .fic{margin-left:4px;color:currentColor}
@@ -1099,6 +1082,7 @@ button.imt[aria-expanded="false"]+.imt,button.imt[aria-expanded="false"]+button.
 .archd{display:flex;gap:8px;width:100%;border:0;border-top:1px solid var(--u-line);text-align:left;padding:9px 12px;font:inherit;color:var(--u-ink);background:var(--u-soft);align-items:center;min-height:44px}
 .archd .arcnm{font-size:var(--fs-base);min-width:0;font-weight:900}
 .archd.done .arcct{color:var(--u-acct);font-weight:700}
+.iprog .prog{margin:2px 0 10px;height:10px;box-sizing:border-box;border:1.5px solid var(--k2);border-radius:6px;background:var(--u-surface);overflow:hidden}
 .prog i{display:block;height:100%;background:var(--u-accent)}
 .sheet.t-info .dtabs [data-dtab="info"],.sheet.t-ep .dtabs [data-dtab="ep"]{color:var(--u-ink);border-bottom-color:var(--u-accent)}
 
@@ -1421,14 +1405,6 @@ span.mname{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space
   .e1 .e1-dt{grid-column:2;grid-row:1;width:100%}
   .eps>.e1{padding-right:10px}
 }
-/* スマホの未入力アラート：見出しとボタンを詰めて並べ、高すぎるときは中だけスクロール */
-@media (max-width:899px){
-  .dmiss{margin:8px 0 0;font-size:var(--fs-s);display:flex;flex-wrap:wrap;align-items:center;gap:5px;padding:7px 10px;max-height:94px;overflow-y:auto}
-  .dmiss .dmh{padding:0 2px 0 0;font-size:var(--fs-s)}
-  .dmiss .mbtns{display:contents}
-  .dmiss .mbtns button{padding:2px 9px;font-size:var(--fs-s);line-height:1.5}
-  .dmiss .mi .nb{padding:2px 7px}
-}
 /* 主題歌の種類・編へ移動：ほかの選択ボタンと同じ見た目（文字色・太さ・矢印） */
 select#arcJump{cursor:pointer;-webkit-appearance:none;appearance:none;padding-right:26px!important;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5l3 3 3-3' fill='none' stroke='%23888' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
 /* 設定の保存状況：「保存済み」と「最終変更」の間をあける */
@@ -1708,15 +1684,6 @@ select.sg-t{height:var(--h-in);width:auto;max-width:120px;cursor:pointer;-webkit
 .thbi{display:block;width:100%;height:100%;object-fit:cover}
 .thbi:not([src]){visibility:hidden}
 @media (min-width:900px){.row.thr .slot{grid-template-columns:62px 44px minmax(0,1fr) auto!important}.thb{width:44px}}
-/* 詳細 案A：上に横長の画像（番組情報タブだけ） */
-/* 詳細の上部画像：枠の端から端まで、高さは抑える（スマホ 約150px／PC 約300px）。少し上寄りで切り取る。押すと大きく表示 */
-.dheroW{position:relative;margin:0 -16px}
-.dhero{display:block;width:100%;height:150px;margin:0;padding:0;border:0;background:var(--u-chip);overflow:hidden;cursor:zoom-in}
-/* 位置を調整：PCはマウスを乗せたときだけ、スマホは常に表示 */
-.dheroi{display:block;width:100%;height:100%;object-fit:cover;object-position:center 30%}
-.sheet.t-ep .dheroW{display:none}
-@media (max-width:600px){.dheroW{margin:0 -14px}}
-@media (min-width:900px){.dhero{height:300px}}
 /* 詳細 案B：ポスター＋要点 */
 /* 画像を大きく表示 */
 .imgview{position:fixed;inset:0;z-index:60;background:rgba(6,8,12,.9);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:calc(16px + env(safe-area-inset-top,0px)) 16px calc(16px + env(safe-area-inset-bottom,0px))}
@@ -1784,9 +1751,26 @@ select.sg-t{height:var(--h-in);width:auto;max-width:120px;cursor:pointer;-webkit
 .vtog button[aria-pressed="true"]{background:var(--u-surface);color:var(--u-ink);box-shadow:0 1px 3px rgba(16,24,40,.15)}
 .count .vtog ~ .gbulk{margin-left:12px!important}
 @media (max-width:899px){.count .vtog ~ .gbulk{flex-basis:auto!important}}
-/* グリッド：スマホ2列・PC5列（大きさ「小」は3列・7列、「大」は2列・4列）。ポスターは太枠＋影で1枚ずつ少し傾け、左上に斜めのステータスのシール */
-.pgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 18px;padding:6px 4px 0}
-@media (min-width:900px){.pgrid{grid-template-columns:repeat(5,minmax(0,1fr));gap:28px 22px}}
+/* グリッド：列の数は --gc（大きさ 小・中・大 × スマホ／iPad縦／PC。YouTubeは横長なので別）。ポスターは太枠＋影で1枚ずつ少し傾け、左上に斜めのステータスのシール */
+.pgrid{--gc:2;display:grid;grid-template-columns:repeat(var(--gc),minmax(0,1fr));gap:24px 18px;padding:6px 4px 0}
+html[data-gsz="s"] .pgrid{--gc:3}
+html[data-gsz="l"] .pgrid{--gc:1}
+@media (min-width:600px) and (max-width:899px){
+  .pgrid{--gc:4}
+  html[data-gsz="s"] .pgrid{--gc:5}
+  html[data-gsz="l"] .pgrid{--gc:3}
+  .ygrid{--gc:3}
+  html[data-gsz="s"] .ygrid{--gc:4}
+  html[data-gsz="l"] .ygrid{--gc:2}
+}
+@media (min-width:900px){
+  .pgrid{--gc:5;gap:28px 22px}
+  html[data-gsz="s"] .pgrid{--gc:7}
+  html[data-gsz="l"] .pgrid{--gc:3}
+  .ygrid{--gc:4}
+  html[data-gsz="s"] .ygrid{--gc:5}
+  html[data-gsz="l"] .ygrid{--gc:3}
+}
 .pcell{position:relative;display:flex;flex-direction:column;gap:8px;min-width:0;padding:0;border:0;background:none;text-align:left;font:inherit;color:var(--u-ink);cursor:pointer;-webkit-tap-highlight-color:transparent}
 .pimg{position:relative;display:block;aspect-ratio:2/3;border:2px solid var(--k);border-radius:14px;box-shadow:4px 4px 0 var(--ks);overflow:hidden;background:var(--u-soft);transform:rotate(var(--rot,0deg))}
 .pcell:nth-child(5n+1){--rot:-3deg}
@@ -1794,6 +1778,8 @@ select.sg-t{height:var(--h-in);width:auto;max-width:120px;cursor:pointer;-webkit
 .pcell:nth-child(5n+3){--rot:-1.5deg}
 .pcell:nth-child(5n+4){--rot:1deg}
 .pcell:nth-child(5n){--rot:-2deg}
+.ygrid .pcell:nth-child(2n+1){--rot:-1deg}
+.ygrid .pcell:nth-child(2n){--rot:.8deg}
 .pimgi{display:block;width:100%;height:100%;object-fit:cover}
 .pimgi:not([src]){visibility:hidden}
 .pttl{font-family:var(--fd);font-weight:400;font-size:13px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
@@ -1815,25 +1801,7 @@ select.sg-t{height:var(--h-in);width:auto;max-width:120px;cursor:pointer;-webkit
 .row.thr.yrow .slot{grid-template-columns:48px 64px minmax(0,1fr) auto!important}
 .row.thr.yrow .thb{width:64px;aspect-ratio:16/9}
 @media (min-width:900px){.row.thr.yrow .slot{grid-template-columns:62px 80px minmax(0,1fr) auto!important}.row.thr.yrow .thb{width:80px}}
-.ygrid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
-@media (min-width:900px){.ygrid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}}
 .ygrid .pimg{aspect-ratio:16/9}
-/* グリッドの大きさ：小・大（中は上の大きさ）。YouTubeは横長のサムネなので別 */
-html[data-gsz="s"] .pgrid:not(.ygrid){grid-template-columns:repeat(3,minmax(0,1fr));gap:20px 12px}
-html[data-gsz="s"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}
-html[data-gsz="l"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
-@media (min-width:900px){
-  html[data-gsz="s"] .pgrid:not(.ygrid){grid-template-columns:repeat(7,minmax(0,1fr));gap:24px 16px}
-  html[data-gsz="l"] .pgrid:not(.ygrid){grid-template-columns:repeat(4,minmax(0,1fr))}
-  html[data-gsz="s"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
-  html[data-gsz="l"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
-}
-/* iPad 縦など（600〜899px）は4列（小は5列・大は3列） */
-@media (min-width:600px) and (max-width:899px){
-  .pgrid:not(.ygrid){grid-template-columns:repeat(4,minmax(0,1fr))}
-  html[data-gsz="s"] .pgrid:not(.ygrid){grid-template-columns:repeat(5,minmax(0,1fr))}
-  html[data-gsz="l"] .pgrid:not(.ygrid){grid-template-columns:repeat(3,minmax(0,1fr))}
-}
 .vtog .gszb{position:absolute;right:1px;bottom:0;font-size:9px;font-weight:700;line-height:1;color:var(--u-accent)}
 .v-tl .wc-tags>*{flex:none}
 .v-tl .wc-tags .wc-st{white-space:nowrap}
@@ -2108,7 +2076,7 @@ html[data-gsz="l"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(240px,1f
   .v-tl .wc-line::before{bottom:-34px}
 }
 /* --- ライブラリ・コレクションの上：大きな文字のタブ（選んでいるタブだけ大きく、件数はアクセント色の数字） --- */
-.gtabs{display:flex;align-items:baseline;gap:4px 18px;overflow-x:auto;scrollbar-width:none;margin:14px -16px 4px;padding:0 16px 4px}
+.gtabs{position:relative;display:flex;align-items:baseline;gap:4px 18px;overflow-x:auto;scrollbar-width:none;margin:14px -16px 4px;padding:0 16px 4px}
 .gtabs::-webkit-scrollbar{display:none}
 .gtabs button{flex:none;display:flex;align-items:baseline;gap:4px;border:0;background:none;padding:0;font:inherit;font-size:15px;font-weight:900;line-height:1.2;color:var(--u-sub);white-space:nowrap;cursor:pointer}
 .gtabs button b{font-family:var(--fn);font-weight:800;font-size:13px;color:var(--u-accent)}
@@ -2167,5 +2135,17 @@ html[data-gsz="l"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(240px,1f
   body:has(#layer .sheet.dpanel) .wpc-side{display:none}
 }
 @media (min-width:900px) and (max-width:1279px){
-  body:has(#layer .sheet.dpanel) .pgrid:not(.ygrid){grid-template-columns:repeat(3,minmax(0,1fr))}
+  body:has(#layer .sheet.dpanel) .pgrid{--gc:3}
+  html[data-gsz="s"] body:has(#layer .sheet.dpanel) .pgrid{--gc:4}
+  html[data-gsz="l"] body:has(#layer .sheet.dpanel) .pgrid{--gc:2}
+  body:has(#layer .sheet.dpanel) .ygrid{--gc:2}
+  html[data-gsz="s"] body:has(#layer .sheet.dpanel) .ygrid{--gc:3}
+  html[data-gsz="l"] body:has(#layer .sheet.dpanel) .ygrid{--gc:1}
 }
+/* --- YouTubeの詳細の見出し：上に少し傾けた横長の画像（太枠＋影）、その下にラベル・タイトル・YouTubeで見る／まとめ動画 --- */
+.yhx .yimg{display:block;width:calc(100% - 8px);aspect-ratio:16/9;margin:6px 0 16px 4px;padding:0;border:2px solid var(--k);border-radius:16px;box-shadow:5px 5px 0 var(--ks);overflow:hidden;background:var(--u-soft);transform:rotate(-1.5deg);cursor:zoom-in}
+.yimgi{display:block;width:100%;height:100%;object-fit:cover}
+.yimgi:not([src]){visibility:hidden}
+.yhx .dtbtns{flex-direction:row}
+.yhx .dtb.u-btn{flex:1 1 0}
+.yhx:not(:has(.yimg)){background:none}

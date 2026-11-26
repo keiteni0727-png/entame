@@ -1,6 +1,6 @@
 /* ===================== YouTube：詳細・追加と編集・操作（一覧と絞り込みは yt.js） ===================== */
 /* ---------- 詳細：作品の詳細と同じ形
-   上：投稿者・ジャンル・視聴ステータスのラベル／前・次・編集・閉じる、タイトルとコピー
+   上：前・次・編集・閉じる。その下に画像（横長）・投稿者・ジャンル・視聴ステータスのラベル・タイトルとコピー・YouTubeで見る／まとめ動画のボタン
    YOUTUBEカード：「項目名　内容」を1行ずつ（再生リスト・まとめ動画も行の中）。中身を押しても編集しない。
    編集はカードの見出しの右の「編集」から、そのカードの場所でまとめて編集（作品の ON AIR と同じ） ---------- */
 let ytOpen = null;
@@ -17,7 +17,14 @@ function ytDetailHtml(x) {
   const un = t => `<span class="unset">${t}</span>`;
   const nn = t => `<span class="nosong">${t}</span>`;
   const nf = k => (x.noF || []).includes(k);
-  const row = (k, v) => `<dt>${k}</dt><dd>${v}</dd>`;
+  /* 要確認：項目名の横に「!」、押すと下に補足（作品の詳細と同じ形）。ms＝その行の未入力 */
+  const miss = ytMissingOf(x);
+  const wnTx = m => `<p>${esc(m.k)}が未入力です<button type="button" data-jump="${m.j}">入力する</button>${m.n ? `<button type="button" data-ynof="${m.n}">なし</button>` : ""}</p>`;
+  const row = (k, v) => {
+    const l = miss.filter(m => m.k === k);
+    const key = "y:" + k;
+    return `<dt>${k}${l.length ? wnMark(key) : ""}</dt><dd>${v}</dd>${l.length ? wnNote(key, l.map(wnTx).join("")) : ""}`;
+  };
   const st = x.s || "";
   const stCls = "s-" + (st || UNSEEN);
   const stBtn = `<span class="stw"><button type="button" class="pill dst ${stCls}" id="ytStOpen" aria-haspopup="true" aria-expanded="${ytStMenu}">${esc(stLabel(st || UNSEEN))}<span class="stv" aria-hidden="true">▾</span></button>${ytStMenu ? `<span class="stmenu" role="menu">${YT_ST.map(([v, l]) => `<button type="button" role="menuitemradio" data-yts="${v}" aria-checked="${st === v}" class="s-${l}">${stLabel(l)}</button>`).join("")}</span>` : ""}</span>`;
@@ -27,8 +34,9 @@ function ytDetailHtml(x) {
     row("初回投稿日", x.up ? `<span class="inum">${esc(fmtD(x.up))}</span>` : un("未設定")),
     row("再生時間", x.dur ? `<span class="inum">${esc(x.dur)}</span>` : nf("dur") ? nn("なし") : un("未設定")),
     row("パート数", n ? `<span class="inum">全${n}本</span>` : un("未設定")),
-    row("再生リスト", x.pl ? `<a class="ilnk" href="${esc(x.pl)}" target="_blank" rel="noopener" aria-label="${esc(x.t)}をYouTubeで見る">${IC_PLAY}YouTubeで見る</a>` : nf("pl") ? nn("なし") : un("未設定")),
-    row("まとめ動画", x.sm ? `<a class="ilnk" href="${esc(x.sm)}" target="_blank" rel="noopener">まとめ動画を開く${IC_EXT}</a>` : nf("sm") ? nn("なし") : un("未設定")),
+    /* 再生リスト・まとめ動画は見出しのボタンで開く。ここには未入力のときだけ行を出す */
+    ...(miss.some(m => m.k === "再生リスト") ? [row("再生リスト", un("未設定"))] : []),
+    ...(miss.some(m => m.k === "まとめ動画") ? [row("まとめ動画", un("未設定"))] : []),
   ];
   const info = `<div class="icard ibc"><div class="ich"><span class="ilamp ytl">YOUTUBE</span><button type="button" class="u-btn sm iedit" data-jump="ycard" aria-label="基本情報を編集">編集</button></div><dl class="idl">${rows.join("")}</dl></div>`;
   const prog = `<div class="icard iprog"><div class="ich"><span class="ilamp progl">PROGRESS</span><span class="inow">${n ? `${pw} / ${n}本 見た` : "パート数を入れると進み具合を記録できます"}</span></div>${
@@ -44,8 +52,11 @@ function ytDetailHtml(x) {
   const c = ytCat(x),
     sb = ytGrp(x);
   const gBtn = c ? `<button type="button" class="dmt lab s" data-jump="yfGenre" title="ジャンルを変える">${c}${sb ? `・${esc(sb)}` : ""}</button>` : "";
-  return `${ytHeroHtml(x)}<div class="dhead ydhead"><div class="hdrow"><div class="meta dmeta"><span class="kind yauth">${esc(x.a || "YouTube")}</span>${gBtn}${stBtn}</div><div class="hdrow">${navB(-1, "前の作品")}${navB(1, "次の作品")}<button type="button" class="u-btn sm" id="ytEdit" aria-label="再生リストを編集">編集</button><button class="u-btn icon sm soft close" type="button" data-close aria-label="閉じる">✕</button></div></div>
-    <h3>${esc(x.t)}<button type="button" class="tcopy" id="ytCopy" aria-label="タイトルをコピー" title="タイトルをコピー"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button></h3>${ytMissDetail(x)}</div>
+  /* 投稿者・ジャンルの未入力：上のラベルの横に「!」 */
+  const topMiss = miss.filter(m => m.k === "投稿者" || m.k === "ジャンル");
+  const lnk = [x.pl ? `<a class="u-btn dtb vod" href="${esc(x.pl)}" target="_blank" rel="noopener">${IC_PLAY}<span>YouTubeで見る</span></a>` : "", x.sm ? `<a class="u-btn dtb" href="${esc(x.sm)}" target="_blank" rel="noopener"><span>まとめ動画</span>${IC_EXT}</a>` : ""].join("");
+  return `<div class="dhead ydhead"><div class="hdrow dnavrow"><div class="hdrow">${navB(-1, "前の作品")}${navB(1, "次の作品")}<button type="button" class="u-btn sm" id="ytEdit" aria-label="再生リストを編集">編集</button><button class="u-btn icon sm soft close" type="button" data-close aria-label="閉じる">✕</button></div></div></div>
+    <div class="dtit dhx yhx">${ytHeroHtml(x)}<div class="dtc"><div class="meta dmeta"><span class="kind yauth">${esc(x.a || "YouTube")}</span>${gBtn}${stBtn}${topMiss.length ? wnMark("y:top") : ""}</div>${topMiss.length ? wnNote("y:top", topMiss.map(wnTx).join("")) : ""}<h3>${esc(x.t)}<button type="button" class="tcopy" id="ytCopy" aria-label="タイトルをコピー" title="タイトルをコピー"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button></h3>${lnk ? `<div class="dtbtns">${lnk}</div>` : ""}</div></div>
     <div class="ydbody">${info}${prog}
     <div class="links">${ytImgAddChip(x)}<button type="button" class="u-btn sm txt danger delsm" id="ytDel">削除</button></div></div>`;
 }
@@ -70,6 +81,7 @@ function ytOpenDetail(id, dir) {
   if (!dir) ytNavIds = ytScreenIds();
   ytOpen = id;
   ytStMenu = false;
+  wnOpen.clear();
   openId = null;
   form = null;
   yform = null;
@@ -244,7 +256,7 @@ function ytOpenInline(target) {
   inn.querySelectorAll(".ined").forEach(x => x.remove());
   inn.querySelectorAll(".icard[hidden]").forEach(x => (x.hidden = false));
   const card = target === "ycard" && inn.querySelector(".icard.ibc");
-  const anc = card || inn.querySelector(".ydhead");
+  const anc = card || inn.querySelector(".yhx") || inn.querySelector(".ydhead");
   if (!anc) {
     yform = null;
     return;
@@ -456,6 +468,16 @@ const YT_FORM_ACTIONS = [
 /* 詳細画面（x＝開いている再生リスト） */
 const YT_DETAIL_ACTIONS = [
   ["#ytEdit", (el, x) => ytOpenForm(x)],
+  /* 要確認の「!」：押すと補足を開く／閉じる */
+  [
+    "[data-wn]",
+    el => {
+      const k = el.dataset.wn;
+      if (wnOpen.has(k)) wnOpen.delete(k);
+      else wnOpen.add(k);
+      ytRefresh();
+    },
+  ],
   ["[data-dnav]", el => ytDetailNav(+el.dataset.dnav)],
   /* 未入力アラートの「なし」 */
   [
