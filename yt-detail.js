@@ -96,7 +96,7 @@ function ytOpenDetail(id, dir) {
     return;
   }
   $("#layer").innerHTML =
-    `<div class="scrim" data-close></div><div class="sheet dpanel" role="dialog" aria-modal="true" aria-label="${esc(x.t)}"><div class="wrap" id="ytIn">${ytDetailHtml(x)}</div></div>`;
+    `<div class="scrim" data-close></div><div class="dp-grip" title="ドラッグで幅を変える（ダブルクリックで元の幅）" aria-hidden="true"></div><div class="sheet dpanel" role="dialog" aria-modal="true" aria-label="${esc(x.t)}"><div class="wrap" id="ytIn">${ytDetailHtml(x)}</div></div>`;
   markSel();
 }
 function ytRefresh() {

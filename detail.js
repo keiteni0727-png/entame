@@ -47,6 +47,7 @@ function wnText(it, x) {
   return `<p>${esc(tx)}${go}${nb}</p>`;
 }
 function infoCards(it, { md, ns, mv, stv, cs, songRows }) {
+  const eps = episodes(it);
   const un = t => `<span class="unset">${t}</span>`;
   const nn = t => `<span class="nosong">${t}</span>`;
   const when = [it.dow >= 0 ? DOW[it.dow] + "曜 " : "", it.time || ""].join("").trim();
@@ -71,6 +72,7 @@ function infoCards(it, { md, ns, mv, stv, cs, songRows }) {
   const TIMEK = ["放送時間", "配信時間", "放送クール", "クールのずれ"];
   const edB = (jump, lab) => `<button type="button" class="u-btn sm iedit" data-jump="${jump}" aria-label="${lab}を編集">編集</button>`;
   const lines = [];
+  let tkStat = "";
   if (!ns) {
     const tLab = md === "stream" ? "配信時間" : "放送時間";
     const dowS = it.dow >= 0 ? DOW[it.dow] + "曜" : "";
@@ -82,13 +84,34 @@ function infoCards(it, { md, ns, mv, stv, cs, songRows }) {
   }
   const perLab = mv ? "公開日" : md === "sp" ? "放送日" : md === "ova" ? "発売日" : md === "stream" ? "配信開始" : "放送開始";
   const dd = x => x.replace(/（.）/, "").trim();
+  /* 放送期間：開始日と終了日の間をバーにして、今日の位置に丸（行は増やさない）。状態（放送中・放送終了・あと○日）と放送済みの話数は時刻の行の右端に */
   {
     const pm = mk("r:期間", ["開始日", "公開日", "発売日", "放送日"]);
     if (!per) lines.push(`<div class="tk-per">${tkMiss(perLab + " 未設定", "r:期間0", [])}${pm}</div>`);
     else if (per.includes(" 〜 ")) {
       const [p1, p2] = per.split(" 〜 ");
-      lines.push(`<div class="tk-per"><span>${esc(dd(p1))}</span><i aria-hidden="true"></i><span${p2 ? "" : ' class="tk-open"'}>${p2 ? esc(dd(p2)) : "放送中"}</span>${pm}</div>`);
+      const ms0 = x => (m => (m ? Date.UTC(+m[1], +m[2] - 1, +m[3]) : NaN))(/(\d{4})\/(\d{1,2})\/(\d{1,2})/.exec(x || ""));
+      const t1 = ms0(p1),
+        t2 = ms0(p2),
+        today = (j => Date.UTC(...j.day.split("-").map((v, k) => +v - (k === 1 ? 1 : 0))))(jst(NOWMIN()));
+      const tot = eps.filter(e => !e.sp).length,
+        airedN = eps.filter(e => !e.sp && e.t && aired(e)).length;
+      const pre = today < t1,
+        fin = (t2 && today > t2) || (tot && airedN >= tot && !(t2 && today <= t2));
+      /* 丸の位置：日付で。終了日がなければ放送済みの話数の割合（話数もなければ真ん中） */
+      const pct = pre ? 0 : fin ? 100 : t2 > t1 ? Math.round(((today - t1) / (t2 - t1)) * 100) : tot ? Math.round((airedN / tot) * 100) : 50;
+      const st = pre ? `<span class="tk-st pre">あと${Math.ceil((t1 - today) / 864e5)}日</span>` : fin ? `<span class="tk-st end">放送終了</span>` : `<span class="tk-st on">放送中</span>`;
+      /* 放送済みの話数は放送中だけ（終了・放送前は札だけにして、時刻の行に収める） */
+      const cnt = tot && !pre && !fin ? `<span class="tk-cnt"><b>${airedN}</b>/${tot}話</span>` : "";
+      tkStat = `<span class="tk-stat">${st}${cnt}</span>`;
+      lines.push(`<div class="tk-per"><span>${esc(dd(p1))}</span><span class="tk-bar${fin ? " fin" : ""}" aria-hidden="true"><i style="width:${pct}%"></i>${pre || fin ? "" : `<b style="left:${pct}%"></b>`}</span><span${p2 ? "" : ' class="tk-open"'}>${p2 ? esc(dd(p2)) : "未定"}</span>${pm}</div>`);
     } else lines.push(`<div class="tk-per"><small class="tk-l">${perLab}</small><span>${esc(dd(per))}</span>${pm}</div>`);
+  }
+  /* 状態は時刻の行の右端に（時刻の行がない作品は期間の行のあと） */
+  if (tkStat) {
+    const k = lines.findIndex(l => l.startsWith('<div class="tk-when">'));
+    if (k >= 0) lines[k] = lines[k].replace(/<\/div>$/, tkStat + "</div>");
+    else lines.push(`<div class="tk-when">${tkStat}</div>`);
   }
   /* 札の行：放送局・放送枠（ドラマ）・配信サイト・シリーズ（アニメ以外）・未入力の公式サイト／配信URL */
   const chips = [];
@@ -296,7 +319,7 @@ function openDetail(id, dir, keepNav) {
     return;
   }
   $("#layer").innerHTML =
-    `<div class="scrim" data-close></div><div class="sheet dpanel" role="dialog" aria-modal="true" aria-label="${esc(it.t)}"><div class="wrap" id="sheetIn">${renderDetail(it)}</div></div>`;
+    `<div class="scrim" data-close></div><div class="dp-grip" title="ドラッグで幅を変える（ダブルクリックで元の幅）" aria-hidden="true"></div><div class="sheet dpanel" role="dialog" aria-modal="true" aria-label="${esc(it.t)}"><div class="wrap" id="sheetIn">${renderDetail(it)}</div></div>`;
   syncDhh();
   setDTab("info");
   markSel();
@@ -726,4 +749,70 @@ function detailNav(d) {
 function onDetailClick(e) {
   const it = openId && items.find(x => x.id === openId);
   return !!it && runActions(DETAIL_ACTIONS, e, it);
+}
+
+/* ---------- PC：右の詳細パネルの幅（左の境目をドラッグ。最小は今の幅、最大は画面の右側3分の2。ダブルクリックで元の幅。この端末で覚える） ---------- */
+const PW_MIN = 470,
+  K_PW = "adb.v3.pw";
+const pwZoom = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--z")) || 1;
+const pwMax = () => Math.max(PW_MIN, Math.floor((innerWidth * 2) / 3 / pwZoom()));
+function pwApply(w) {
+  const r = document.documentElement.style;
+  if (!w || w <= PW_MIN) r.removeProperty("--pw");
+  else r.setProperty("--pw", Math.min(w, pwMax()) + "px");
+}
+pwApply(+ls.get(K_PW) || 0);
+addEventListener("resize", () => pwApply(+ls.get(K_PW) || 0));
+document.addEventListener("pointerdown", e => {
+  const g = e.target.closest && e.target.closest(".dp-grip");
+  if (!g || e.button > 0) return;
+  e.preventDefault();
+  try {
+    g.setPointerCapture(e.pointerId);
+  } catch (_) {}
+  document.documentElement.classList.add("pwdrag");
+  const move = ev => pwApply(Math.round((innerWidth - ev.clientX) / pwZoom()));
+  const up = ev => {
+    g.removeEventListener("pointermove", move);
+    g.removeEventListener("pointerup", up);
+    g.removeEventListener("pointercancel", up);
+    document.documentElement.classList.remove("pwdrag");
+    const w = parseFloat(document.documentElement.style.getPropertyValue("--pw")) || 0;
+    ls.set(K_PW, w > PW_MIN ? w : 0);
+    syncDhh();
+  };
+  g.addEventListener("pointermove", move);
+  g.addEventListener("pointerup", up);
+  g.addEventListener("pointercancel", up);
+});
+document.addEventListener("dblclick", e => {
+  if (!(e.target.closest && e.target.closest(".dp-grip"))) return;
+  pwApply(0);
+  ls.set(K_PW, 0);
+});
+/* 境目を押しても「外を押した」扱いにしない（詳細の中の編集を閉じない） */
+document.addEventListener(
+  "click",
+  e => {
+    if (e.target.closest && e.target.closest(".dp-grip")) e.stopImmediatePropagation();
+  },
+  true,
+);
+/* パネルの幅・一覧の幅に合わせて印を付ける（パネルが広い＝.pwide、一覧が狭い＝html.nlist） */
+const pwRO =
+  "ResizeObserver" in window
+    ? new ResizeObserver(() => {
+        const sh = $("#layer .sheet.dpanel"),
+          m = $("#main");
+        if (sh) sh.classList.toggle("pwide", IS_PC() && sh.clientWidth >= 760);
+        document.documentElement.classList.toggle("nlist", !!(IS_PC() && sh && m && m.clientWidth < 640));
+      })
+    : null;
+if (pwRO) {
+  pwRO.observe($("#main"));
+  new MutationObserver(() => {
+    const sh = $("#layer .sheet.dpanel");
+    if (sh) pwRO.observe(sh);
+    else document.documentElement.classList.remove("nlist");
+  }).observe($("#layer"), { childList: true });
 }

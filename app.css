@@ -2072,24 +2072,12 @@ html[data-gsz="s"] .pgrid{--gc:3}
 /* --- PC：作品・YouTubeの詳細は右に開いたままのパネル（幅470px・左に太枠の境目）。一覧は暗くせず、そのまま操作できる --- */
 @media (min-width:900px){
   #layer .sheet.dpanel{top:0;bottom:0;left:auto;right:0;width:var(--pw);max-width:none;max-height:none;transform:none;border-radius:0;border-left:3px solid var(--k);box-shadow:none}
-  #layer .sheet.dpanel .wrap{max-width:none;padding-left:16px;padding-right:16px}
-  #layer .scrim:has(+ .sheet.dpanel){display:none}
+  #layer .sheet.dpanel .wrap{flex:1 1 auto;width:100%;min-width:0;max-width:none;padding-left:16px;padding-right:16px}
+  #layer:has(.sheet.dpanel) .scrim{display:none}
   body:has(#layer .sheet.dpanel){padding-right:calc(var(--pw) * var(--z))}
   /* パネルを開いている間：番組表の NEXT UP はパネルと入れかえ、一覧のグリッドは狭い画面なら3列 */
   body:has(#layer .sheet.dpanel) .wpc{grid-template-columns:minmax(0,1fr)}
   body:has(#layer .sheet.dpanel) .wpc-side{display:none}
-}
-@media (min-width:900px) and (max-width:1279px){
-  body:has(#layer .sheet.dpanel) .pgrid{--gc:3}
-  html[data-gsz="s"] body:has(#layer .sheet.dpanel) .pgrid{--gc:4}
-  body:has(#layer .sheet.dpanel) .ygrid{--gc:2}
-  html[data-gsz="s"] body:has(#layer .sheet.dpanel) .ygrid{--gc:3}
-}
-@media (min-width:1280px) and (max-width:1599px){
-  body:has(#layer .sheet.dpanel) .pgrid{--gc:5}
-  html[data-gsz="s"] body:has(#layer .sheet.dpanel) .pgrid{--gc:6}
-  body:has(#layer .sheet.dpanel) .ygrid{--gc:3}
-  html[data-gsz="s"] body:has(#layer .sheet.dpanel) .ygrid{--gc:4}
 }
 /* --- YouTubeの詳細の見出し：上に少し傾けた横長の画像（太枠＋影）、その下にラベル・タイトル・YouTubeで見る／まとめ動画 --- */
 .yhx .yimg{display:block;width:calc(100% - 8px);aspect-ratio:16/9;margin:6px 0 16px 4px;padding:0;border:2px solid var(--k);border-radius:16px;box-shadow:5px 5px 0 var(--ks);overflow:hidden;background:var(--u-soft);transform:rotate(-1.5deg);cursor:zoom-in}
@@ -2143,7 +2131,16 @@ html[data-gsz="s"] .pgrid{--gc:3}
 .tk-time{font-family:var(--fn);font-weight:900;font-size:24px;line-height:1.05}
 .tk-cour{align-self:center;font-family:var(--fn);font-weight:800;font-size:11px;padding:2px 8px;border:1.5px solid var(--k2);border-radius:999px;background:var(--pop);color:var(--onpop)}
 .tk-per{display:flex;align-items:center;gap:8px;margin-top:6px;font-family:var(--fn);font-weight:800;font-size:14px;white-space:nowrap}
-.tk-per i{flex:1;min-width:16px;height:2px;background:repeating-linear-gradient(90deg,var(--u-strong) 0 6px,transparent 6px 10px)}
+.tk-bar{position:relative;flex:1;min-width:24px;height:10px;box-sizing:border-box;border:1.5px solid var(--k2);border-radius:6px;background:var(--u-surface)}
+.tk-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:var(--u-accent)}
+.tk-bar b{position:absolute;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;box-sizing:border-box;border-radius:50%;background:var(--pop);border:2px solid var(--k)}
+.tk-stat{display:inline-flex;align-items:center;gap:6px;margin-left:auto;align-self:center}
+.tk-st{font-size:11px;font-weight:900;line-height:1.4;padding:1px 8px;border-radius:999px;border:1.5px solid var(--k);white-space:nowrap}
+.tk-st.on{background:var(--u-accent);color:#fff}
+.tk-st.end{background:var(--u-chip);color:var(--u-sub);border-color:var(--k2)}
+.tk-st.pre{background:var(--pop);color:var(--onpop)}
+.tk-cnt{font-size:11px;font-weight:800;color:var(--u-sub);white-space:nowrap}
+.tk-cnt b{font-family:var(--fn);font-weight:900;font-size:13px;color:var(--u-accent)}
 .tk-per .tk-open{color:var(--u-accent)}
 .tk-l{font-family:var(--u-f);font-size:11px;font-weight:700;color:var(--u-sub)}
 .tk-when+.tk-per{margin-top:6px}
@@ -2190,3 +2187,33 @@ html[data-gsz="s"] .pgrid{--gc:3}
 /* 曲の編集の行：話数の札はアーティストの下の行に（長い「1〜3話・5話・8〜10話」で曲名を押しつぶさない） */
 .sg-sum{grid-template-columns:minmax(0,1fr)}
 .sg-sum .sg-se{justify-self:start;margin-top:3px;white-space:normal;line-height:1.5}
+/* --- PC：右のパネルの幅を変える境目（左の太枠の上。ドラッグで幅を変える） --- */
+.dp-grip{display:none}
+@media (min-width:900px){
+  #layer .dp-grip{display:block;position:fixed;top:0;bottom:0;right:var(--pw);z-index:22;width:12px;margin-right:-7px;cursor:ew-resize;touch-action:none}
+  #layer .dp-grip::after{content:"";position:absolute;left:3px;top:50%;width:6px;height:44px;margin-top:-22px;border-radius:3px;background:var(--k);opacity:0;transition:opacity .15s}
+  #layer .dp-grip:hover::after,html.pwdrag #layer .dp-grip::after{opacity:1}
+  html.pwdrag,html.pwdrag *{cursor:ew-resize!important;user-select:none}
+  /* パネルを開いている間：一覧のグリッドは空いた幅に合わせて列の数を変える */
+  body:has(#layer .sheet.dpanel) .pgrid{grid-template-columns:repeat(auto-fill,minmax(128px,1fr))}
+  html[data-gsz="s"] body:has(#layer .sheet.dpanel) .pgrid{grid-template-columns:repeat(auto-fill,minmax(96px,1fr))}
+  body:has(#layer .sheet.dpanel) .ygrid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+  html[data-gsz="s"] body:has(#layer .sheet.dpanel) .ygrid{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+}
+/* パネルが横に広いとき（.pwide。幅760px以上）：番組情報のカードを左右2列に（間延びしないように） */
+.sheet.dpanel.pwide .dp-info{column-count:2;column-gap:12px}
+.sheet.dpanel.pwide .dp-info>*{break-inside:avoid}
+.sheet.dpanel.pwide .dp-info>.links{column-span:all}
+/* 一覧の幅が狭いとき（パネルを広げたとき。html.nlist）：番組表のカードはスマホと同じ大きさ */
+@media (min-width:900px){
+  html.nlist .wcard.v-tl{grid-template-columns:50px 14px 90px minmax(0,1fr);column-gap:10px;padding-bottom:28px!important}
+  html.nlist .v-tl .wc-time{font-size:18px}
+  html.nlist .v-tl .wc-line i{margin-top:9px;width:10px;height:10px;box-shadow:0 0 0 3px var(--u-bg)}
+  html.nlist .v-tl .wc-body{height:auto;min-height:135px}
+  html.nlist .v-tl .wc-img{width:100%;height:auto;aspect-ratio:2/3}
+  html.nlist .v-tl .wc-ttl{font-size:15px}
+  html.nlist .v-tl .wc-tags{flex-wrap:wrap}
+}
+/* 一覧が狭いときの番組表：進み具合の「5/12話」を折り返さない */
+html.nlist .wc-foot2 .wc-cnt{white-space:nowrap}
+html.nlist .wc-foot2 .wc-bar{min-width:40px}
