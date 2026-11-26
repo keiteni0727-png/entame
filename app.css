@@ -4,7 +4,7 @@
 /* ===================== 共通の土台（見た目）：おかね手帳・エンタメ管理で同じファイルを使う =====================
   ・色・書体・角丸。アクセント色（--u-accent / --u-accent2）だけ、アプリ側のCSSで上書きする
   ・アプリの外枠に class="u-app" を付けると、左メニューなどの共通部品が使える */
-:root{--pop:#ffd23f;--pop2:#fff3c4;--onpop:#1a1714;--k:#1a1714;--ks:#1a1714;--k2:#1a1714;--kbg:#1a1714;--fd:"Mochiy Pop One",var(--u-f);--fn:"Rubik",var(--u-f);--u-bg:#f7f1e8;--u-surface:#ffffff;--u-ink:#1a1714;--u-sub:#6b6257;--u-line:#e4dacb;--u-soft:#f0e8dc;--u-strong:#cbbca6;--u-chip:#efe6d8;--u-accent:#ff5a1f;--u-accent2:#ffe5d9;--u-acct:#c43e0c;--u-live:#d4342a;--u-live2:#fbe9e7;--u-danger:#c8382e;--u-danger2:#fbe9e7;--u-ok:#1f8a52;--u-ok2:#e3f3ea;--u-warn:#a36800;--u-warn2:#f8eed5;--u-on:#ffffff;--u-scrim:rgba(12,16,24,.45);--u-shadow:0 10px 32px rgba(16,24,40,.18);--u-r:10px;--u-rl:14px;--u-f:"Zen Kaku Gothic New","Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",system-ui,sans-serif;--u-num:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--fs-xs:11px;--fs-s:12px;--fs-m:13px;--fs-base:14px;--fs-l:16px;--fs-xl:20px;--fs-2xl:28px;--fs-3xl:40px;
+:root{--pop:#ffd23f;--pop2:#fff3c4;--onpop:#1a1714;--seen:#3ddc97;--k:#1a1714;--ks:#1a1714;--k2:#1a1714;--kbg:#1a1714;--fd:"Mochiy Pop One",var(--u-f);--fn:"Rubik",var(--u-f);--u-bg:#f7f1e8;--u-surface:#ffffff;--u-ink:#1a1714;--u-sub:#6b6257;--u-line:#e4dacb;--u-soft:#f0e8dc;--u-strong:#cbbca6;--u-chip:#efe6d8;--u-accent:#ff5a1f;--u-accent2:#ffe5d9;--u-acct:#c43e0c;--u-live:#d4342a;--u-live2:#fbe9e7;--u-danger:#c8382e;--u-danger2:#fbe9e7;--u-ok:#1f8a52;--u-ok2:#e3f3ea;--u-warn:#a36800;--u-warn2:#f8eed5;--u-on:#ffffff;--u-scrim:rgba(12,16,24,.45);--u-shadow:0 10px 32px rgba(16,24,40,.18);--u-r:10px;--u-rl:14px;--u-f:"Zen Kaku Gothic New","Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",system-ui,sans-serif;--u-num:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--fs-xs:11px;--fs-s:12px;--fs-m:13px;--fs-base:14px;--fs-l:16px;--fs-xl:20px;--fs-2xl:28px;--fs-3xl:40px;
   --r-s:6px;--r-m:var(--u-r);--r-l:var(--u-rl);--r-full:999px;
   --h-s:32px;--h-m:40px;--h-l:48px;--h-chip:28px;--h-in:36px;--u-navb:max(14px,calc(env(safe-area-inset-bottom,0px) - 6px))}
 
@@ -734,9 +734,6 @@ input[type=date]::-webkit-date-and-time-value{text-align:left}
 /* メニューのアイコン */
 /* ===== 番組表（新） ===== */
 .wtop{display:flex;gap:12px;align-items:stretch;padding-top:16px}
-.wt-clock{display:flex;align-items:baseline;gap:12px;flex:1;min-width:0;padding:4px 2px}
-.wt-clock time{font-size:var(--fs-3xl);line-height:1;font-variant-numeric:tabular-nums}
-.wt-clock span{font-size:var(--fs-base);font-weight:700;color:var(--u-sub)}
 
 .wcard.live{border:2px solid var(--u-live);box-shadow:0 0 0 4px color-mix(in srgb,var(--u-live) 14%,transparent)}
 
@@ -772,9 +769,6 @@ input[type=date]::-webkit-date-and-time-value{text-align:left}
 .xser .u-btn{flex:none}
 @media (max-width:899px){
   .wtop{padding-top:10px;gap:8px}
-  .wt-clock{flex-direction:column;gap:4px;justify-content:center}
-  .wt-clock time{font-size:var(--fs-3xl)}
-  .wt-clock span{font-size:var(--fs-m)}
   .wday{margin-top:12px}
   .wc-time{font-size:var(--fs-2xl)}
   .wc-ttl{font-size:var(--fs-xl)}
@@ -1065,7 +1059,6 @@ button.imt[aria-expanded="false"]+.imt,button.imt[aria-expanded="false"]+button.
 .idl .ilnk .ilar{font-size:var(--fs-l);line-height:1}
 
 /* ===================== 2026-11 新デザイン（AB案）：番組表 ===================== */
-.wt-clock time{font-family:var(--fn);font-weight:800;letter-spacing:0;color:var(--u-acct)}
 .wtop-side{display:flex;gap:12px;align-items:stretch;min-width:0;flex:1}
 .wt-l{display:block;font-family:var(--u-num);font-size:var(--fs-xs);font-weight:700;letter-spacing:.1em;margin-bottom:2px;color:var(--u-live)}
 .wtabs button[aria-selected="true"]{background:var(--u-accent);color:var(--u-on);box-shadow:none}
@@ -1073,18 +1066,13 @@ button.imt[aria-expanded="false"]+.imt,button.imt[aria-expanded="false"]+button.
 .wtabs button[aria-selected="true"] .wdot{background:var(--u-on)}
 /* カード（行）：左に時刻の列、右に中身 */
 .wcard{min-width:0;display:flex;flex-direction:row;gap:12px;background:none;border:0;border-radius:0;overflow:visible;position:relative}
-.wcard .wc-tick,.wcard.un .wc-tick{flex:none}
+.wcard .wc-tick{flex:none}
 .wcard .wc-time{font-family:var(--fn);font-size:var(--fs-2xl);font-weight:800;line-height:1;letter-spacing:0;color:var(--u-ink)}
 .wcard:not(.nx):not(.live) .wc-time{color:var(--u-sub)}
 .wcard .wc-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;padding-bottom:16px}
 .wcard .wc-main{display:flex;flex-direction:column;gap:6px;padding:0;border:0;background:none;text-align:left;font:inherit;color:var(--u-ink);min-width:0}
 .wc-tags{display:flex;flex-wrap:wrap;gap:4px 5px;align-items:center;min-width:0}
 .wc-tags .wc-st{font-size:var(--fs-s);font-weight:700;color:var(--u-sub)}
-.wc-b{display:inline-flex;align-items:center;gap:5px;font-size:var(--fs-xs);font-weight:700;padding:2px 7px;border-radius:var(--r-s);white-space:nowrap;line-height:1.35}
-.wc-b.live{background:var(--u-live2);color:var(--u-live);font-family:var(--fn);font-size:var(--fs-base);letter-spacing:.06em;font-weight:800;padding:1px 7px}
-.wc-b.live i{width:7px;height:7px;border-radius:50%;background:var(--u-live)}
-.wc-b.nx{background:var(--u-accent2);color:var(--u-acct);font-family:var(--fn);font-size:var(--fs-base);letter-spacing:.06em;font-weight:800;padding:1px 7px}
-.wc-b.un{background:var(--u-live2);color:var(--u-live)}
 .wcard .wc-ttl{font-size:var(--fs-l);font-weight:700;line-height:1.35}
 .wcard .wc-ep{font-size:var(--fs-base);color:var(--u-ink);line-height:1.45}
 .wcard .wc-ep em{border:0;margin:0;padding:0;font-size:inherit;vertical-align:baseline;font-style:normal;font-weight:700;color:var(--u-sub)}
@@ -1746,7 +1734,7 @@ select.sg-t{height:var(--h-in);width:auto;max-width:120px;cursor:pointer;-webkit
 .v-tl.live .wc-time{color:var(--u-live)}
 .v-tl .wc-line{grid-area:line;position:relative;display:flex;justify-content:center}
 .v-tl .wc-line::before{content:"";position:absolute;top:0;bottom:-18px;width:2px;background:var(--u-line)}
-.wline .v-tl:last-child .wc-line::before{bottom:calc(100% - 20px)}
+.wline .v-tl:last-of-type .wc-line::before{bottom:calc(100% - 20px)}
 .v-tl .wc-line i{position:relative;margin-top:9px;width:10px;height:10px;border-radius:50%;background:var(--u-strong);box-shadow:0 0 0 3px var(--u-bg)}
 .v-tl.nx .wc-line i{background:var(--u-accent);box-shadow:0 0 0 3px var(--u-accent2)}
 .v-tl.live .wc-line i{background:var(--u-live);box-shadow:0 0 0 3px var(--u-live2)}
@@ -1755,12 +1743,6 @@ select.sg-t{height:var(--h-in);width:auto;max-width:120px;cursor:pointer;-webkit
 .wc-imgi:not([src]){visibility:hidden}
 .wc-noimg{position:absolute;inset:0;display:grid;place-items:center;color:var(--u-strong)}
 .wc-noimg svg{width:30px;height:30px}
-.v-tl .wc-img .wc-b{position:absolute;left:4px;top:4px;max-width:calc(100% - 8px);box-sizing:border-box;overflow:hidden}
-.v-tl .wc-img .wc-b.live,.v-tl .wc-img .wc-b.nx{font-size:var(--fs-s)}
-.v-tl .wc-img .wc-b.nx{background:var(--u-accent);color:var(--u-on)}
-.v-tl .wc-img .wc-b.live{background:var(--u-live);color:#fff}
-.v-tl .wc-img .wc-b.live i{background:#fff}
-.v-tl .wc-img .wc-b.un{background:var(--u-live);color:#fff}
 .v-tl .wc-body{grid-area:body;min-width:0;min-height:135px;display:flex;flex-direction:column;justify-content:space-between;gap:6px;padding:0}
 .v-tl .wc-main{gap:5px}
 .v-tl .wc-tags{flex-wrap:wrap;row-gap:4px}
@@ -1770,30 +1752,27 @@ select.sg-t{height:var(--h-in);width:auto;max-width:120px;cursor:pointer;-webkit
 .wc-foot2 .wc-prog{flex:1;min-width:0}
 .wc-foot2 .wc-bar{max-width:200px}
 .wcard.v-tl .wc-tick.u-btn{flex:none;margin-left:auto;height:32px;padding:0 14px;font-size:var(--fs-s);border-radius:var(--r-m)}
-.wline .v-tl:first-child .wc-line::before{top:14px}
+.wline .v-tl:first-of-type .wc-line::before{top:14px}
 .wline{display:flex;flex-direction:column;margin-top:4px}
 @media (min-width:900px){
-  .wpc{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:28px;align-items:start;padding-top:16px}
+  .wpc{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:28px;align-items:start;padding-top:16px}
   .wpc-main .wtabs{margin-top:0}
   .wpc-side{position:sticky;top:16px}
   .wpc-side .wtop{padding-top:0}
   .wpc-side .wtop-side{flex-direction:column;gap:14px}
-  .wpc-side .wt-clock{flex-direction:column;align-items:flex-start;gap:4px;background:var(--u-surface);border:1px solid var(--u-line);border-radius:var(--r-l);padding:16px 18px}
-  .wpc-side .wt-clock time{font-size:56px}
   .wcard.v-tl{grid-template-columns:80px 20px 120px minmax(0,1fr);grid-template-areas:"time line img body";column-gap:16px}
   .v-tl .wc-time{font-size:40px}
   .v-tl .wc-line i{margin-top:13px;width:14px;height:14px;box-shadow:0 0 0 4px var(--u-bg)}
   .v-tl.nx .wc-line i{box-shadow:0 0 0 4px var(--u-accent2)}
   .v-tl.live .wc-line i{box-shadow:0 0 0 4px var(--u-live2)}
   .v-tl .wc-line::before{bottom:-22px}
-  .wline .v-tl:last-child .wc-line::before{bottom:calc(100% - 26px)}
-  .wline .v-tl:first-child .wc-line::before{top:20px}
+  .wline .v-tl:last-of-type .wc-line::before{bottom:calc(100% - 26px)}
+  .wline .v-tl:first-of-type .wc-line::before{top:20px}
   .v-tl{padding-bottom:22px!important}
   .v-tl .wc-body{height:180px;min-height:0;padding:0;overflow:hidden}
   .v-tl .wc-img{width:120px;height:180px;aspect-ratio:auto}
-  .v-tl .wc-img .wc-b{left:6px;top:6px}
   .v-tl .wc-ttl{font-size:var(--fs-xl)}
-  .wline .v-tl:last-child{padding-bottom:0!important}
+  .wline .v-tl:last-of-type{padding-bottom:0!important}
   .v-tl .wc-tags{flex-wrap:nowrap;overflow:hidden}
 }
 /* ===== リスト／グリッドの切り替え・グリッド表示 ===== */
@@ -2116,7 +2095,6 @@ html[data-gsz="l"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(240px,1f
 .tl.next .tlb{background:var(--pop2)}
 .tln{font-family:var(--fn);font-weight:800;color:var(--u-ink)}
 /* --- 番組表：曜日・カード --- */
-.wtop .wtop-side>*:first-child{font-family:var(--fn)}
 .wdayhd h2{font-family:var(--fd);font-weight:400}
 .wtabs{background:none;padding:0;gap:5px}
 .wtabs button{background:var(--u-surface);border:2px solid var(--k);border-radius:14px;color:var(--u-ink)}
@@ -2149,3 +2127,40 @@ html[data-gsz="l"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(240px,1f
   .gtabs [aria-selected="true"]{font-size:40px}
   .gtabs [aria-selected="true"] b{font-size:22px}
 }
+/* --- 番組表：上の見出し（小さな TONIGHT ＋大きな「今夜の番組表」） --- */
+.whd{padding-top:18px}
+.whd small{display:block;font-family:var(--fn);font-weight:900;font-size:12px;letter-spacing:.24em;color:var(--u-accent)}
+.whd h1{margin:2px 0 0;font-family:var(--fd);font-weight:400;font-size:28px;line-height:1.25}
+.wtop:has(.wtop-side:empty){display:none}
+/* カードの右上に斜めに貼ったシール（ON AIR・NEXT・見た） */
+.wcard.v-tl{position:relative}
+.wc-seal{position:absolute;z-index:2;top:-16px;right:-12px;transform:rotate(7deg);padding:2px 9px;border:2px solid var(--k);border-radius:8px;box-shadow:2px 2px 0 var(--ks);font-family:var(--fn);font-weight:900;font-size:11px;letter-spacing:.08em;line-height:1.4;white-space:nowrap;pointer-events:none}
+.wc-seal.live{background:var(--u-live);color:#fff}
+.wc-seal.nx{background:var(--pop);color:var(--onpop)}
+.wc-seal.seen{background:var(--seen);color:var(--onpop)}
+/* 今の時刻の位置：「NOW 22:41」の札と横線 */
+.wnow{display:flex;align-items:center;gap:8px;margin:0 0 18px}
+.wnow b{flex:none;padding:2px 9px;border:2px solid var(--k);border-radius:8px;background:var(--u-accent);color:#fff;font-family:var(--fn);font-weight:900;font-size:12px;letter-spacing:.06em}
+.wnow::after{content:"";flex:1;height:2px;border-radius:1px;background:var(--u-accent)}
+@media (min-width:900px){
+  .whd small{font-size:13px}
+  .whd h1{font-size:40px}
+  .wnow{margin-bottom:24px}
+}
+/* PC：NEXT UP（次に始まる作品を大きなポスターで） */
+.nup{position:relative;margin-bottom:16px;padding:16px;border:2px solid var(--k);border-radius:18px;background:var(--u-surface);box-shadow:4px 4px 0 var(--ks)}
+.nup-h{font-family:var(--fn);font-weight:900;font-size:12px;letter-spacing:.2em;color:var(--u-accent);margin-bottom:12px}
+.nup-img{position:relative;display:block;width:150px;aspect-ratio:2/3;margin:0 auto 14px;padding:0;border:2px solid var(--k);border-radius:14px;box-shadow:4px 4px 0 var(--ks);overflow:hidden;background:var(--u-soft);transform:rotate(-2deg);cursor:pointer}
+.nup-imgi{display:block;width:100%;height:100%;object-fit:cover}
+.nup-imgi:not([src]){visibility:hidden}
+.nup-in{font-family:var(--fn);font-weight:900;font-size:22px;color:var(--u-accent);line-height:1.2}
+.nup-t{display:block;margin:4px 0 0;padding:0;border:0;background:none;text-align:left;font-family:var(--fd);font-weight:400;font-size:18px;line-height:1.35;color:var(--u-ink);cursor:pointer}
+.nup-ep{margin-top:4px;font-size:var(--fs-m);color:var(--u-sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nup-btns{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.nup-btns:empty{display:none}
+.nup-btns .u-btn{height:42px;justify-content:center;gap:6px;border-radius:14px;font-weight:900;text-decoration:none;border:2px solid var(--k)}
+.nup-vod{background:var(--kbg);color:#fff;box-shadow:3px 3px 0 var(--u-accent)}
+.nup-vod .iic{width:15px;height:15px}
+.nup-vod .iic.ply circle{fill:#fff}
+.nup-vod .iic.ply path{fill:var(--kbg)}
+.nup-tick{background:var(--pop);color:var(--onpop);box-shadow:2px 2px 0 var(--ks)}
