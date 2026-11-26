@@ -278,6 +278,9 @@ function openDetail(id, dir, keepNav) {
   syncDhh();
   setDTab("info");
   markSel();
+  /* スクロールしたら上の段に地の色を付ける（スクロール前は透明で、ポスターが上の段の横まで上がる） */
+  const sh2 = $("#layer .sheet");
+  sh2.addEventListener("scroll", () => sh2.classList.toggle("scrolled", sh2.scrollTop > 4), { passive: true });
   if (!TOUCH) $(".sheet .close").focus({ preventScroll: true });
 }
 /* 詳細を「基本情報／話数」タブで切り替え（PC・スマホ共通）（タブの状態はシート自体のクラスで持つ） */

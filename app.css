@@ -332,7 +332,7 @@ dd{margin:0;min-width:0;overflow-wrap:anywhere}
 .ghd small{font-family:var(--u-f);font-size:var(--fs-s);color:var(--u-sub);font-weight:500}
 .ghd span{margin-left:auto;font-family:var(--u-f);font-size:var(--fs-s);color:var(--u-sub)}
 /* 編集画面の区切り */
-.fsec{border:1px solid var(--u-line);padding:10px 12px;margin-top:8px;background:var(--u-surface)}
+.fsec{border:2px solid var(--k);padding:10px 12px;margin-top:8px;background:var(--u-surface)}
 .fsec h4{margin:0 0 8px;font-size:var(--fs-m);letter-spacing:.04em;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .fsec h4 .hint{font-weight:400}
 .fsec .fgrid{margin-top:0;gap:10px}
@@ -554,7 +554,7 @@ input[type=date]::-webkit-date-and-time-value{text-align:left}
 /* 番組表：時刻の下の放送局 */
 /* スマホ・タブレット：画面下のメニュー（家計簿と同じ形）と、その横の設定ボタン */
 /* 基本情報カード */
-.icard{background:var(--u-surface);border:2px solid var(--k);border-radius:18px;padding:12px 14px;margin-bottom:10px}
+.icard{background:var(--u-surface);border:2px solid var(--k);border-radius:18px;padding:10px 14px;margin-bottom:8px}
 .icard [data-jump]{cursor:pointer}
 .icard [data-jump]:not(.u-btn){border-radius:var(--r-s)}
 .icard [data-jump]:active{background:var(--u-chip)}
@@ -830,9 +830,9 @@ input[type=date]::-webkit-date-and-time-value{text-align:left}
 .ghd.stuck{box-shadow:0 1px 0 var(--u-line),0 6px 8px -8px rgba(0,0,0,.25)}
 /* ---------- 作品の詳細：上の段の放送形態ラベル・ON AIR・MUSIC ---------- */
 .dmeta .dmt{margin:0;border:0;font-size:var(--fs-s);padding:4px 8px 4px 7px;border-radius:var(--r-s);vertical-align:0;cursor:pointer;border-left:0}
-.ich{display:flex;flex-wrap:wrap;align-items:center;row-gap:6px;margin-bottom:8px}
+.ich{display:flex;flex-wrap:wrap;align-items:center;row-gap:6px;margin-bottom:6px}
 .ilamp{font-family:var(--fn);font-size:12px;font-weight:900;letter-spacing:.14em;line-height:1;padding:0;border-radius:0;background:none;color:var(--u-accent)}
-.idl{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;margin:0;align-items:center}
+.idl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0;align-items:center}
 .idl dt{font-size:var(--fs-s);font-weight:700;color:var(--u-sub);white-space:nowrap}
 .idl dd{margin:0;min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:var(--fs-base)}
 .idl .iwhen{font-family:var(--u-num);font-size:var(--fs-xl);font-weight:700;letter-spacing:.01em}
@@ -846,7 +846,7 @@ input[type=date]::-webkit-date-and-time-value{text-align:left}
 .ima .ieps{display:inline-flex;flex-wrap:wrap;gap:4px}
 .ima .iep{flex:none;font-size:var(--fs-xs);font-weight:600;color:var(--u-sub);border:1px solid var(--u-line);border-radius:var(--r-s);padding:0 6px;line-height:1.6}
 @media (max-width:560px){
-  .idl{gap:7px 12px}
+  .idl{gap:6px 12px}
   .idl .iwhen{font-size:var(--fs-l)}
   .dmeta .dmt{font-size:var(--fs-s);padding:4px 7px 4px 6px}
 }
@@ -1144,7 +1144,7 @@ button.imt[aria-expanded="false"]+.imt,button.imt[aria-expanded="false"]+button.
 /* 条件のラベル（2つまで＋他○件）・解除・件数。高さは1行のまま */
 .fsum{display:flex;align-items:center;gap:8px;margin:10px 0 2px;min-height:28px;font-size:var(--fs-s);color:var(--u-sub)}
 .fsum-l{flex:1;min-width:0;display:flex;align-items:center;gap:5px;overflow:hidden}
-.fchip{min-width:0;max-width:46%}
+.fchip{min-width:0;max-width:46%;border:1.5px solid var(--k2)}
 .fchip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fmore{flex:none}
 .fsum .clear{flex:none}
@@ -1549,7 +1549,7 @@ select#arcJump{cursor:pointer;-webkit-appearance:none;appearance:none;padding-ri
 .field input[type=url]{font-size:var(--fs-m);padding:6px 9px}
 /* ===== 作品の編集：タイトル・ジャンルとステータスの札・表の形の段 ===== */
 .fhead{display:grid;gap:8px;margin:4px 0 10px}
-.ftitle{width:100%;border:1px solid var(--u-line);background:var(--u-surface);color:var(--u-ink);border-radius:var(--r-m);padding:8px 10px;font:inherit;font-size:var(--fs-l);font-weight:700}
+.ftitle{width:100%;border:2px solid var(--k);background:var(--u-surface);color:var(--u-ink);border-radius:14px;padding:9px 12px;font:inherit;font-size:17px;font-weight:700}
 .fchips{display:flex;gap:6px;flex-wrap:wrap}
 .fhead .fchip{--chip-fg:#fff}
 .fhead .fchip.ka{--chip-bg:var(--anime)}.fhead .fchip.kd{--chip-bg:var(--drama)}.fhead .fchip.kf{--chip-bg:var(--movie)}.fhead .fchip.kr{--chip-bg:var(--stream)}
@@ -1561,7 +1561,7 @@ select#arcJump{cursor:pointer;-webkit-appearance:none;appearance:none;padding-ri
 .fxst button[aria-pressed="true"]{color:#fff;border-color:transparent}
 .fxst button[aria-pressed="true"].s-未視聴{background:var(--st-want)}.fxst button[aria-pressed="true"].s-視聴中{background:var(--st-now)}.fxst button[aria-pressed="true"].s-視聴済み{background:var(--st-done)}.fxst button[aria-pressed="true"].s-見ない{background:var(--st-drop)}
 /* 作品の編集：ON AIR・MUSIC の枠（詳細のカードと同じラベル・枠） */
-.fsec.ftbl,.fsec.fsongs{border:1px solid var(--u-line);border-radius:var(--r-l);padding:12px 14px;background:var(--u-surface);margin-top:12px}
+.fsec.ftbl,.fsec.fsongs{border:2px solid var(--k);border-radius:18px;padding:12px 14px;background:var(--u-surface);margin-top:12px}
 .fsec.ftbl h4,.fsec.fsongs h4{margin:0 0 8px;align-items:center}
 .ftbl .fgrid{display:block;margin:0 -14px -12px}
 .ftbl .frow3{display:contents}
@@ -1804,7 +1804,7 @@ html[data-gsz="l"] .pgrid{--gc:1}
 .dtimg.none{display:flex;align-items:center;justify-content:center;box-sizing:border-box;border:1.5px dashed var(--u-line);background:var(--u-soft);color:var(--u-sub);cursor:pointer}
 .dtimg.none svg{width:22px;height:22px;color:var(--u-strong)}
 /* ===== AniList：作品の追加画面の検索・番組表の新作・続編のお知らせ ===== */
-.alx{margin:2px 0 12px;padding:10px;border:1px solid var(--u-line);border-radius:var(--r-l);background:var(--u-bg)}
+.alx{margin:2px 0 12px;padding:10px;border:2px solid var(--k);border-radius:18px;background:var(--u-surface)}
 .alx-row{display:flex;gap:8px;align-items:center}
 .alx-row .u-input{flex:1}
 .alx-msg{margin:8px 2px 0;font-size:var(--fs-s);color:var(--u-sub)}
@@ -1959,9 +1959,9 @@ html[data-gsz="l"] .pgrid{--gc:1}
 }
 
 /* 入力欄の統一（両モード共通）：標準の入力欄（.u-input）と同じ見た目にそろえる。背景と同色にならないよう一段違う背景と濃い枠にし、高さ・文字も標準に合わせる（フォーカス中は今まで通り）。チップ型の小入力は対象外 */
-.u-input,.edt-in input,.field input:not([type=checkbox]):not([type=radio]):not(.chipin),.field select,.e1 input:not([type=checkbox]),.sg-f2 input,.sg-r input:not([type=checkbox]),.madd2 input,.dd-q{background:var(--u-chip);border-color:var(--u-strong)}
-.er input:not(:focus),.ftbl .field input:not([type=checkbox]):not(:focus),.ftbl .fdd{background:var(--u-chip);border-color:var(--u-strong)}
-.spaste textarea,select.sg-t{border-color:var(--u-strong)}
+.u-input,.edt-in input,.field input:not([type=checkbox]):not([type=radio]):not(.chipin),.field select,.e1 input:not([type=checkbox]),.sg-f2 input,.sg-r input:not([type=checkbox]),.madd2 input,.dd-q{background:var(--u-chip);border-color:var(--k2)}
+.er input:not(:focus),.ftbl .field input:not([type=checkbox]):not(:focus),.ftbl .fdd{background:var(--u-chip);border-color:var(--k2)}
+.spaste textarea,select.sg-t{border-color:var(--k2)}
 
 /* 細部の標準化：余白とタグの形をほかの画面にそろえる */
 /* AniList確認などのシート：最後の文・候補が下端に張り付かないよう、ほかのシートと同じ下余白を持つ */
@@ -1992,13 +1992,13 @@ html[data-gsz="l"] .pgrid{--gc:1}
 /* --- 作品の詳細：見出しの書体 --- */
 .dhead h3,.dhx h3{font-family:var(--fd);font-weight:400;letter-spacing:.01em}
 /* 上の段だけ上に固定し、タブはそのすぐ下に固定（大きな見出しはスクロールで流れる） */
-.dmain>.dtabs{position:sticky;top:var(--dhh,0px);z-index:3;background:var(--u-bg);margin:14px -16px 0;padding:12px 20px;gap:4px;border-bottom:0}
+.dmain>.dtabs{position:sticky;top:var(--dhh,0px);z-index:3;background:var(--u-bg);margin:10px -16px 0;padding:8px 20px;gap:4px;border-bottom:0}
 /* タブは1本の溝（へこんだ面＋太枠）の中に並べ、ボタン（公式サイトなど）と見分けやすくする */
-.dmain>.dtabs::before{content:"";position:absolute;inset:8px 16px;border:2px solid var(--k);border-radius:16px;background:var(--u-chip)}
+.dmain>.dtabs::before{content:"";position:absolute;inset:4px 16px;border:2px solid var(--k);border-radius:16px;background:var(--u-chip)}
 /* --- 大きな見出し（スマホ）：左に傾けたポスター（後ろに黄色の丸）、右にラベル・タイトル・配信と公式サイトのボタン --- */
 .dhx{position:relative;display:block;margin:0 -16px;padding:14px 16px 4px;background:radial-gradient(circle at 70px 96px,var(--pop) 84px,transparent 85px)}
 .dhrow{display:flex;gap:18px;align-items:flex-start}
-.dhx .dtc{display:flex;flex-direction:column;gap:8px;padding-top:2px}
+.dhx .dtc{display:flex;flex-direction:column;gap:7px;padding-top:2px}
 .dhx .dmeta{margin:0}
 .dhx .wnn{margin:0}
 .dhx h3{font-size:20px;line-height:1.35;margin:0}
@@ -2006,13 +2006,15 @@ html[data-gsz="l"] .pgrid{--gc:1}
 .dhx .dtimg.none{background:var(--u-surface)}
 /* 配信・公式サイトのボタン（縦に並べる） */
 .dhx .dtbtns{flex-direction:column;margin-top:2px;gap:8px}
-.dhx .dtb.u-btn{flex:none;height:40px;border-radius:14px;font-weight:900;border:2px solid var(--k);background:var(--u-surface);color:var(--u-ink)}
+.dhx .dtb.u-btn{flex:none;height:34px;border-radius:12px;font-size:var(--fs-s);font-weight:900;border:2px solid var(--k);background:var(--u-surface);color:var(--u-ink)}
 .dhx .dtb.vod{background:var(--kbg);color:#fff;box-shadow:3px 3px 0 var(--u-accent)}
 .dhx .dtb.vod .iic.ply circle{fill:#fff}
 .dhx .dtb.vod .iic.ply path{fill:var(--kbg)}
 /* 上の段：前後・編集・✕だけ（右寄せ） */
 .dnavrow{justify-content:flex-end}
 /* --- 詳細の小さいボタン（前後・編集・✕・カードの編集・話数の編集と貼り付け）：ステッカーの形（太枠＋小さなずらした影） --- */
+.sheet:not(.form) .u-btn.sm{height:28px;padding:0 10px;font-size:var(--fs-s)}
+.sheet:not(.form) .u-btn.icon.sm{width:28px;padding:0}
 .sheet:not(.form) .u-btn.sm:not(.txt):not(.pri){border:2px solid var(--k);background:var(--u-surface);color:var(--u-ink);font-weight:900;box-shadow:2px 2px 0 var(--ks)}
 .sheet:not(.form) .u-btn.sm.pri{border:2px solid var(--k);box-shadow:2px 2px 0 var(--ks)}
 .sheet:not(.form) .u-btn.sm:disabled{box-shadow:none}
@@ -2115,3 +2117,16 @@ html[data-gsz="l"] .pgrid{--gc:1}
   /* 細くした分、長い項目名は2行に折り返す（「…」で切らない） */
   .ftbl .fgrid>.field>span:first-child,.ftbl .frow3>.field>span:first-child,.ftbl .field>label.field>span{white-space:normal;line-height:1.35}
 }
+/* --- 作品の詳細：ポスターを上の段（前後・編集・✕）と同じ高さまで上げる。上の段はスクロールするまで透明（YouTubeは横長の画像なので今のまま） --- */
+.dhx:not(.yhx){margin-top:calc(-1 * var(--dhh,0px))}
+.dhx:not(.yhx) .dtc{padding-top:calc(var(--dhh,0px) - 10px)}
+.sheet:not(.form):has(.dhx:not(.yhx)):not(.scrolled) .dhead{background:transparent}
+.sheet:not(.form):has(.dhx:not(.yhx)) .dhead{pointer-events:none}
+.sheet:not(.form):has(.dhx:not(.yhx)) .dhead button{pointer-events:auto}
+@media (max-width:600px){.dhx:not(.yhx){padding-top:12px}}
+/* --- 作品・YouTubeの追加と編集の画面：地はクリーム色、見出しは Mochiy、✕・下のボタンはステッカー（詳細の中で開く編集も同じボタン） --- */
+.sheet.form:has(#titleF,#ytF),.sheet.form:has(#titleF,#ytF) .ffoot{background:var(--u-bg)}
+.sheet.form .hdrow h3,.ined .hdrow h3{font-family:var(--fd);font-weight:400}
+.sheet.form .u-btn.icon.sm.close{border:2px solid var(--k);background:var(--u-surface);color:var(--u-ink);box-shadow:2px 2px 0 var(--ks)}
+.ffoot .u-btn,.alx-row .u-btn{border:2px solid var(--k);font-weight:900;box-shadow:2px 2px 0 var(--ks)}
+.ffoot .u-btn:not(.pri){background:var(--u-surface);color:var(--u-ink)}
