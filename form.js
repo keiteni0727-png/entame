@@ -428,7 +428,7 @@ function openInlineForm(target, el) {
   readForm();
   form.init = JSON.stringify({ ...form, init: 0 });
   const box = $("#formIn");
-  inPopPlace(box, anc);
+  inPopPlace(box);
   const i = box.querySelector(".fgrid input:not([type=date]):not([type=checkbox]):not([type=file])");
   if (i && !TOUCH) i.focus({ preventScroll: true });
 }
@@ -438,21 +438,20 @@ function closeInlineForm() {
   inPopClear("#sheetIn");
 }
 /* 前面に出す編集（作品・YouTubeの詳細で共通）：消す／置く。
-   置く場所は押した場所の高さ（はみ出すなら上へずらす）。詳細はスクロールを止め、編集の中だけスクロールする */
+   置く場所は詳細の見えている所の真ん中。詳細はスクロールを止め、編集の中だけスクロールする */
 function inPopClear(wrap) {
   document.querySelectorAll(`${wrap} .ined, ${wrap} .inpop-bg`).forEach(x => x.remove());
   document.querySelectorAll(`${wrap} .icard[hidden]`).forEach(x => (x.hidden = false));
 }
-function inPopPlace(box, anc) {
+function inPopPlace(box) {
   const sh = box.closest(".sheet"),
     bg = box.previousElementSibling;
   if (!sh) return;
   const H = sh.clientHeight,
-    st = sh.scrollTop,
-    sr = sh.getBoundingClientRect();
+    st = sh.scrollTop;
   box.style.maxHeight = H - 16 + "px";
-  const at = anc && anc.isConnected ? anc.getBoundingClientRect().top - sr.top : 8;
-  const top = Math.max(8, Math.min(at, H - box.offsetHeight - 8));
+  /* 詳細の見えている所の真ん中に置く */
+  const top = Math.max(8, (H - box.offsetHeight) / 2);
   box.style.top = st + top + "px";
   if (bg) Object.assign(bg.style, { top: st + "px", height: H + "px" });
 }

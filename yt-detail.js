@@ -237,6 +237,7 @@ function ytOpenForm(x, target) {
       };
   /* 詳細から項目を指定したときは、詳細の中でその項目だけ編集する（作品の詳細と同じ） */
   if (x && ONLY_Y[target] && ytOpen === x.id && $("#layer .sheet:not(.form) #ytIn")) return ytOpenInline(target);
+  yform.fromDetail = !!x && ytOpen === x.id; // 詳細から開いたか（閉じたら詳細に戻る）
   ytOpen = null;
   openId = null;
   form = null;
@@ -266,7 +267,7 @@ function ytOpenInline(target) {
   /* 編集中は前・次の矢印を押せないように */
   inn.querySelectorAll(".dnav").forEach(b => (b.disabled = true));
   const box = $("#ytFormIn");
-  inPopPlace(box, anc);
+  inPopPlace(box);
   const i = box.querySelector(".fgrid.only input:not([type=checkbox])");
   if (i && !TOUCH) i.focus({ preventScroll: true });
 }

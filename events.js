@@ -132,7 +132,15 @@ const COMMON_ACTIONS = [
       else if (yid) ytOpenDetail(yid);
     },
   ],
-  ["[data-close]", () => close()],
+  /* 閉じる：詳細から開いた「作品を編集」「再生リストを編集」は、閉じたら詳細に戻る */
+  [
+    "[data-close]",
+    () => {
+      const back = form && !form.inline && form.fromDetail && form.id ? ["t", form.id] : yform && !yform.inline && yform.fromDetail && yform.id ? ["y", yform.id] : null;
+      close();
+      if (back) back[0] === "t" ? openDetail(back[1], 0, true) : ytOpenDetail(back[1]);
+    },
+  ],
   ["#sbAdd,#bnAdd", () => (state.mode === "yt" ? ytOpenForm(null) : openForm(null))],
 ];
 /* スワイプ（共通部品 u-swipe.js）：スマホの番組表で、曜日の見出しと作品カード（.wday）だけを指に合わせて横に動かし、離すと隣の曜日へ。曜日タブなどは動かさない */

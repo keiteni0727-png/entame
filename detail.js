@@ -121,7 +121,7 @@ function infoCards(it, { md, ns, mv, stv, cs, songRows }) {
       const l = songRows.filter(r => r.k === k);
       const cls = SG_CLS[k] || "";
       if (musFold.has(k))
-        return `<button type="button" class="tk-fold" data-imfold="${esc(k)}" aria-expanded="false"><span class="tk-tp ${cls}">${esc(k)}</span>${l.length}曲（たたんでいます）<span aria-hidden="true">›</span></button>`;
+        return `<button type="button" class="tk-fold" data-imfold="${esc(k)}" aria-expanded="false"><span class="tk-tp ${cls}">${esc(k)}</span>${l.length}曲<span aria-hidden="true">›</span></button>`;
       const rows = l
         .map(r => {
           const { st, ar } = songTA(r.x);

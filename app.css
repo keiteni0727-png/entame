@@ -213,7 +213,7 @@ main{padding-bottom:20px}
 .tcopy{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;margin:-4px 0 0 6px;width:var(--h-s);height:var(--h-s);border:0;border-radius:var(--r-m);background:transparent;color:var(--u-sub);cursor:pointer}
 .tcopy:hover{background:var(--u-chip)}
 .tcopy:active{transform:scale(.92)}
-.sheet h4{font-size:var(--fs-m);margin:20px 0 8px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.sheet h4{font-size:var(--fs-m);margin:20px 0 8px;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .sheet h4 small{color:var(--u-sub);font-weight:500}
 .seg{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:6px;margin:14px 0}
 .seg button{border:1px solid var(--u-line);background:transparent;border-radius:var(--r-m);padding:8px 4px;font-size:var(--fs-m);font-weight:700}
@@ -382,6 +382,8 @@ html,body{overflow-x:clip;max-width:100%;overscroll-behavior:none}
 .ybar i{display:block;height:100%;background:var(--u-ok)}
 .ystep{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .ystep span{font-size:var(--fs-base)}
+#ytIn .ystep .u-btn.icon,#ytIn .ystep .u-btn.sm{height:32px}
+#ytIn .ystep .u-btn.icon{width:32px}
 .ystep b{font-family:var(--u-num);font-size:var(--fs-xl)}
 .field input.chipin{border:1px dashed var(--u-line);background:transparent;border-radius:var(--r-full);padding:6px 12px;width:150px;font:inherit;font-size:var(--fs-l)}
 .gtog{display:flex;gap:6px;border:0;background:transparent;padding:0;font:inherit;color:inherit;text-align:left;cursor:pointer;align-items:center}
@@ -1073,7 +1075,7 @@ button.imt[aria-expanded="false"]+.imt,button.imt[aria-expanded="false"]+button.
 .archd.done .arcct{color:var(--u-acct);font-weight:700}
 .iprog .prog{margin:2px 0 10px;height:10px;box-sizing:border-box;border:1.5px solid var(--k2);border-radius:6px;background:var(--u-surface);overflow:hidden}
 .prog i{display:block;height:100%;background:var(--u-accent)}
-.sheet.t-info .dtabs [data-dtab="info"],.sheet.t-ep .dtabs [data-dtab="ep"]{border-bottom-color:var(--u-accent);background:var(--pop);color:var(--onpop);border-color:var(--k);box-shadow:2px 2px 0 var(--ks)}
+.sheet.t-info .dtabs [data-dtab="info"],.sheet.t-ep .dtabs [data-dtab="ep"]{background:var(--pop);color:var(--onpop);border-color:var(--k);box-shadow:none}
 
 /* 一覧：OP・EDの列をなくしたので、タイトルを広く */
 @media (min-width:900px){.row.lst:not(.yrow) .slot{grid-template-columns:62px minmax(0,1fr) auto}}
@@ -1094,6 +1096,7 @@ button.imt[aria-expanded="false"]+.imt,button.imt[aria-expanded="false"]+button.
 .fdd-cv{flex:none;color:var(--u-sub);transition:transform .15s}
 .fdd[aria-expanded="true"] .fdd-cv{transform:rotate(180deg)}
 .fdd-c{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-sizing:border-box;font-size:var(--fs-m);font-weight:700;padding:3px 10px;border-radius:var(--r-full);background:var(--u-soft);color:var(--u-ink);line-height:1.4}
+.fdd-c:not(.vc){background:var(--u-surface);border:1.5px solid var(--k2);padding:2px 9px}
 .fdd-c.vc{border-radius:var(--r-s);background:var(--vc);color:var(--vt)}
 .fdd-more{font-size:var(--fs-s);font-weight:500;color:var(--u-sub)}
 
@@ -1635,6 +1638,7 @@ select#arcJump{cursor:pointer;-webkit-appearance:none;appearance:none;padding-ri
 .sg-ft{display:flex;align-items:center;gap:8px;padding-top:6px;border-top:1px solid var(--u-soft)}
 select.sg-t{height:var(--h-in);width:auto;max-width:120px;cursor:pointer;-webkit-appearance:none;appearance:none;border:1px solid var(--u-line);background:var(--u-bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5l3 3 3-3' fill='none' stroke='%23888' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 8px center;color:var(--u-ink);border-radius:var(--r-m);padding:0 26px 0 8px;font:inherit;font-size:var(--fs-base);font-weight:700}
 .sg-ft .del{margin-left:auto}
+.sg-ft .u-btn.sm{height:var(--h-chip)}
 @media (max-width:899px){.sg-f2{grid-template-columns:1fr}}
 /* 曲の「＋追加」の札は、曲の種類の色（OP＝青・ED＝紫…） */
 .u-chip.add:is(.sgadd,.sgnext,.sg-exadd){color:var(--sgc,var(--u-acct));border-color:color-mix(in srgb,var(--sgc,var(--u-acct)) 55%,transparent)}
@@ -1842,11 +1846,11 @@ html[data-gsz="s"] .pgrid{--gc:3}
 /* AniListで確認：今の値と AniList の値を並べる */
 .alchk h3 small{display:block;font-size:var(--fs-s);color:var(--u-sub);font-weight:600}
 .alchk .alx-row{margin-bottom:8px}
-.alc-hit{display:flex;gap:10px;align-items:center;padding:8px;border:1px solid var(--u-line);border-radius:var(--r-m);margin-bottom:12px}
+.alc-hit{display:flex;gap:10px;align-items:center;padding:8px 10px;border:2px solid var(--k);border-radius:14px;background:var(--u-surface);margin-bottom:12px}
 .alc-hit .alx-tx{flex:1}
-.alc-tbl{display:grid;border:1px solid var(--u-line);border-radius:var(--r-m);overflow:hidden}
+.alc-tbl{display:grid;border:2px solid var(--k);border-radius:14px;background:var(--u-surface);overflow:hidden}
 .alc-hd,.alc-r{display:grid;grid-template-columns:5.5em minmax(0,1fr) minmax(0,1fr) 5em;gap:8px;align-items:center;padding:8px 10px}
-.alc-hd{background:var(--u-bg);font-size:var(--fs-xs);font-weight:700;color:var(--u-sub);white-space:nowrap}
+.alc-hd{background:var(--u-chip);font-size:var(--fs-xs);font-weight:700;color:var(--u-sub);white-space:nowrap}
 .alc-c.u,.alc-n.u{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .alc-hd span:last-child,.alc-x{text-align:center}
 .alc-r{border-top:1px solid var(--u-line);font-size:var(--fs-m);cursor:pointer}
@@ -1984,7 +1988,7 @@ html[data-gsz="s"] .pgrid{--gc:3}
 /* --- 作品の詳細：見出しの書体 --- */
 .dhead h3,.dhx h3{font-family:var(--fd);font-weight:400;letter-spacing:.01em}
 /* 上の段だけ上に固定し、タブはそのすぐ下に固定（大きな見出しはスクロールで流れる） */
-.dmain>.dtabs{position:sticky;top:var(--dhh,0px);z-index:3;background:var(--u-bg);margin:10px -16px 0;padding:8px 20px;gap:4px;border-bottom:0}
+.dmain>.dtabs{position:sticky;top:var(--dhh,0px);z-index:3;background:var(--u-bg);margin:10px -16px 0;padding:10px 22px;gap:4px;border-bottom:0}
 /* タブは1本の溝（へこんだ面＋太枠）の中に並べ、ボタン（公式サイトなど）と見分けやすくする */
 .dmain>.dtabs::before{content:"";position:absolute;inset:4px 16px;border:2px solid var(--k);border-radius:16px;background:var(--u-chip)}
 /* --- 大きな見出し（スマホ）：左に傾けたポスター（後ろに黄色の丸）、右にラベル・タイトル・配信と公式サイトのボタン --- */
@@ -2175,3 +2179,12 @@ html[data-gsz="s"] .pgrid{--gc:3}
 .iser .tk-ser .sern{flex:1;min-width:0;font-family:var(--fd);font-weight:400;font-size:16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tk-ser .tk-chip{margin-right:auto}
 .tk-yb{flex:none;height:28px;padding:0 10px;border:2px solid var(--k);border-radius:10px;background:var(--pop);color:var(--onpop);font:inherit;font-size:12px;font-weight:900;box-shadow:2px 2px 0 var(--ks);white-space:nowrap;cursor:pointer}
+/* 詳細の上に出すシート（AniListで確認など）の下のボタンの行：地はシートと同じ色（白い帯にしない） */
+.sheet:not(.form) .ffoot{background:var(--u-bg)}
+/* 見出しの行だけのカード（PROGRESS でパート数がないときなど）：上下のすき間をそろえる */
+.icard>.ich:last-child{margin-bottom:0}
+/* 種類の札：日本語（主題歌・挿入歌）は字の高さが違うので少し下げる */
+.tk-tp.t-th,.tk-tp.t-in{padding-top:4px;padding-bottom:2px}
+/* 曲の編集の行：話数の札はアーティストの下の行に（長い「1〜3話・5話・8〜10話」で曲名を押しつぶさない） */
+.sg-sum{grid-template-columns:minmax(0,1fr)}
+.sg-sum .sg-se{justify-self:start;margin-top:3px;white-space:normal;line-height:1.5}
