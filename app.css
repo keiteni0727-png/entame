@@ -2116,7 +2116,7 @@ html[data-gsz="s"] .pgrid{--gc:3}
 }
 /* --- 作品の詳細：ポスターを上の段（前後・編集・✕）と同じ高さまで上げる。上の段はスクロールするまで透明（YouTubeは横長の画像なので今のまま） --- */
 .dhx:not(.yhx){margin-top:calc(-1 * var(--dhh,0px))}
-.dhx:not(.yhx) .dtc{padding-top:calc(var(--dhh,0px) - 10px)}
+.dhx:not(.yhx) .dtc{padding-top:calc(var(--dhh,0px) - 2px)}
 .sheet:not(.form):has(.dhx:not(.yhx)):not(.scrolled) .dhead{background:transparent}
 .sheet:not(.form):has(.dhx:not(.yhx)) .dhead{pointer-events:none}
 .sheet:not(.form):has(.dhx:not(.yhx)) .dhead button{pointer-events:auto}

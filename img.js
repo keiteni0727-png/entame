@@ -339,7 +339,11 @@ const gridProg = (it, attr) => {
   }
   if (attr !== "data-id") return "";
   const l = watchable(episodes(it));
-  if (!l.length) return "";
+  /* 話数のない作品（映画・1話だけの作品など）は、視聴済みなら 1/1、それ以外は 0/1 */
+  if (!l.length) {
+    const d = it.s === "視聴済み" ? 1 : 0;
+    return `<span class="pprog"><span class="pbar"><i style="width:${d * 100}%"></i></span><b class="inum">${d}/1</b></span>`;
+  }
   const w = l.filter(e => e.w).length;
   return `<span class="pprog"><span class="pbar"><i style="width:${Math.round((w / l.length) * 100)}%"></i></span><b class="inum">${w}/${l.length}</b></span>`;
 };
