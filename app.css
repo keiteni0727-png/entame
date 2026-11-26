@@ -4,7 +4,7 @@
 /* ===================== 共通の土台（見た目）：おかね手帳・エンタメ管理で同じファイルを使う =====================
   ・色・書体・角丸。アクセント色（--u-accent / --u-accent2）だけ、アプリ側のCSSで上書きする
   ・アプリの外枠に class="u-app" を付けると、左メニューなどの共通部品が使える */
-:root{--pop:#ffd23f;--hl:var(--u-ink);--fd:"Mochiy Pop One",var(--u-f);--fn:"Rubik",var(--u-f);--u-bg:#f7f1e8;--u-surface:#ffffff;--u-ink:#1a1714;--u-sub:#6b6257;--u-line:#e4dacb;--u-soft:#f0e8dc;--u-strong:#cbbca6;--u-chip:#efe6d8;--u-accent:#ff5a1f;--u-accent2:#ffe5d9;--u-acct:#c43e0c;--u-live:#d4342a;--u-live2:#fbe9e7;--u-danger:#c8382e;--u-danger2:#fbe9e7;--u-ok:#1f8a52;--u-ok2:#e3f3ea;--u-warn:#a36800;--u-warn2:#f8eed5;--u-on:#ffffff;--u-scrim:rgba(12,16,24,.45);--u-shadow:0 10px 32px rgba(16,24,40,.18);--u-r:10px;--u-rl:14px;--u-f:"Zen Kaku Gothic New","Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",system-ui,sans-serif;--u-disp:"Bebas Neue","IBM Plex Mono",ui-monospace,sans-serif;--u-num:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--fs-xs:11px;--fs-s:12px;--fs-m:13px;--fs-base:14px;--fs-l:16px;--fs-xl:20px;--fs-2xl:28px;--fs-3xl:40px;
+:root{--pop:#ffd23f;--pop2:#fff3c4;--onpop:#1a1714;--k:#1a1714;--k2:#1a1714;--kbg:#1a1714;--fd:"Mochiy Pop One",var(--u-f);--fn:"Rubik",var(--u-f);--u-bg:#f7f1e8;--u-surface:#ffffff;--u-ink:#1a1714;--u-sub:#6b6257;--u-line:#e4dacb;--u-soft:#f0e8dc;--u-strong:#cbbca6;--u-chip:#efe6d8;--u-accent:#ff5a1f;--u-accent2:#ffe5d9;--u-acct:#c43e0c;--u-live:#d4342a;--u-live2:#fbe9e7;--u-danger:#c8382e;--u-danger2:#fbe9e7;--u-ok:#1f8a52;--u-ok2:#e3f3ea;--u-warn:#a36800;--u-warn2:#f8eed5;--u-on:#ffffff;--u-scrim:rgba(12,16,24,.45);--u-shadow:0 10px 32px rgba(16,24,40,.18);--u-r:10px;--u-rl:14px;--u-f:"Zen Kaku Gothic New","Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",system-ui,sans-serif;--u-num:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--fs-xs:11px;--fs-s:12px;--fs-m:13px;--fs-base:14px;--fs-l:16px;--fs-xl:20px;--fs-2xl:28px;--fs-3xl:40px;
   --r-s:6px;--r-m:var(--u-r);--r-l:var(--u-rl);--r-full:999px;
   --h-s:32px;--h-m:40px;--h-l:48px;--h-chip:28px;--h-in:36px;--u-navb:max(4px,calc(env(safe-area-inset-bottom,0px) - 16px))}
 
@@ -166,9 +166,9 @@ html.pkopen,html.pkopen body{overflow:hidden}
 /* 色・書体・角丸・土台・左メニューは u-base.css（アプリ共通）。ここはアクセント色と、このアプリだけの色 */
 /* ダークモード */
 @media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){--pop:#ff5e6c;--hl:#ffc24b;--fd:"Dela Gothic One",var(--u-f);--fn:"Bebas Neue",var(--u-f);--u-bg:#0a0d1a;--u-surface:#141a2e;--u-ink:#f2f0ea;--u-sub:#9aa0b8;--u-line:#232a47;--u-soft:#1b2238;--u-strong:#3a4160;--u-chip:#1e2540;--u-accent:#ffc24b;--u-accent2:#3a3020;--u-acct:#ffc24b;--u-live:#ff6b5e;--u-live2:#3a201d;--u-danger:#ff7a6e;--u-danger2:#3a201d;--u-ok:#4cc98a;--u-ok2:#17301f;--u-warn:#e8b44c;--u-warn2:#3a2f15;--u-on:#1a1205;--u-scrim:rgba(4,6,10,.6);--u-shadow:0 10px 32px rgba(0,0,0,.5);--anime:#ff6a5c;--drama:#6f97ff;--movie:#b18cff;--stream:#3fcfcf;--reality:#ff86b0;--yt:#ff4d45;--sp:#ff86b0;--su:#3fcf9f;--au:#ffa35c;--wi:#7fb0ff;--accent:#8fa8ff;--st-want:#4cc98a;--st-now:#f0a83a;--st-done:#e08aa3;--st-drop:#8e95a8;color-scheme:dark}
+  :root:not([data-theme="light"]){--pop2:#3a3220;--k:#000000;--k2:#8c8496;--kbg:#0b0a0e;--u-bg:#17151b;--u-surface:#24212a;--u-ink:#f5efe6;--u-sub:#a79e92;--u-line:#3a3540;--u-soft:#2c2832;--u-strong:#4a4452;--u-chip:#2c2832;--u-accent:#ff5a1f;--u-accent2:#3e2418;--u-acct:#ff7a45;--u-live:#ff6b5e;--u-live2:#3a201d;--u-danger:#ff7a6e;--u-danger2:#3a201d;--u-ok:#4cc98a;--u-ok2:#17301f;--u-warn:#e8b44c;--u-warn2:#3a2f15;--u-on:#ffffff;--u-scrim:rgba(4,6,10,.6);--u-shadow:0 10px 32px rgba(0,0,0,.5);--anime:#ff6a5c;--drama:#6f97ff;--movie:#b18cff;--stream:#3fcfcf;--reality:#ff86b0;--yt:#ff4d45;--sp:#ff86b0;--su:#3fcf9f;--au:#ffa35c;--wi:#7fb0ff;--accent:#8fa8ff;--st-want:#4cc98a;--st-now:#f0a83a;--st-done:#e08aa3;--st-drop:#8e95a8;color-scheme:dark}
 }
-:root[data-theme="dark"]{--pop:#ff5e6c;--hl:#ffc24b;--fd:"Dela Gothic One",var(--u-f);--fn:"Bebas Neue",var(--u-f);--u-bg:#0a0d1a;--u-surface:#141a2e;--u-ink:#f2f0ea;--u-sub:#9aa0b8;--u-line:#232a47;--u-soft:#1b2238;--u-strong:#3a4160;--u-chip:#1e2540;--u-accent:#ffc24b;--u-accent2:#3a3020;--u-acct:#ffc24b;--u-live:#ff6b5e;--u-live2:#3a201d;--u-danger:#ff7a6e;--u-danger2:#3a201d;--u-ok:#4cc98a;--u-ok2:#17301f;--u-warn:#e8b44c;--u-warn2:#3a2f15;--u-on:#1a1205;--u-scrim:rgba(4,6,10,.6);--u-shadow:0 10px 32px rgba(0,0,0,.5);--anime:#ff6a5c;--drama:#6f97ff;--movie:#b18cff;--stream:#3fcfcf;--reality:#ff86b0;--yt:#ff4d45;--sp:#ff86b0;--su:#3fcf9f;--au:#ffa35c;--wi:#7fb0ff;--accent:#8fa8ff;--st-want:#4cc98a;--st-now:#f0a83a;--st-done:#e08aa3;--st-drop:#8e95a8;color-scheme:dark}
+:root[data-theme="dark"]{--pop2:#3a3220;--k:#000000;--k2:#8c8496;--kbg:#0b0a0e;--u-bg:#17151b;--u-surface:#24212a;--u-ink:#f5efe6;--u-sub:#a79e92;--u-line:#3a3540;--u-soft:#2c2832;--u-strong:#4a4452;--u-chip:#2c2832;--u-accent:#ff5a1f;--u-accent2:#3e2418;--u-acct:#ff7a45;--u-live:#ff6b5e;--u-live2:#3a201d;--u-danger:#ff7a6e;--u-danger2:#3a201d;--u-ok:#4cc98a;--u-ok2:#17301f;--u-warn:#e8b44c;--u-warn2:#3a2f15;--u-on:#ffffff;--u-scrim:rgba(4,6,10,.6);--u-shadow:0 10px 32px rgba(0,0,0,.5);--anime:#ff6a5c;--drama:#6f97ff;--movie:#b18cff;--stream:#3fcfcf;--reality:#ff86b0;--yt:#ff4d45;--sp:#ff86b0;--su:#3fcf9f;--au:#ffa35c;--wi:#7fb0ff;--accent:#8fa8ff;--st-want:#4cc98a;--st-now:#f0a83a;--st-done:#e08aa3;--st-drop:#8e95a8;color-scheme:dark}
 body{-webkit-text-size-adjust:100%;background:var(--u-bg);color:var(--u-ink);font-size:var(--fs-l);line-height:1.55;margin:0;font-family:var(--u-f);-webkit-font-smoothing:antialiased}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--u-surface)}
 button{font:inherit;color:inherit;cursor:pointer}
@@ -1125,7 +1125,7 @@ body.sbc .u-app .sb .sb-logo{display:none}
 @media (max-width:899px){.u-app .sb-logo{width:24px;height:24px}}
 
 /* ===================== 2026-11 新デザイン（AB案）：番組表 ===================== */
-.wt-clock time{font-family:var(--u-disp);font-weight:400;letter-spacing:0;color:var(--u-acct)}
+.wt-clock time{font-family:var(--fn);font-weight:800;letter-spacing:0;color:var(--u-acct)}
 .wtop-side{display:flex;gap:12px;align-items:stretch;min-width:0;flex:1}
 .wt-un.on{border:2px solid var(--st-now);border-color:var(--u-live);background:var(--u-live2)}
 .wt-l{display:block;font-family:var(--u-num);font-size:var(--fs-xs);font-weight:700;letter-spacing:.1em;margin-bottom:2px;color:var(--u-live)}
@@ -1135,16 +1135,16 @@ body.sbc .u-app .sb .sb-logo{display:none}
 /* カード（行）：左に時刻の列、右に中身 */
 .wcard{min-width:0;display:flex;flex-direction:row;gap:12px;background:none;border:0;border-radius:0;overflow:visible;position:relative}
 .wcard .wc-tick,.wcard.un .wc-tick{flex:none}
-.wcard .wc-time{font-family:var(--u-disp);font-size:var(--fs-2xl);font-weight:400;line-height:1;letter-spacing:0;color:var(--u-ink)}
+.wcard .wc-time{font-family:var(--fn);font-size:var(--fs-2xl);font-weight:800;line-height:1;letter-spacing:0;color:var(--u-ink)}
 .wcard:not(.nx):not(.live) .wc-time{color:var(--u-sub)}
 .wcard .wc-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;padding-bottom:16px}
 .wcard .wc-main{display:flex;flex-direction:column;gap:6px;padding:0;border:0;background:none;text-align:left;font:inherit;color:var(--u-ink);min-width:0}
 .wc-tags{display:flex;flex-wrap:wrap;gap:4px 5px;align-items:center;min-width:0}
 .wc-tags .wc-st{font-size:var(--fs-s);font-weight:700;color:var(--u-sub)}
 .wc-b{display:inline-flex;align-items:center;gap:5px;font-size:var(--fs-xs);font-weight:700;padding:2px 7px;border-radius:var(--r-s);white-space:nowrap;line-height:1.35}
-.wc-b.live{background:var(--u-live2);color:var(--u-live);font-family:var(--u-disp);font-size:var(--fs-base);letter-spacing:.06em;font-weight:400;padding:1px 7px}
+.wc-b.live{background:var(--u-live2);color:var(--u-live);font-family:var(--fn);font-size:var(--fs-base);letter-spacing:.06em;font-weight:800;padding:1px 7px}
 .wc-b.live i{width:7px;height:7px;border-radius:50%;background:var(--u-live)}
-.wc-b.nx{background:var(--u-accent2);color:var(--u-acct);font-family:var(--u-disp);font-size:var(--fs-base);letter-spacing:.06em;font-weight:400;padding:1px 7px}
+.wc-b.nx{background:var(--u-accent2);color:var(--u-acct);font-family:var(--fn);font-size:var(--fs-base);letter-spacing:.06em;font-weight:800;padding:1px 7px}
 .wc-b.un{background:var(--u-live2);color:var(--u-live)}
 .wcard .wc-ttl{font-size:var(--fs-l);font-weight:700;line-height:1.35}
 .wcard .wc-ep{font-size:var(--fs-base);color:var(--u-ink);line-height:1.45}
@@ -1820,7 +1820,7 @@ select.sg-t{height:var(--h-in);width:auto;max-width:120px;cursor:pointer;-webkit
 .iask .ivbar{justify-content:flex-end;margin-top:6px}
 /* ===== 番組表：線のタイムライン（PC・スマホ共通。縦長の画像の右に情報） ===== */
 .wcard.v-tl{display:grid;grid-template-columns:50px 14px 90px minmax(0,1fr);grid-template-areas:"time line img body";column-gap:10px;row-gap:8px;padding:0 0 18px;background:none;border:0;box-shadow:none;animation:none}
-.v-tl .wc-time{grid-area:time;font-family:var(--u-disp);font-size:22px;line-height:1;padding-top:2px;color:var(--u-ink)}
+.v-tl .wc-time{grid-area:time;font-family:var(--fn);font-weight:900;font-size:22px;line-height:1;padding-top:2px;color:var(--u-ink)}
 .v-tl:not(.nx):not(.live) .wc-time{color:var(--u-ink)}
 .v-tl.nx .wc-time{color:var(--u-acct)}
 .v-tl.live .wc-time{color:var(--u-live)}
@@ -2164,131 +2164,80 @@ html[data-gsz="l"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(240px,1f
 /* グレーの見出し：字間をフォームの見出しにそろえる */
 .setsec{font-size:var(--fs-s);font-weight:700;color:var(--u-sub);margin:16px 4px 6px;letter-spacing:.04em}
 
-/* ===================== 2026-11-26 新デザイン：ライト＝ポップ・ステッカー（太い黒枠＋ずらした影）／ダーク＝ミッドナイト・シアター（紺地に金のネオン）
-   ライトとダークで形が違う所は、html の .th-l / .th-d で書き分ける（core.js が付ける） ===================== */
-/* --- 作品の詳細：シートの地は背景色、カードを白（ダークは紺） --- */
+/* ===================== 2026-11-26 新デザイン（案3）：ポップ・ステッカー（太い枠＋ずらした影）。ライトとダークは同じ形で色だけ変える
+   枠・影の色は --k（太枠・影）／--k2（細い枠）、黒い地は --kbg、黄・緑の上の文字は --onpop ===================== */
+/* --- 作品の詳細：シートの地は背景色、カードは --u-surface --- */
 .sheet:not(.form){background:var(--u-bg)}
 .sheet:not(.form) .dhead{background:var(--u-bg)}
 .dhead h3,.dhx h3{font-family:var(--fd);font-weight:400;letter-spacing:.01em}
 /* 上の段だけ上に固定し、タブはそのすぐ下に固定（大きな見出しはスクロールで流れる） */
-.dmain>.dtabs{position:sticky;top:var(--dhh,0px);z-index:3;background:var(--u-bg)}
-/* --- 大きな見出し（スマホ）：ライトは傾けたポスター＋大きな％、ダークは画像を横いっぱいの背景に --- */
-.dhx{position:relative;display:block}
+.dmain>.dtabs{position:sticky;top:var(--dhh,0px);z-index:3;background:var(--u-bg);margin:14px -16px 0;padding:8px 16px;gap:6px;border-bottom:0}
+/* --- 大きな見出し（スマホ）：傾けたポスター＋大きな％、右上に黄色の丸 --- */
+.dhx{position:relative;display:block;margin:0 -16px;padding:12px 16px 2px;overflow:hidden}
+.dhx::before{content:"";position:absolute;right:-70px;top:-40px;width:230px;height:230px;border-radius:50%;background:var(--pop)}
 .dhrow{position:relative;z-index:1;display:flex;gap:16px;align-items:flex-end}
 .dhx .dtc{position:relative;z-index:1;margin-top:14px}
 .dhx h3{font-size:24px;line-height:1.3;margin:0}
-.dhbg{display:none}
+.dhx .dtimg{width:116px;margin:4px 0 0 4px;border:2px solid var(--k);border-radius:16px;box-shadow:5px 5px 0 var(--k);transform:rotate(-3deg)}
+.dhx .dtimg.none{background:var(--u-surface)}
 .dhpct{flex:1;min-width:0;padding-bottom:4px}
 .dhpct b{display:block;font-family:var(--fn);font-weight:900;font-size:44px;line-height:1;color:var(--u-accent)}
 .dhpct b small{font-size:18px;margin-left:1px}
 .dhpct>span:not(.dhbar){display:block;font-size:var(--fs-xs);font-weight:800;margin-top:3px}
-.dhbar{display:block;height:10px;border-radius:6px;overflow:hidden;margin-top:8px;background:var(--u-soft)}
+.dhbar{display:block;height:10px;border-radius:6px;overflow:hidden;margin-top:8px;border:2px solid var(--k2);background:var(--u-surface)}
 .dhbar i{display:block;height:100%;background:var(--u-accent)}
-.th-l .dhx{margin:0 -16px;padding:12px 16px 2px;overflow:hidden}
-.th-l .dhx::before{content:"";position:absolute;right:-70px;top:-40px;width:230px;height:230px;border-radius:50%;background:var(--pop)}
-.th-l .dhx .dtimg{width:116px;margin:4px 0 0 4px;border:2px solid var(--u-ink);border-radius:16px;box-shadow:5px 5px 0 var(--u-ink);transform:rotate(-3deg)}
-.th-l .dhx .dtimg.none{background:#fff}
-.th-l .dhbar{border:2px solid var(--u-ink);background:#fff}
-.th-d .dhx{margin:0 -16px;padding:16px 16px 0;overflow:hidden}
-@media (max-width:899px){
-  .th-d .dhx:has(.dhbg){min-height:300px;display:flex;flex-direction:column;justify-content:flex-end;align-items:stretch}
-  .th-d .dhbg{display:block;position:absolute;inset:0;border:0;padding:0;margin:0;background:var(--u-soft);cursor:zoom-in}
-}
-.th-d .dhbg img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 25%}
-.th-d .dhbg::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,13,26,.25) 0%,rgba(10,13,26,0) 30%,rgba(10,13,26,.7) 70%,var(--u-bg) 100%)}
-.th-d .dhx:has(.dhbg) .dtimg{display:none}
-.th-d .dhx .dhrow{justify-content:flex-end}
-.th-d .dhx:has(.dhbg) .dhpct{flex:none;text-align:right}
-.th-d .dhpct b{color:var(--u-accent);font-weight:400;font-size:46px}
-.th-d .dhpct b small{font-size:22px}
-.th-d .dhbar{height:4px;width:120px;margin-left:auto;background:rgba(255,255,255,.18)}
-.th-d .dhx h3{font-size:26px;text-shadow:0 2px 16px rgba(0,0,0,.6)}
-.th-d .dhx .dtimg{border-radius:12px}
 /* 配信・公式サイトのボタン */
 .dhx .dtbtns{margin-top:12px;gap:8px}
-.dhx .dtb.u-btn{height:46px;border-radius:14px;font-weight:900}
-.th-l .dhx .dtb.u-btn{border:2px solid var(--u-ink);background:#fff;color:var(--u-ink)}
-.th-l .dhx .dtb.vod{background:var(--u-ink);color:#fff;box-shadow:3px 3px 0 var(--u-accent)}
-.th-d .dhx .dtb.u-btn{border:1px solid var(--u-strong);background:var(--u-surface);color:var(--u-ink)}
-.th-d .dhx .dtb.vod{border:0;background:var(--u-accent);color:var(--u-on);box-shadow:0 6px 20px rgba(255,194,75,.3)}
-.th-d .dhx .dtb.vod .iic.ply circle{fill:var(--u-on)}
-.th-d .dhx .dtb.vod .iic.ply path{fill:var(--u-accent)}
+.dhx .dtb.u-btn{height:46px;border-radius:14px;font-weight:900;border:2px solid var(--k);background:var(--u-surface);color:var(--u-ink)}
+.dhx .dtb.vod{background:var(--kbg);color:#fff;box-shadow:3px 3px 0 var(--u-accent)}
+.dhx .dtb.vod .iic.ply circle{fill:#fff}
+.dhx .dtb.vod .iic.ply path{fill:var(--kbg)}
 @media (min-width:900px){
-  .dhbg,.dhpct{display:none!important}
-  .th-l .dhx,.th-d .dhx{margin:0;padding:0;overflow:visible;min-height:0}
-  .th-l .dhx::before{display:none}
+  .dhpct{display:none!important}
+  .dhx{margin:0;padding:0;overflow:visible;min-height:0}
+  .dhx::before{display:none}
   .dhx .dtc{margin-top:6px}
-  .th-l .dmain>.dtabs,.th-d .dmain>.dtabs{margin:14px 0 0;padding-left:0;padding-right:0}
-  .th-l .dpimg{border:2px solid var(--u-ink);box-shadow:5px 5px 0 var(--u-ink);border-radius:16px}
+  .dmain>.dtabs{margin:14px 0 0;padding-left:0;padding-right:0}
+  .dpimg,.dpimg.none{border:2px solid var(--k);box-shadow:5px 5px 0 var(--k);border-radius:16px}
 }
-/* --- タブ：ライトはステッカーの札、ダークは金の下線 --- */
-.th-l .dmain>.dtabs{margin:14px -16px 0;padding:8px 16px;gap:6px;border-bottom:0}
-.th-l .dtabs button{border:2px solid var(--u-ink);border-radius:12px;background:#fff;color:var(--u-ink);padding:8px 0;margin:0;font-weight:900}
-.th-l.th-l .sheet.t-info .dtabs [data-dtab="info"],.th-l.th-l .sheet.t-ep .dtabs [data-dtab="ep"]{background:var(--pop);border-color:var(--u-ink);box-shadow:2px 2px 0 var(--u-ink)}
-.th-l .dtabs small{font-family:var(--fn);font-weight:800;color:var(--u-accent)}
-.th-d .dmain>.dtabs{margin:14px -16px 0;padding:0 16px}
-.th-d .dtabs button{font-weight:900}
-.th-d .sheet.t-info .dtabs [data-dtab="info"],.th-d .sheet.t-ep .dtabs [data-dtab="ep"]{text-shadow:0 0 12px rgba(255,194,75,.5)}
-.th-d .dtabs small{font-family:var(--fn);font-weight:400;font-size:15px;color:var(--u-accent)}
+/* --- タブ：ステッカーの札（選択中は黄色） --- */
+.dtabs button{border:2px solid var(--k);border-radius:12px;background:var(--u-surface);color:var(--u-ink);padding:8px 0;margin:0;font-weight:900}
+.sheet.t-info .dtabs [data-dtab="info"],.sheet.t-ep .dtabs [data-dtab="ep"]{background:var(--pop);color:var(--onpop);border-color:var(--k);box-shadow:2px 2px 0 var(--k)}
+.dtabs small{font-family:var(--fn);font-weight:800;color:var(--u-accent)}
 /* --- 次に見る（スマホ・番組情報の一番上に1行） --- */
-.dnextl{display:flex;align-items:center;gap:8px;margin:12px 0;padding:7px 7px 7px 12px;border-radius:14px}
-.dnl-l{flex:none;font-size:10px;font-weight:900;line-height:1.5}
+.dnextl{display:flex;align-items:center;gap:8px;margin:12px 0;padding:7px 7px 7px 12px;border-radius:14px;background:var(--u-surface);border:2px solid var(--k)}
+.dnl-l{flex:none;font-size:10px;font-weight:900;line-height:1.5;color:var(--u-on);background:var(--u-accent);border-radius:6px;padding:1px 6px}
 .dnl-t{flex:1;min-width:0;border:0;background:none;padding:0;text-align:left;font:inherit;font-size:var(--fs-s);font-weight:700;color:var(--u-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
-.dnl-b.u-btn{flex:none;height:32px;padding:0 12px;border-radius:16px;font-size:var(--fs-s);font-weight:900}
-.th-l .dnextl{background:#fff;border:2px solid var(--u-ink)}
-.th-l .dnl-l{color:#fff;background:var(--u-accent);border-radius:6px;padding:1px 6px}
-.th-l .dnl-b.u-btn{border:2px solid var(--u-ink);background:var(--pop);color:var(--u-ink)}
-.th-d .dnextl{background:#17161a;border:1px solid #4a4230}
-.th-d .dnl-l{font-family:var(--fn);font-weight:400;font-size:14px;letter-spacing:.1em;color:var(--u-accent)}
-.th-d .dnl-t{color:#cdd1e0}
-.th-d .dnl-b.u-btn{border:0;background:var(--u-accent);color:var(--u-on)}
+.dnl-b.u-btn{flex:none;height:32px;padding:0 12px;border-radius:16px;font-size:var(--fs-s);font-weight:900;border:2px solid var(--k);background:var(--pop);color:var(--onpop)}
 @media (min-width:900px){.dnextl{display:none}}
 /* --- 番組情報のカード（ON AIR・MUSIC など） --- */
-.th-l .sheet .icard{background:#fff;border:2px solid var(--u-ink);border-radius:18px}
-.th-d .sheet .icard{background:var(--u-surface);border-color:var(--u-line);border-radius:18px}
-:is(.th-l,.th-d) .ilamp{background:none;color:var(--u-accent);padding:0;font-family:var(--fn);border-radius:0}
-.th-l .ilamp{font-weight:900;font-size:12px;letter-spacing:.14em}
-.th-d .ilamp{font-weight:400;font-size:16px;letter-spacing:.16em}
-/* --- 話数リスト：ライトは黒枠の丸、ダークは金の光る点 --- */
-.th-l .tld{border-color:var(--u-ink)}
-.th-l .tl.future .tld{border-color:var(--u-strong)}
-.th-l .tl.seen .tld{border-color:var(--u-ink)}
-.th-l .tl.next .tld{background:var(--pop);border-color:var(--u-ink);box-shadow:0 0 0 4px rgba(255,210,63,.45)}
-.th-l .tl.next .tlb{background:#fff3c4}
-.th-l .tln{font-family:var(--fn);font-weight:800;color:var(--u-ink)}
-.th-d .tl.next .tld{background:var(--u-bg);border-color:var(--u-accent);box-shadow:0 0 12px var(--u-accent)}
-.th-d .tl.next .tlb{background:#1d1b16;box-shadow:inset 0 0 0 1px #4a4230}
-.th-d .tln{font-family:var(--fn);font-weight:400;font-size:17px;letter-spacing:.02em;color:var(--u-ink)}
-.th-d .tl.next .tln,.th-d .tl.unseen .tln{color:var(--u-accent)}
-/* --- 番組表：時計・曜日・カード --- */
+.sheet .icard{background:var(--u-surface);border:2px solid var(--k);border-radius:18px}
+.sheet .ilamp{background:none;color:var(--u-accent);padding:0;font-family:var(--fn);border-radius:0;font-weight:900;font-size:12px;letter-spacing:.14em}
+/* --- 話数リスト：太枠の丸、次の話は黄色 --- */
+.tld{border-color:var(--k)}
+.tl.future .tld{border-color:var(--u-strong)}
+.tl.seen .tld{border-color:var(--k)}
+.tl.next .tld{background:var(--pop);border-color:var(--k);box-shadow:0 0 0 4px rgba(255,210,63,.45)}
+.tl.next .tlb{background:var(--pop2)}
+.tln{font-family:var(--fn);font-weight:800;color:var(--u-ink)}
+/* --- 番組表：曜日・カード --- */
 .wtop .wtop-side>*:first-child{font-family:var(--fn)}
 .wdayhd h2{font-family:var(--fd);font-weight:400}
-.th-l .wtabs{background:none;padding:0;gap:5px}
-.th-l .wtabs button{background:#fff;border:2px solid var(--u-ink);border-radius:14px;color:var(--u-ink)}
-.th-l .wtabs button[aria-selected="true"]{background:var(--u-accent);color:#fff;box-shadow:3px 3px 0 var(--u-ink)}
-.th-l .wtabs button b{font-family:var(--fn);font-weight:800}
-.th-d .wtabs{background-color:#232a47;background-image:radial-gradient(circle,var(--u-bg) 2px,transparent 2.4px),radial-gradient(circle,var(--u-bg) 2px,transparent 2.4px);background-size:14px 8px,14px 8px;background-position:3px 1px,3px calc(100% - 1px);background-repeat:repeat-x;padding:11px 6px;border-radius:8px}
-.th-d .wtabs button{background:#1e2540;border-radius:6px;color:var(--u-ink)}
-.th-d .wtabs button[aria-selected="true"]{background:var(--u-accent);color:var(--u-on);box-shadow:0 0 14px rgba(255,194,75,.35)}
-.th-d .wtabs button b{font-family:var(--fn);font-weight:400;font-size:20px;line-height:1}
+.wtabs{background:none;padding:0;gap:5px}
+.wtabs button{background:var(--u-surface);border:2px solid var(--k);border-radius:14px;color:var(--u-ink)}
+.wtabs button[aria-selected="true"]{background:var(--u-accent);color:var(--u-on);box-shadow:3px 3px 0 var(--k)}
+.wtabs button b{font-family:var(--fn);font-weight:800}
 /* カード：画像と情報をひとつの枠で囲む（枠は時刻・線の右の2列にまたがる飾り） */
 .wcard.v-tl{padding-bottom:28px}
-.wcard.v-tl::before{content:"";grid-column:3/5;grid-row:1;margin:-8px;border-radius:18px;pointer-events:none}
+.wcard.v-tl::before{content:"";grid-column:3/5;grid-row:1;margin:-8px;border-radius:18px;pointer-events:none;background:var(--u-surface);border:2px solid var(--k);box-shadow:4px 4px 0 var(--k)}
 .v-tl .wc-img,.v-tl .wc-body{position:relative;z-index:1}
 .v-tl .wc-line::before{bottom:-28px}
-.th-l .wcard.v-tl::before{background:#fff;border:2px solid var(--u-ink);box-shadow:4px 4px 0 var(--u-ink)}
-.th-l .v-tl .wc-img{border:2px solid var(--u-ink);border-radius:12px}
-.th-l .v-tl .wc-line i{background:var(--u-ink)}
-.th-l .v-tl .wc-ttl,.th-d .v-tl .wc-ttl{font-family:var(--fd);font-weight:400;font-size:15px;line-height:1.35}
-.th-l .wcard.v-tl .wc-tick.u-btn{border:2px solid var(--u-ink);background:var(--pop);color:var(--u-ink);font-weight:900;border-radius:18px;box-shadow:2px 2px 0 var(--u-ink)}
-.th-l .wc-bar{border:1.5px solid var(--u-ink);height:8px;background:var(--u-bg)}
-.th-l .v-tl .wc-time{font-family:var(--fn);font-weight:900;font-size:18px}
-.th-d .wcard.v-tl::before{background:var(--u-surface);border:1px solid var(--u-line)}
-.th-d .wcard.v-tl.nx::before,.th-d .wcard.v-tl.live::before{border-color:#4a4230;box-shadow:0 0 0 1px rgba(255,194,75,.15),0 8px 28px rgba(255,194,75,.08)}
-.th-d .v-tl .wc-line i{background:var(--u-accent);box-shadow:0 0 10px var(--u-accent)}
-.th-d .v-tl .wc-time{font-size:24px}
-.th-d .wcard.v-tl .wc-tick.u-btn{background:var(--u-accent);color:var(--u-on);border:0;font-weight:900;border-radius:10px}
-.th-d .wc-bar{height:3px;background:rgba(255,255,255,.15)}
+.v-tl .wc-img{border:2px solid var(--k);border-radius:12px}
+.wcard.v-tl .wc-line i{background:var(--u-ink)}
+.v-tl .wc-ttl{font-family:var(--fd);font-weight:400;font-size:15px;line-height:1.35}
+.wcard.v-tl .wc-tick.u-btn{border:2px solid var(--k);background:var(--pop);color:var(--onpop);font-weight:900;border-radius:18px;box-shadow:2px 2px 0 var(--k)}
+.wcard .wc-bar{border:1.5px solid var(--k2);height:8px;background:var(--u-bg)}
+.v-tl .wc-time{font-family:var(--fn);font-weight:900;font-size:18px}
 @media (min-width:900px){
   .wcard.v-tl{padding-bottom:34px!important}
   .v-tl .wc-line::before{bottom:-34px}

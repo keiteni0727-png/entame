@@ -408,7 +408,7 @@ U.applyTheme = (v = U.theme()) => {
   /* iPhoneの上の帯などの色も合わせる */
   document.querySelectorAll('meta[name="theme-color"]').forEach(m => {
     if (!m.dataset.orig) m.dataset.orig = m.content;
-    m.content = v === "light" ? "#f7f1e8" : v === "dark" ? "#0a0d1a" : m.dataset.orig;
+    m.content = v === "light" ? "#f7f1e8" : v === "dark" ? "#17151b" : m.dataset.orig;
   });
 };
 /* 「自動」のとき、端末のライト／ダークが切り替わったら印も付け直す */
