@@ -315,10 +315,10 @@ const VIEW_IC = {
   list: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><rect x="3.5" y="4.5" width="3" height="3" rx=".6"/><rect x="3.5" y="10.5" width="3" height="3" rx=".6"/><rect x="3.5" y="16.5" width="3" height="3" rx=".6"/></svg>',
   grid: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.2"/></svg>',
 };
-/* グリッドの1作品の大きさ（小 s／中 m／大 l）。グリッド表示中にグリッドのボタンをもう一度押すと切り替わる。この端末だけ・全メニュー共通 */
+/* グリッドの大きさ（ふつう m／小さい s の2つ）。グリッド表示中にグリッドのボタンをもう一度押すと切り替わる。この端末だけ・全メニュー共通 */
 const K_GSZ = "adb.v3.gsz";
-const GSZ = ["s", "m", "l"],
-  GSZ_L = { s: "小", m: "中", l: "大" };
+const GSZ = ["m", "s"],
+  GSZ_L = { m: "ふつう", s: "小さめ" };
 const gsz = () => (GSZ.includes(ls.get(K_GSZ)) ? ls.get(K_GSZ) : "m");
 const gszApply = () => (document.documentElement.dataset.gsz = gsz());
 gszApply();
@@ -326,10 +326,10 @@ const viewTog = (cur, attr) =>
   `<span class="vtog" role="group" aria-label="表示のしかた">${[["list", "リスト"], ["grid", "グリッド"]]
     .map(([v, l]) => {
       const g = v === "grid" && cur === "grid";
-      return `<button type="button" ${attr}="${v}" aria-pressed="${cur === v}" aria-label="${g ? `大きさ：${GSZ_L[gsz()]}（押すと切り替え）` : l + "で表示"}" title="${g ? "押すと大きさを切り替え" : l}">${VIEW_IC[v]}${g ? `<small class="gszb">${GSZ_L[gsz()]}</small>` : ""}</button>`;
+      return `<button type="button" ${attr}="${v}" aria-pressed="${cur === v}" aria-label="${g ? `大きさ：${GSZ_L[gsz()]}（押すと切り替え）` : l + "で表示"}" title="${g ? "押すと大きさを切り替え" : l}">${VIEW_IC[v]}</button>`;
     })
     .join("")}</span>`;
-/* グリッドの1マス：太枠と影の縦長の画像（1枚ずつ少し傾ける）とタイトル。作品は左上に斜めのステータスのシール、下に進み具合 */
+/* グリッドの1マス：太枠と影の縦長の画像（1枚ずつ少し傾ける）とタイトル。左上に斜めのステータスのシール、左下に放送形態（YouTubeは投稿者）、下に進み具合 */
 const gridSeal = (it, attr) => (s => (s ? `<span class="pseal s-${esc(s)}">${esc(stLabel(s))}</span>` : ""))(attr === "data-yt" ? ytSt(it) || UNSEEN : attr === "data-id" ? it.s : "");
 const gridProg = (it, attr) => {
   if (attr === "data-yt") {
@@ -343,8 +343,14 @@ const gridProg = (it, attr) => {
   const w = l.filter(e => e.w).length;
   return `<span class="pprog"><span class="pbar"><i style="width:${Math.round((w / l.length) * 100)}%"></i></span><b class="inum">${w}/${l.length}</b></span>`;
 };
+/* 画像の左下の札：作品は放送形態（TV・映画・OVAなど）、YouTubeは投稿者 */
+const gridTag = (it, attr) => {
+  if (attr === "data-yt") return it.a ? `<span class="ptag kind yauth">${esc(it.a)}</span>` : "";
+  const l = attr === "data-id" && mediaLabOf(it);
+  return l ? `<span class="ptag mtag m-${l[1]}">${l[0]}</span>` : "";
+};
 const gridCell = (it, attr = "data-id", ik = it) =>
-  `<button type="button" class="pcell${it.s === "視聴済み" ? " done" : ""}" ${attr}="${esc(it.id)}">${gridSeal(it, attr)}<span class="pimg">${posterTag(ik, "s", "pimgi") || `<span class="wc-noimg">${IMG_ICON}</span>`}</span><span class="pttl">${esc(it.t || "（タイトルなし）")}</span>${gridProg(it, attr)}</button>`;
+  `<button type="button" class="pcell${it.s === "視聴済み" ? " done" : ""}" ${attr}="${esc(it.id)}">${gridSeal(it, attr)}<span class="pimg">${posterTag(ik, "s", "pimgi") || `<span class="wc-noimg">${IMG_ICON}</span>`}${gridTag(it, attr)}</span><span class="pttl">${esc(it.t || "（タイトルなし）")}</span>${gridProg(it, attr)}</button>`;
 /* 詳細で開いている作品を一覧で目立たせる（PCの右のパネルで開いている間） */
 function markSel() {
   document.querySelectorAll("#main .sel").forEach(el => el.classList.remove("sel"));

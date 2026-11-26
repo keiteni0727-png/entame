@@ -253,26 +253,20 @@ function ytOpenInline(target) {
   const inn = $("#ytIn");
   yform.only = target;
   yform.inline = true;
-  inn.querySelectorAll(".ined").forEach(x => x.remove());
-  inn.querySelectorAll(".icard[hidden]").forEach(x => (x.hidden = false));
+  inPopClear("#ytIn");
   const card = target === "ycard" && inn.querySelector(".icard.ibc");
   const anc = card || inn.querySelector(".yhx") || inn.querySelector(".ydhead");
   if (!anc) {
     yform = null;
     return;
   }
-  anc.insertAdjacentHTML(card ? "beforebegin" : "afterend", `<div class="ined${card ? " incard" : ""}" id="ytFormIn">${ytFormHtml()}</div>`);
-  if (card) card.hidden = true;
+  /* 詳細の上に前面に出す（作品の詳細と同じ） */
+  inn.insertAdjacentHTML("beforeend", `<div class="inpop-bg" aria-hidden="true"></div><div class="ined inpop" id="ytFormIn" role="dialog" aria-modal="true">${ytFormHtml()}</div>`);
   yform.init = ytFormSig(yform);
   /* 編集中は前・次の矢印を押せないように */
   inn.querySelectorAll(".dnav").forEach(b => (b.disabled = true));
   const box = $("#ytFormIn");
-  const sh = box.closest(".sheet");
-  if (!card && sh) sh.scrollTop = 0;
-  else if (sh) {
-    const top = sh.getBoundingClientRect().top + stickH(sh) + 8;
-    sh.scrollTop += box.getBoundingClientRect().top - top;
-  }
+  inPopPlace(box, anc);
   const i = box.querySelector(".fgrid.only input:not([type=checkbox])");
   if (i && !TOUCH) i.focus({ preventScroll: true });
 }

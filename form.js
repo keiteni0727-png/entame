@@ -422,32 +422,39 @@ function openInlineForm(target, el) {
   }
   form.only = target;
   form.inline = true;
-  document.querySelectorAll("#sheetIn .ined").forEach(x => x.remove());
-  document.querySelectorAll("#sheetIn .icard[hidden]").forEach(x => (x.hidden = false));
-  /* カードの「編集」ボタンから開いたときは、そのカードの場所がそのまま編集画面になる（元の表示は隠す） */
-  const inCard = !!(el && el.closest && el.closest(".iedit") && anc.classList.contains("icard"));
-  anc.insertAdjacentHTML(inCard ? "beforebegin" : "afterend", `<div class="ined${inCard ? " incard" : ""}${target === "onair" ? " insec" : ""}" id="formIn">${formHtml()}</div>`);
-  if (inCard) anc.hidden = true;
+  inPopClear("#sheetIn");
+  /* 詳細の上に前面に出す（押した場所の近くに浮かべる。下の詳細は動かさない） */
+  $("#sheetIn").insertAdjacentHTML("beforeend", `<div class="inpop-bg" aria-hidden="true"></div><div class="ined inpop${target === "onair" ? " insec" : ""}" id="formIn" role="dialog" aria-modal="true">${formHtml()}</div>`);
   readForm();
   form.init = JSON.stringify({ ...form, init: 0 });
   const box = $("#formIn");
-  const sh = box.closest(".sheet");
-  if (anc.classList.contains("dhead") && sh) sh.scrollTop = 0;
-  else if ((inCard || target === "relb") && sh) {
-    /* 編集画面の上端を、上に固定の見出しのすぐ下に合わせる（長い編集画面でも一番下へ飛ばない） */
-    const top = sh.getBoundingClientRect().top + stickH(sh) + 8;
-    const d = box.getBoundingClientRect().top - top;
-    sh.scrollTop += d;
-  } else if (typeof navScroll === "function") navScroll(box);
-  else box.scrollIntoView({ block: "nearest" });
+  inPopPlace(box, anc);
   const i = box.querySelector(".fgrid input:not([type=date]):not([type=checkbox]):not([type=file])");
   if (i && !TOUCH) i.focus({ preventScroll: true });
 }
 function closeInlineForm() {
   closeDD();
   form = null;
-  document.querySelectorAll("#sheetIn .ined").forEach(x => x.remove());
-  document.querySelectorAll("#sheetIn .icard[hidden]").forEach(x => (x.hidden = false));
+  inPopClear("#sheetIn");
+}
+/* 前面に出す編集（作品・YouTubeの詳細で共通）：消す／置く。
+   置く場所は押した場所の高さ（はみ出すなら上へずらす）。詳細はスクロールを止め、編集の中だけスクロールする */
+function inPopClear(wrap) {
+  document.querySelectorAll(`${wrap} .ined, ${wrap} .inpop-bg`).forEach(x => x.remove());
+  document.querySelectorAll(`${wrap} .icard[hidden]`).forEach(x => (x.hidden = false));
+}
+function inPopPlace(box, anc) {
+  const sh = box.closest(".sheet"),
+    bg = box.previousElementSibling;
+  if (!sh) return;
+  const H = sh.clientHeight,
+    st = sh.scrollTop,
+    sr = sh.getBoundingClientRect();
+  box.style.maxHeight = H - 16 + "px";
+  const at = anc && anc.isConnected ? anc.getBoundingClientRect().top - sr.top : 8;
+  const top = Math.max(8, Math.min(at, H - box.offsetHeight - 8));
+  box.style.top = st + top + "px";
+  if (bg) Object.assign(bg.style, { top: st + "px", height: H + "px" });
 }
 /* 変更があれば保存、なければ閉じるだけ */
 function commitInlineForm() {
