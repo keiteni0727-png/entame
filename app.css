@@ -6,30 +6,31 @@
   ・アプリの外枠に class="u-app" を付けると、左メニューなどの共通部品が使える */
 :root{--pop:#ffd23f;--pop2:#fff3c4;--onpop:#1a1714;--k:#1a1714;--ks:#1a1714;--k2:#1a1714;--kbg:#1a1714;--fd:"Mochiy Pop One",var(--u-f);--fn:"Rubik",var(--u-f);--u-bg:#f7f1e8;--u-surface:#ffffff;--u-ink:#1a1714;--u-sub:#6b6257;--u-line:#e4dacb;--u-soft:#f0e8dc;--u-strong:#cbbca6;--u-chip:#efe6d8;--u-accent:#ff5a1f;--u-accent2:#ffe5d9;--u-acct:#c43e0c;--u-live:#d4342a;--u-live2:#fbe9e7;--u-danger:#c8382e;--u-danger2:#fbe9e7;--u-ok:#1f8a52;--u-ok2:#e3f3ea;--u-warn:#a36800;--u-warn2:#f8eed5;--u-on:#ffffff;--u-scrim:rgba(12,16,24,.45);--u-shadow:0 10px 32px rgba(16,24,40,.18);--u-r:10px;--u-rl:14px;--u-f:"Zen Kaku Gothic New","Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",system-ui,sans-serif;--u-num:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--fs-xs:11px;--fs-s:12px;--fs-m:13px;--fs-base:14px;--fs-l:16px;--fs-xl:20px;--fs-2xl:28px;--fs-3xl:40px;
   --r-s:6px;--r-m:var(--u-r);--r-l:var(--u-rl);--r-full:999px;
-  --h-s:32px;--h-m:40px;--h-l:48px;--h-chip:28px;--h-in:36px;--u-navb:max(4px,calc(env(safe-area-inset-bottom,0px) - 16px))}
+  --h-s:32px;--h-m:40px;--h-l:48px;--h-chip:28px;--h-in:36px;--u-navb:max(14px,calc(env(safe-area-inset-bottom,0px) - 6px))}
 
 /* ===== 土台：ページ全体をスクロールさせる。端を越えて引っ張れないようにする ===== */
 *{box-sizing:border-box}
 
-/* ===== PCの左メニュー（折りたためる）。スマホでは出さない ===== */
-.u-app .sb{display:none;gap:1px}
+/* ===== PC：左の細いアイコンのレール（幅88px・黒地、選択中は黄色の角丸）。スマホでは出さない ===== */
+:root{--sbw:88px}
+.u-app .sb{display:none}
 @media (min-width:900px){
   body{padding-left:var(--sbw)}
-  .u-app .sb{position:fixed;left:0;top:0;bottom:0;width:var(--sbw);background:var(--u-surface);border-right:1px solid var(--u-line);display:flex;flex-direction:column;padding:14px 12px;overflow-y:auto;overflow-x:hidden;overscroll-behavior:none;z-index:6;padding-top:0;scrollbar-width:none}
-  .u-app .sb-top{display:flex;align-items:center;gap:8px;padding:2px 4px 12px;border-bottom:1px solid var(--u-line);margin-bottom:10px}
-  .u-app .sb-sec{font-size:11px;font-weight:700;color:var(--u-sub);letter-spacing:.08em;padding:8px 8px 4px}
-  .u-app .sb-it{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;text-align:left;padding:9px 10px;border-radius:10px;font-size:14.5px;font-weight:700;color:var(--u-sub);white-space:nowrap}
-  .u-app .sb-it i{width:22px;text-align:center;font-style:normal;flex:none;font-size:16px}
-  .u-app .sb-it[aria-current="page"]{background:var(--u-accent2);color:var(--u-acct)}
-  .u-app .sb-foot{margin-top:auto;border-top:1px solid var(--u-line);padding-top:10px;display:flex;flex-direction:column;gap:4px}
-  .u-app .sb-st{padding:4px 10px}
-  body.sbc .u-app .sb .lbl{display:none}
-  body.sbc .u-app .sb-st{display:flex;justify-content:center;padding:4px 0}
-  body.sbc .u-app .sb-top{flex-direction:column;gap:10px;padding-inline:0}
-  body.sbc .u-app .sb-it{justify-content:center;padding:10px 0}
+  .u-app .sb{position:fixed;left:0;top:0;bottom:0;z-index:6;width:var(--sbw);box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 0 12px;background:var(--kbg);overflow-y:auto;overscroll-behavior:none;scrollbar-width:none}
+  .u-app .sb::-webkit-scrollbar{display:none}
+  .u-app .sb-logo{width:40px;height:40px;flex:none;display:block;margin-bottom:8px}
+  .u-app .sb-add{flex:none;display:grid;place-items:center;width:56px;height:56px;margin-bottom:14px;padding:0;border:2px solid #000;border-radius:18px;background:var(--u-accent);color:#fff;box-shadow:3px 3px 0 var(--pop);cursor:pointer}
+  .u-app .sb-add svg{width:26px;height:26px}
+  .u-app .sb-it{flex:none;display:flex;flex-direction:column;align-items:center;gap:4px;width:72px;padding:9px 0 8px;border:0;border-radius:16px;background:none;color:rgba(255,255,255,.72);font:inherit;font-size:11px;font-weight:900;line-height:1.2;cursor:pointer}
+  .u-app .sb-it svg{width:24px;height:24px}
+  .u-app .sb-it[aria-current="page"]{background:var(--pop);color:var(--onpop)}
+  .u-app .sb-foot{margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:8px}
+  .u-app .sb-st{display:flex;justify-content:center}
+  .u-app .sb-st .sv{font-size:0;gap:0}
+  .u-app .sb-st .svat{display:none}
 }
 @media (min-width:900px) and (hover:hover){
-  .u-app .sb-it:not([aria-current]):hover{background:var(--u-chip);color:var(--u-ink)}
+  .u-app .sb-it:not([aria-current]):hover{background:rgba(255,255,255,.1);color:#fff}
 }
 
 /* ===== ボタン（おかね手帳の書き方）：class="u-btns" の中の button すべてに効く =====
@@ -87,17 +88,16 @@
 .u-seg>button{flex:1;height:calc(var(--h-s) - 2px);padding:0 10px;border:0;border-radius:calc(var(--r-m) - 3px);background:transparent;color:var(--u-sub);font:700 var(--fs-m)/1 var(--u-f);white-space:nowrap;cursor:pointer}
 .u-seg>button.on,.u-seg>button[aria-selected="true"],.u-seg>button[aria-pressed="true"]{background:var(--u-surface);color:var(--u-ink);box-shadow:0 1px 3px rgba(16,24,40,.12)}
 
-/* ===== スマホの下部メニュー：.tbwrap の中に .tabbar（画面の切り替え）と .tbgear（設定）。PCでは出さない ===== */
-/* 画面下からの距離（ウリログと同じ：ホームバーぎりぎりまで下げる） */
+/* ===== スマホ：画面から浮いたドック（黒地・ずらした影）。今夜・ライブラリ・真ん中に＋・コレクション・設定。PCでは出さない ===== */
 .u-app .tbwrap{display:none}
 @media (max-width:899px){
-  .u-app .tbwrap{position:fixed;z-index:30;left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));bottom:var(--u-navb);display:flex;justify-content:center;gap:8px;pointer-events:none}
-  .u-app .tbwrap>*{pointer-events:auto;background:var(--u-surface);border:1px solid var(--u-line);border-radius:22px;box-shadow:0 8px 28px rgba(16,24,40,.18)}
-  .u-app .tabbar{flex:0 1 520px;min-width:0;display:flex;gap:2px;padding:4px}
-  .u-app .tabbar button{flex:1;border:0;background:none;color:var(--u-sub);border-radius:18px;height:calc(var(--tbh,58px) - 8px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;font-weight:700;padding:0}
-  .u-app .tabbar svg{width:22px;height:22px;padding:3px 14px;box-sizing:content-box;border-radius:999px}
-  .u-app .tabbar button[aria-current="page"]{color:var(--u-acct)}
-  .u-app .tabbar button[aria-current="page"] svg{background:var(--u-accent2)}
+  .u-app .tbwrap{position:fixed;z-index:30;left:max(14px,env(safe-area-inset-left,0px));right:max(14px,env(safe-area-inset-right,0px));bottom:var(--u-navb);display:flex;justify-content:center;pointer-events:none}
+  .u-app .tabbar{pointer-events:auto;flex:0 1 520px;min-width:0;height:var(--tbh);box-sizing:border-box;display:flex;align-items:center;gap:2px;padding:0 6px;background:var(--kbg);border-radius:22px;box-shadow:4px 4px 0 var(--u-accent)}
+  .u-app .dk-it{flex:1;min-width:0;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:0;border:0;border-radius:16px;background:none;color:rgba(255,255,255,.7);font:inherit;font-size:10px;font-weight:900;line-height:1.1;white-space:nowrap;cursor:pointer}
+  .u-app .dk-it svg{width:22px;height:22px}
+  .u-app .dk-it[aria-current="page"]{background:var(--pop);color:var(--onpop)}
+  .u-app .dk-add{flex:none;display:grid;place-items:center;width:58px;height:58px;margin:-26px 4px 0;padding:0;border:2.5px solid var(--kbg);border-radius:50%;background:var(--u-accent);color:#fff;box-shadow:3px 3px 0 var(--kbg);cursor:pointer}
+  .u-app .dk-add svg{width:28px;height:28px}
 }
 
 /* ===== トップへ戻るボタン（.hide で隠す） ===== */
@@ -633,13 +633,6 @@ input[type=date]::-webkit-date-and-time-value{text-align:left}
 @media (min-width:900px){
   header .wrap{max-width:1100px}
   .wrap{max-width:1100px}
-  .sb-add{display:flex;align-items:center;justify-content:center;gap:4px;height:var(--h-m);box-sizing:border-box;border:0;background:var(--u-accent);color:var(--u-on);border-radius:var(--r-m);padding:0 10px;font-weight:700;font-size:var(--fs-base);margin-bottom:8px;white-space:nowrap}
-  .sb-st{font-size:var(--fs-s);padding:4px 10px;display:flex;flex-direction:column;gap:2px}
-  .sb-st .svat{font-size:var(--fs-xs)}
-  body.sbc .sb-st .svat{display:none}
-  body.sbc .sb-st{align-items:center;padding:4px 0}
-  body.sbc .sb-st .sv{font-size:0;gap:0}
-  body.sbc .sb-add{padding:10px 0}
   #saveNote{display:none}
   .pwide{display:flex;justify-content:flex-end;width:84px}
   .slot{grid-template-columns:62px minmax(0,1fr) minmax(0,380px) auto}
@@ -777,19 +770,6 @@ input[type=date]::-webkit-date-and-time-value{text-align:left}
 .xser{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:color-mix(in srgb,var(--accent) 9%,var(--u-surface));border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);border-radius:var(--r-m);padding:8px 12px;margin:0 0 8px;font-size:var(--fs-m)}
 .xser span{flex:1;min-width:0}
 .xser .u-btn{flex:none}
-/* 左メニュー：U-NEXT風に、まとまりごとの角丸パネル */
-.u-app .sb .sbp{flex:none;background:var(--u-chip);border-radius:var(--r-l);margin:0 0 6px;overflow:hidden}
-.u-app .sb .sbp .sb-row{gap:0}
-.u-app .sb .sbp .sb-row>.sb-it{border-radius:0;background:none;padding-left:8px}
-.u-app .sb .sbp .sb-row>.sb-it.on{color:var(--u-acct)}
-
-/* 左メニュー：詰めた余白・折りたたみ・件数 */
-.u-app .sb .sb-row{display:flex;align-items:center;gap:2px}
-.u-app .sb .sb-row>.sb-it{flex:1;min-width:0}
-.u-app .sb .sb-it{padding-top:7px;padding-bottom:7px}
-/* 折りたたみ時：アイコンを枠の真ん中に */
-body.sbc .u-app .sb .sbp .sb-row>.sb-it{justify-content:center;padding:10px 0}
-body.sbc .u-app .sb .sb-it i{margin:0}
 @media (max-width:899px){
   .wtop{padding-top:10px;gap:8px}
   .wt-clock{flex-direction:column;gap:4px;justify-content:center}
@@ -808,7 +788,7 @@ body.sbc .u-app .sb .sb-it i{margin:0}
 .mic.w{color:var(--u-acct)}.mic.a{color:var(--anime)}.mic.d{color:var(--drama)}.mic.m{color:var(--movie)}.mic.s{color:var(--stream)}.mic.yt{color:var(--yt)}
 .hcur .mic{width:26px;height:26px}
 .hcur .mic svg{width:24px;height:24px}
-/* ===== スマホ：上の帯（アイコン・アプリ名、真ん中に画面名、右に＋と⚙） ===== */
+/* ===== スマホ：上の帯（アイコン・アプリ名、真ん中に画面名） ===== */
 @media (max-width:899px){
   .hbar{gap:8px}
   .hcur{flex:none}
@@ -918,30 +898,9 @@ body.sbc .u-app .sb .sb-it i{margin:0}
 }
 /* 設定：表示（自動／ライト／ダーク） */
 
-/* ===== PC：左上の☰は左メニューの中。上の帯と左メニューの見出しの高さ・下線をそろえる ===== */
+/* ===== PC：上の帯 ===== */
 @media (min-width:900px){
   .hbar{display:flex;gap:12px;padding-block:10px;min-height:36px}
-  .sb-ham{flex:none;width:36px;height:36px;border:0;background:var(--u-chip);color:var(--u-ink);border-radius:var(--r-m);display:grid;place-items:center;padding:0}
-  .sb-ham svg{width:20px;height:20px}
-  .sb-ham:hover{background:var(--u-line)}
-  /* たたんだとき：☰だけを真ん中に */
-  body.sbc .u-app .sb .sb-top{justify-content:center;padding:0}
-  
-  /* たたんだとき：今開いているメニューの枠に色をつける */
-  body.sbc .u-app .sb .sbp.cur{background:color-mix(in srgb,var(--u-accent) 16%,var(--u-chip));box-shadow:inset 0 0 0 2px var(--u-accent)}
-}
-/* PC：左メニューの幅を少し広げて「エンタメ管理」が切れないように。たたんだときはアイコンを詰めて、ノートPCの高さでもスクロールバーが出ないように */
-@media (min-width:900px){
-  :root{--sbw:248px}
-  body.sbc{--sbw:68px}
-  .u-app .sb .sb-top{box-sizing:border-box;height:calc(var(--hdh,57px));min-height:57px;margin:0 -12px 10px;padding:0 14px;flex-direction:row;align-items:center;gap:8px}
-  .u-app .sb-top b{font-weight:900;white-space:nowrap;font-size:var(--fs-l)}
-  .u-app .sb::-webkit-scrollbar{display:none}
-  body.sbc .u-app .sb .sb-add{height:var(--h-m);padding:0;margin-bottom:6px}
-  body.sbc .u-app .sb .sbp{margin-bottom:4px}
-  body.sbc .u-app .sb .sbp .sb-row>.sb-it{height:40px;padding:0}
-  body.sbc .u-app .sb .sb-foot{padding-top:6px;gap:2px}
-  body.sbc .u-app .sb .sb-foot .sb-it{height:36px;padding:0}
 }
 
 /* ===== 上の帯：高さを固定（メニューで変わらない）。PCは右上に表示の切り替え（スマホは設定の中） ===== */
@@ -950,15 +909,6 @@ header .hbar{box-sizing:border-box;height:56px;padding-block:0}
   .wtabs{margin-top:10px}
   .wtabs button{padding:6px 2px}
   .wtabs button b{font-size:var(--fs-base)}
-}
-/* ===== PC：左メニューは開いたときも、たたんだときと同じ大きさ（詰めた行）でスクロールなしに ===== */
-@media (min-width:900px){
-  .u-app .sb .sb-add{height:var(--h-m);padding:0;margin-bottom:6px}
-  .u-app .sb .sbp{margin-bottom:4px}
-  .u-app .sb .sbp .sb-row>.sb-it{height:40px;padding-top:0;padding-bottom:0}
-  .u-app .sb .sb-sec{padding:4px 8px 2px}
-  .u-app .sb .sb-foot{padding-top:6px;gap:2px}
-  .u-app .sb .sb-foot .sb-it{height:36px;padding-top:0;padding-bottom:0}
 }
 /* 作品詳細の上段：番組名は枠の右端まで使って折り返す（行の長さをそろえる balance をやめる） */
 .sheet:not(.form) .dhead h3{text-wrap:wrap}
@@ -1113,10 +1063,6 @@ button.imt[aria-expanded="false"]+.imt,button.imt[aria-expanded="false"]+button.
 .idl .ilnk .iic{width:13px;height:13px;flex:none}
 .idl .ilnk .iic.ply{width:15px;height:15px}
 .idl .ilnk .ilar{font-size:var(--fs-l);line-height:1}
-/* 左上のロゴ：アプリアイコンと同じマーク（ON AIRの文字の代わり） */
-.u-app .sb-logo{width:26px;height:26px;flex:none;display:block}
-body.sbc .u-app .sb .sb-logo{display:none}
-@media (max-width:899px){.u-app .sb-logo{width:24px;height:24px}}
 
 /* ===================== 2026-11 新デザイン（AB案）：番組表 ===================== */
 .wt-clock time{font-family:var(--fn);font-weight:800;letter-spacing:0;color:var(--u-acct)}
@@ -1210,32 +1156,18 @@ body.sbc .u-app .sb .sb-logo{display:none}
 /* YouTube詳細：上段のジャンル（押すと編集）。作品の種別ラベルと同じ形 */
 .dmeta .dmt.lab{background:color-mix(in srgb,var(--accent) 10%,transparent);color:var(--accent);font-weight:700}
 
-@media (max-width:899px){header .hthm{display:none}header .hact{display:inline-flex}}
+@media (max-width:899px){header .hthm{display:none}}
 /* ===================== 2026-11 見直し：上の帯・下メニュー・絞り込みシート・プルダウン ===================== */
-/* 上の帯：スマホは☰と月マークをなくし、右に＋（追加）と⚙（設定）。PCは今までどおり */
-.hact{display:none}
+/* 上の帯：スマホは小さなロゴと今の画面の名前だけ（追加・設定は下のドック）。PCは右上に表示の切り替え */
 .hthm{margin-left:auto}
 .ich .iedit{margin-left:auto}
 
-:root{--anime:#d4342a;--drama:#2457d6;--movie:#7b4bd1;--stream:#0f8a8a;--reality:#d2457a;--yt:#e5221a;--sp:#d2457a;--su:#14896a;--au:#c8611a;--wi:#2f6fc9;--accent:#2f5bd6;--st-want:#1f8a52;--st-now:#c77a00;--st-done:#8a3b52;--st-drop:#7a8090;--sg-op:#2f6fd1;--sg-ed:#7a4fd0;--sg-th:#1f8a6d;--sg-in:#c46a12;--tbh:58px}
+:root{--anime:#d4342a;--drama:#2457d6;--movie:#7b4bd1;--stream:#0f8a8a;--reality:#d2457a;--yt:#e5221a;--sp:#d2457a;--su:#14896a;--au:#c8611a;--wi:#2f6fc9;--accent:#2f5bd6;--st-want:#1f8a52;--st-now:#c77a00;--st-done:#8a3b52;--st-drop:#7a8090;--sg-op:#2f6fd1;--sg-ed:#7a4fd0;--sg-th:#1f8a6d;--sg-in:#c46a12;--tbh:64px}
 @media (max-width:899px){
   body{padding-bottom:calc(var(--u-navb) + var(--tbh) + 24px);--u-toast-b:calc(var(--tbh) + 22px)}
   .u-app .totop{bottom:calc(var(--u-navb) + var(--tbh) + 12px)}
-  /* 左から出すメニューは使わない */
-  .u-app .sb{display:none!important}
 }
-/* 下メニューの色：今いるメニューの色に合わせる */
-.u-app .tabbar button{cursor:pointer}
 
-/* 「その他」：映画・バラエティ・YouTube・シリーズ・主題歌のタイル */
-.otiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding-block:16px}
-.otile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:96px;border:1px solid var(--u-line);border-radius:var(--r-l);background:var(--u-surface);color:var(--u-ink);font:inherit;cursor:pointer;padding:12px}
-.otile .mic{width:30px;height:30px}
-.otile .mic svg{width:26px;height:26px}
-.otile b{font-size:var(--fs-l)}
-.otile small{font-size:var(--fs-s);color:var(--u-sub);font-family:var(--u-num)}
-.otile:active{transform:scale(.98)}
-@media (min-width:900px){.otiles{grid-template-columns:repeat(4,minmax(0,200px))}}
 
 /* 一覧の上の1列：絞り込み・★保存・並び順・検索 */
 .fbar{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,auto) 42px 42px;gap:6px;margin-top:12px}
@@ -1324,20 +1256,16 @@ body:has(#layer .sheet) .tbwrap{display:none}
   .row.lst .lab.s.pconly{display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
   .row.lst .meta{min-width:0}
 }
-/* 帯（スマホ）：左にアプリアイコンと「エンタメ管理」、真ん中に今の画面、右に＋（オレンジ）と⚙ */
+/* 帯（スマホ）：左にアプリアイコンと「エンタメ管理」だけ（今の画面はドックの選択中と、ライブラリの大きなタブでわかる） */
 .hlogo{display:none}
 @media (max-width:899px){
   header .hbar{height:52px;position:relative}
   .hlogo{display:flex;align-items:center;gap:7px;flex:none;min-width:0}
   .hlogo svg{width:26px;height:26px;flex:none}
   .hlogo b{font-size:var(--fs-base);font-weight:700;white-space:nowrap}
-  header .hcur{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);gap:8px;pointer-events:none}
-  header .hcur .hname{font-family:var(--u-f);font-size:var(--fs-l);font-weight:700}
-  header .hcur .mic{width:22px;height:22px}
-  header .hcur .mic svg{width:20px;height:20px}
-  header #hAdd{margin-left:auto}
+  header .hcur{display:none}
 }
-@media (max-width:380px){.hlogo b{display:none}}
+
 /* ===== シリーズ ===== */
 .fbar:has(.srmgr){grid-template-columns:minmax(0,1fr) auto 42px 42px}
 .srcard:active{transform:scale(.99)}
@@ -1431,7 +1359,6 @@ span.mname{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space
   .fsh.in{animation:fdrop .14s ease-out}
   .fsdrop.fpop.k-sort{left:0;right:auto}
 }
-.sb-add{flex:none}
 /* 設定のシリーズ：一覧の中でスクロール（行は伸ばさず上詰め） */
 .mlist.slist{align-content:start;grid-auto-rows:min-content;background:var(--u-surface);-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 /* スマホも絞り込み・保存フィルタはボタンのすぐ下に出す（PCと同じ形） */
@@ -2220,4 +2147,16 @@ html[data-gsz="l"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(240px,1f
 @media (min-width:900px){
   .wcard.v-tl{padding-bottom:34px!important}
   .v-tl .wc-line::before{bottom:-34px}
+}
+/* --- ライブラリ・コレクションの上：大きな文字のタブ（選んでいるタブだけ大きく、件数はアクセント色の数字） --- */
+.gtabs{display:flex;align-items:baseline;gap:4px 18px;overflow-x:auto;scrollbar-width:none;margin:14px -16px 4px;padding:0 16px 4px}
+.gtabs::-webkit-scrollbar{display:none}
+.gtabs button{flex:none;display:flex;align-items:baseline;gap:4px;border:0;background:none;padding:0;font:inherit;font-size:15px;font-weight:900;line-height:1.2;color:var(--u-sub);white-space:nowrap;cursor:pointer}
+.gtabs button b{font-family:var(--fn);font-weight:800;font-size:13px;color:var(--u-accent)}
+.gtabs [aria-selected="true"]{font-family:var(--fd);font-weight:400;font-size:30px;color:var(--u-ink)}
+.gtabs [aria-selected="true"] b{font-size:18px}
+@media (min-width:900px){
+  .gtabs{margin:18px 0 6px;padding:0}
+  .gtabs [aria-selected="true"]{font-size:40px}
+  .gtabs [aria-selected="true"] b{font-size:22px}
 }

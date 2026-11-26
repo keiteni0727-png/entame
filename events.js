@@ -3,20 +3,9 @@
 /* ---------- クリック ----------
    画面ごとの「割り当て表」（[ボタンの目印, 押したときの処理]）を上から順に試し、処理したところで止める（runActions は core.js） */
 
-/* PC：左メニューの開閉と設定の歯車 */
-const SHELL_ACTIONS = [
-  ["[data-gear]", el => openSettings(el.dataset.gear === "1" ? "" : el.dataset.gear)],
-  [
-    "[data-sbtog]",
-    () => {
-      sbCollapsed = !sbCollapsed;
-      ls.set("adb.v3.sbc", sbCollapsed);
-      document.body.classList.toggle("sbc", sbCollapsed);
-      renderSidebar();
-    },
-  ],
-];
-/* 左メニュー・上の切り替え・未視聴のスイッチ・見出しの開閉 */
+/* 設定の歯車 */
+const SHELL_ACTIONS = [["[data-gear]", el => openSettings(el.dataset.gear === "1" ? "" : el.dataset.gear)]];
+/* メニュー・ライブラリのタブ・番組表の曜日・見出しの開閉 */
 const NAV_ACTIONS = [
   /* 番組表の曜日タブ（スマホ） */
   [
@@ -26,30 +15,27 @@ const NAV_ACTIONS = [
       go();
     },
   ],
-  /* スマホの下メニュー・「その他」のタイル・上の「‹」 */
+  /* メニュー（PCのレール・スマホのドック）：今夜・ライブラリ・コレクション。ライブラリ・コレクションは前に見ていたタブを開く */
   [
-    "[data-bnav]",
+    "[data-nav]",
     el => {
-      const m = el.dataset.bnav;
+      const g = el.dataset.nav;
       /* 詳細・編集を開いていたら閉じてから移る */
       if ($("#layer").innerHTML) close();
       closeDD();
-      leaveXser();
-      if (state.mode === m && m !== "o") {
-        scrollTo({ top: 0, behavior: "smooth" });
-        return;
-      }
-      setMode(m);
+      const wasX = leaveXser();
+      /* 今のメニューをもう一度押したら先頭へ */
+      if (!wasX && NAV_OF(state.mode) === g) return scrollTo({ top: 0, behavior: "smooth" });
+      setMode(g === "w" ? "w" : navLast[g]);
       go();
     },
   ],
-  /* 左メニューの名前 */
+  /* ライブラリ・コレクションの上のタブ（アニメ・ドラマ…／シリーズ・主題歌） */
   [
     "[data-mode]",
     el => {
       const m = el.dataset.mode;
       const wasX = leaveXser();
-      /* 今のメニューをもう一度押したら先頭へ（スマホの下メニューと同じ） */
       if (!wasX && state.mode === m) return scrollTo({ top: 0, behavior: "smooth" });
       setMode(m);
       go();
@@ -147,7 +133,7 @@ const COMMON_ACTIONS = [
     },
   ],
   ["[data-close]", () => close()],
-  ["#sbAdd,#hAdd", () => (state.mode === "yt" ? ytOpenForm(null) : openForm(null))],
+  ["#sbAdd,#bnAdd", () => (state.mode === "yt" ? ytOpenForm(null) : openForm(null))],
 ];
 /* スワイプ（共通部品 u-swipe.js）：スマホの番組表で、曜日の見出しと作品カード（.wday）だけを指に合わせて横に動かし、離すと隣の曜日へ。曜日タブなどは動かさない */
 const segBtns = () => [...document.querySelectorAll("#main .wtabs [data-tb]")];

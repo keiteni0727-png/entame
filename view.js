@@ -1,4 +1,4 @@
-/* ===================== 画面：左メニュー・番組表・ライブラリ一覧 ===================== */
+/* ===================== 画面：メニュー（PCのレール・スマホのドック）・番組表・ライブラリ一覧 ===================== */
 
 /* ---------- 表示の部品：アイコン・左メニュー・上の切り替え・ラベル ---------- */
 /* YouTubeの投稿者の絵文字（左メニュー・上の帯の切り替え） */
@@ -15,43 +15,53 @@ const MODE_IC = {
   mu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>',
   o: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg>',
 };
-/* スマホの下メニュー：番組表・アニメ・ドラマ・その他（映画・バラエティ・YouTube・シリーズ・主題歌は「その他」の中） */
-const OTHER_MODES = ["m", "s", "yt", "sr", "mu"];
+/* ---------- メニュー：今夜（番組表）・ライブラリ（アニメ／ドラマ／映画／バラエティ／YouTube）・コレクション（シリーズ／主題歌）・設定
+   画面は今までどおり state.mode で切り替え、メニューはそのまとまり（NAV_OF）で見せる ---------- */
+const LIB_MODES = ["a", "d", "m", "s", "yt"];
+const COL_MODES = ["sr", "mu"];
+const NAV_OF = m => (LIB_MODES.includes(m) ? "lib" : COL_MODES.includes(m) ? "col" : "w");
+const NAV_NAME = { w: "今夜", lib: "ライブラリ", col: "コレクション" };
+const NAV_IC = {
+  w: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>',
+  lib: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg>',
+  col: MODE_IC.sr.replace('stroke-width="2"', 'stroke-width="2.2"'),
+  gear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+  add: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+};
+/* ライブラリ・コレクションを開いたとき：前に見ていたタブ（端末に覚える） */
+const navLast = Object.assign({ lib: "a", col: "sr" }, ls.get("adb.v3.navLast") || {});
+function rememberNav() {
+  const g = NAV_OF(state.mode);
+  if (g === "w" || navLast[g] === state.mode) return;
+  navLast[g] = state.mode;
+  ls.set("adb.v3.navLast", navLast);
+}
+const navBtn = (g, cls) => `<button type="button" class="${cls}" data-nav="${g}"${NAV_OF(state.mode) === g ? ' aria-current="page"' : ""} title="${NAV_NAME[g]}">${NAV_IC[g].replace("<svg ", '<svg aria-hidden="true" ')}<span>${NAV_NAME[g]}</span></button>`;
+/* スマホ：画面から浮いたドック。今夜・ライブラリ・真ん中に＋（追加）・コレクション・設定 */
 function renderBnav() {
   const nav = $("#bnav");
   if (!nav) return;
-  const cur = OTHER_MODES.includes(state.mode) ? "o" : state.mode;
-  nav.innerHTML = ["w", "a", "d", "o"]
-    .map(m => `<button type="button" data-bnav="${m}"${cur === m ? ' aria-current="page"' : ""}>${MODE_IC[m].replace("<svg ", '<svg aria-hidden="true" ')}${MODE_NAME[m]}</button>`)
-    .join("");
+  nav.innerHTML = `${navBtn("w", "dk-it")}${navBtn("lib", "dk-it")}<button type="button" class="dk-add" id="bnAdd" aria-label="追加">${NAV_IC.add}</button>${navBtn("col", "dk-it")}<button type="button" class="dk-it" data-gear="1" title="設定">${NAV_IC.gear}<span>設定</span></button>`;
 }
-/* 「その他」の画面：タイルで並べる */
-function renderOther() {
-  const n = m => (m === "yt" ? ytItems.length : m === "sr" ? new Set(items.map(i => i.series).filter(Boolean)).size : m === "mu" ? songRows().length : items.filter(i => inMode(m, i)).length);
-  const sub = { m: "作品", s: "作品", yt: "本", sr: "シリーズ", mu: "曲" };
-  return `<div class="otiles">${OTHER_MODES.map(m => {
-    const c = n(m);
-    return `<button type="button" class="otile ${m}" data-bnav="${m}"><span class="mic ${m}" aria-hidden="true">${MODE_IC[m]}</span><b>${MODE_NAME[m]}</b><small>${c}${sub[m]}</small></button>`;
-  }).join("")}</div>`;
-}
-/* PC：左の折りたためるメニュー */
-let sbCollapsed = !!ls.get("adb.v3.sbc");
-/* メニューごとの対象（左メニューの件数用。ofKind と同じ考え方） */
+/* メニューごとの対象（ライブラリのタブの件数用。ofKind と同じ考え方） */
 const inMode = (m, i) =>
   m === "a" ? i.k === "a" : m === "d" ? i.k === "d" : m === "m" ? mediaOf(i).media === "movie" : m === "s" ? i.k === "r" : false;
+const modeCount = m => (m === "yt" ? ytItems.length : m === "sr" ? new Set(items.map(i => i.series).filter(Boolean)).size : m === "mu" ? songRows().length : items.filter(i => inMode(m, i)).length);
+/* ライブラリ・コレクションの上：大きな文字のタブ（選んでいるタブだけ大きく、件数はアクセント色の数字） */
+function navTabsHtml() {
+  const g = NAV_OF(state.mode);
+  if (g === "w" || state.xser) return "";
+  const l = g === "lib" ? LIB_MODES : COL_MODES;
+  return `<div class="gtabs" role="tablist" aria-label="${NAV_NAME[g]}">${l.map(m => `<button type="button" role="tab" data-mode="${m}" aria-selected="${state.mode === m}">${MODE_NAME[m]}<b class="inum">${modeCount(m)}</b></button>`).join("")}</div>`;
+}
+/* PC：左の細いアイコンのレール。ロゴ・＋（追加）・今夜／ライブラリ／コレクション・下に設定と保存の状態 */
 function renderSidebar() {
   const sb = $("#sb");
   if (!sb) return;
-  document.body.classList.toggle("sbc", sbCollapsed);
-  /* 左メニューはメニュー名だけ（種別・配信サイト・投稿者などは一覧の「絞り込み」で選ぶ） */
-  const mode = (m, ic, l) =>
-    `<div class="sbp${state.mode === m ? " cur" : ""}"><div class="sb-row"><button type="button" class="sb-it${state.mode === m ? " on" : ""}"${state.mode === m ? ' aria-current="page"' : ""} data-mode="${m}" title="${l}"><i aria-hidden="true">${ic}</i><span class="lbl">${l}</span></button></div></div>`;
-  /* PC：左上に☰（左メニューの折りたたみ）。上の帯と高さ・線をそろえる。ロゴはアプリアイコンと同じマーク（スマホは下メニューなので出さない） */
-  sb.innerHTML = `<div class="sb-top"><button type="button" class="sb-ham" data-sbtog="1" aria-label="${sbCollapsed ? "メニューを開く" : "メニューを折りたたむ"}" aria-expanded="${!sbCollapsed}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><svg class="sb-logo" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="var(--u-accent)"/><rect x="7" y="9" width="18" height="12.5" rx="2.5" fill="#fff"/><path d="M14.2 12.3v6l5-3z" fill="var(--u-accent)"/><rect x="11.5" y="23.5" width="9" height="1.8" rx=".9" fill="#fff"/></svg><b class="lbl">エンタメ管理</b></div>
-    <button type="button" class="sb-add" id="sbAdd" aria-label="追加">＋<span class="lbl"> 追加</span></button>
-    <div class="sb-sec lbl">メニュー</div>
-    ${MODE_KEYS.map(m => mode(m, `<span class="mic ${m}">${MODE_IC[m]}</span>`, MODE_NAME[m])).join("")}
-    <div class="sb-foot"><button type="button" class="sb-it" data-gear="1" title="設定"><i aria-hidden="true">⚙️</i><span class="lbl">設定</span></button><div class="sb-st" id="sbSave">${saveNoteHtml()}</div></div>`;
+  sb.innerHTML = `<svg class="sb-logo" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="var(--u-accent)"/><rect x="7" y="9" width="18" height="12.5" rx="2.5" fill="#fff"/><path d="M14.2 12.3v6l5-3z" fill="var(--u-accent)"/><rect x="11.5" y="23.5" width="9" height="1.8" rx=".9" fill="#fff"/></svg>
+    <button type="button" class="sb-add" id="sbAdd" aria-label="追加" title="追加">${NAV_IC.add}</button>
+    ${["w", "lib", "col"].map(g => navBtn(g, "sb-it")).join("")}
+    <div class="sb-foot"><button type="button" class="sb-it" data-gear="1" title="設定">${NAV_IC.gear}<span>設定</span></button><div class="sb-st" id="sbSave">${saveNoteHtml()}</div></div>`;
 }
 /* 映画タブ：アニメ・ドラマの「種別＝映画」をまとめて出す（データは1件のまま、アニメ／ドラマ側にも出る） */
 /* バラエティタブ：ジャンル「バラエティ」（k="r"、恋愛リアリティなど）だけ。配信オリジナルのアニメ・ドラマはそれぞれの側で放送形態「配信」として出る */
@@ -654,13 +664,14 @@ function render() {
   const hc = $("#hcur");
   if (hc)
     hc.innerHTML =
-      `<span class="mic ${state.mode}" aria-hidden="true">${MODE_IC[state.mode]}</span><span class="hname">${MODE_NAME[state.mode]}</span>`;
+      `<span class="mic nav" aria-hidden="true">${NAV_IC[NAV_OF(state.mode)]}</span><span class="hname">${NAV_NAME[NAV_OF(state.mode)]}</span>`;
+  rememberNav();
   renderSidebar();
   renderBnav();
   document.documentElement.classList.toggle("fshopen", state.mode === "yt" ? yst.fp === "all" : state.mode === "sr" || state.mode === "mu" ? lui.fp === "all" : state.fOpen === "all");
   if (!loaded) return;
   const y = U.lockY ?? scrollY;
-  let body = yt ? renderYt() : state.mode === "w" ? renderWeek() : state.mode === "o" ? renderOther() : state.mode === "sr" ? renderSeries() : state.mode === "mu" ? renderSongs() : renderList();
+  let body = yt ? renderYt() : state.mode === "w" ? renderWeek() : state.mode === "sr" ? renderSeries() : state.mode === "mu" ? renderSongs() : renderList();
   /* 「すべて開く／閉じる」は件数と同じ行の右端に置く */
   const gb = /<span class="gbulk">[\s\S]*?<\/span>/.exec(body);
   const ci = body.indexOf('<p class="count">');
@@ -669,7 +680,7 @@ function render() {
     const ce = body.indexOf("</p>", ci);
     body = body.slice(0, ce) + gb[0] + body.slice(ce);
   }
-  setMain(body);
+  setMain(navTabsHtml() + body);
   if (xserY != null) {
     scrollTo(0, xserY);
     xserY = null;
@@ -687,7 +698,7 @@ const FEMPTY = { sf: [], era: [], cour: [], series: [], type: [], vod: "", slot:
 function setMode(m) {
   if (state.mode === m) return;
   Object.assign(lui, { q: "", qOpen: false, fp: "", fSub: "" });
-  if (!state.xser && !["w", "yt", "o", "sr", "mu"].includes(state.mode)) state.fm[state.mode] = Object.fromEntries(FKEEP.map(k => [k, state[k]]));
+  if (!state.xser && !["w", "yt", "sr", "mu"].includes(state.mode)) state.fm[state.mode] = Object.fromEntries(FKEEP.map(k => [k, state[k]]));
   const saved = state.fm[m] || {};
   Object.assign(state, FEMPTY, Object.fromEntries(FKEEP.filter(k => k in saved).map(k => [k, saved[k]])));
   state.mode = m;
@@ -698,7 +709,7 @@ function setMode(m) {
   state.fSub = "";
   state.qOpen = false;
   state.q = "";
-  if (["w", "yt", "o", "sr", "mu"].includes(m)) return;
+  if (["w", "yt", "sr", "mu"].includes(m)) return;
   if (m === "m" || m === "s") state.type = [];
   state.limit = 200;
 }
