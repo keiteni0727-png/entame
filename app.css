@@ -2171,7 +2171,9 @@ html[data-gsz="l"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(240px,1f
 .sheet:not(.form) .dhead{background:var(--u-bg)}
 .dhead h3,.dhx h3{font-family:var(--fd);font-weight:400;letter-spacing:.01em}
 /* 上の段だけ上に固定し、タブはそのすぐ下に固定（大きな見出しはスクロールで流れる） */
-.dmain>.dtabs{position:sticky;top:var(--dhh,0px);z-index:3;background:var(--u-bg);margin:14px -16px 0;padding:8px 16px;gap:6px;border-bottom:0}
+.dmain>.dtabs{position:sticky;top:var(--dhh,0px);z-index:3;background:var(--u-bg);margin:14px -16px 0;padding:12px 20px;gap:4px;border-bottom:0}
+/* タブは1本の溝（へこんだ面＋太枠）の中に並べ、ボタン（公式サイトなど）と見分けやすくする */
+.dmain>.dtabs::before{content:"";position:absolute;inset:8px 16px;border:2px solid var(--k);border-radius:16px;background:var(--u-chip)}
 /* --- 大きな見出し（スマホ）：傾けたポスター＋大きな％、右上に黄色の丸 --- */
 .dhx{position:relative;display:block;margin:0 -16px;padding:12px 16px 2px;overflow:hidden}
 .dhx::before{content:"";position:absolute;right:-70px;top:-40px;width:230px;height:230px;border-radius:50%;background:var(--pop)}
@@ -2197,11 +2199,12 @@ html[data-gsz="l"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(240px,1f
   .dhx{margin:0;padding:0;overflow:visible;min-height:0}
   .dhx::before{display:none}
   .dhx .dtc{margin-top:6px}
-  .dmain>.dtabs{margin:14px 0 0;padding-left:0;padding-right:0}
+  .dmain>.dtabs{margin:14px 0 0;padding-left:4px;padding-right:4px}
+  .dmain>.dtabs::before{inset:8px 0}
   .dpimg,.dpimg.none{border:2px solid var(--k);box-shadow:5px 5px 0 var(--ks);border-radius:16px}
 }
-/* --- タブ：ステッカーの札（選択中は黄色） --- */
-.dtabs button{border:2px solid var(--k);border-radius:12px;background:var(--u-surface);color:var(--u-ink);padding:8px 0;margin:0;font-weight:900}
+/* --- タブ：溝の中に並べ、選択中だけ黄色のステッカーの札 --- */
+.dtabs button{position:relative;border:2px solid transparent;border-radius:12px;background:none;color:var(--u-sub);padding:6px 0;margin:0;font-weight:900}
 .sheet.t-info .dtabs [data-dtab="info"],.sheet.t-ep .dtabs [data-dtab="ep"]{background:var(--pop);color:var(--onpop);border-color:var(--k);box-shadow:2px 2px 0 var(--ks)}
 .dtabs small{font-family:var(--fn);font-weight:800;color:var(--u-accent)}
 /* --- 次に見る（スマホ・番組情報の一番上に1行） --- */
