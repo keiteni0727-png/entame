@@ -268,8 +268,7 @@ const CHANGE_ACTIONS = [
       const sh = $("#layer .sheet"),
         h = $("#arc-" + k);
       if (sh && h) {
-        const hd = sh.querySelector(".dhead");
-        sh.scrollTop += h.getBoundingClientRect().top - sh.getBoundingClientRect().top - (hd ? hd.offsetHeight : 0) - 8;
+        sh.scrollTop += h.getBoundingClientRect().top - sh.getBoundingClientRect().top - stickH(sh) - 8;
       }
     },
   ],

@@ -86,9 +86,8 @@ function navScroll(el) {
   const box = sc.getBoundingClientRect(),
     r = el.getBoundingClientRect();
   const vis = x => x && x.offsetParent !== null && getComputedStyle(x).position === "sticky";
-  const hd = [...sc.querySelectorAll(".dhead")].find(vis),
-    ft = [...sc.querySelectorAll(".ffoot")].find(vis);
-  const top = box.top + (hd ? hd.getBoundingClientRect().height : 0),
+  const ft = [...sc.querySelectorAll(".ffoot")].find(vis);
+  const top = box.top + stickH(sc),
     bot = box.bottom - (ft ? ft.getBoundingClientRect().height : 0);
   const row = el.closest("[data-er],[data-ar],.sg,.field,label") || el;
   const pad = Math.min(64, row.getBoundingClientRect().height + 8);
@@ -359,3 +358,12 @@ document.addEventListener("input", e => {
   btn.classList.add("hide");
   btn.tabIndex = -1;
 })();
+
+/* 詳細の上に固定している部分（上の段・タブ）の高さの合計。スクロールで目的の場所を固定部分の下に合わせるときに使う */
+function stickH(sc) {
+  let h = 0;
+  sc.querySelectorAll(".dhead,.dtabs").forEach(x => {
+    if (x.offsetParent !== null && getComputedStyle(x).position === "sticky") h += x.getBoundingClientRect().height;
+  });
+  return h;
+}

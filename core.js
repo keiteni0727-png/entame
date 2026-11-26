@@ -401,12 +401,20 @@ U.applyTheme = (v = U.theme()) => {
   const r = document.documentElement;
   if (v === "auto") r.removeAttribute("data-theme");
   else r.setAttribute("data-theme", v);
+  /* 実際に出ている方（自動のときは端末の設定）を th-l / th-d の印で付ける。ライトとダークで形の違う所はこの印で書き分ける */
+  const dark = v === "dark" || (v === "auto" && matchMedia("(prefers-color-scheme: dark)").matches);
+  r.classList.toggle("th-d", dark);
+  r.classList.toggle("th-l", !dark);
   /* iPhoneの上の帯などの色も合わせる */
   document.querySelectorAll('meta[name="theme-color"]').forEach(m => {
     if (!m.dataset.orig) m.dataset.orig = m.content;
-    m.content = v === "light" ? "#ffffff" : v === "dark" ? "#16181d" : m.dataset.orig;
+    m.content = v === "light" ? "#f7f1e8" : v === "dark" ? "#0a0d1a" : m.dataset.orig;
   });
 };
+/* 「自動」のとき、端末のライト／ダークが切り替わったら印も付け直す */
+try {
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => U.applyTheme());
+} catch (_) {}
 U.setTheme = v => {
   try {
     if (v === "auto") localStorage.removeItem(U.THEME_KEY);

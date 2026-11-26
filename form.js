@@ -435,8 +435,7 @@ function openInlineForm(target, el) {
   if (anc.classList.contains("dhead") && sh) sh.scrollTop = 0;
   else if ((inCard || target === "relb") && sh) {
     /* 編集画面の上端を、上に固定の見出しのすぐ下に合わせる（長い編集画面でも一番下へ飛ばない） */
-    const hd = sh.querySelector(".dhead");
-    const top = sh.getBoundingClientRect().top + (hd ? hd.getBoundingClientRect().height : 0) + 8;
+    const top = sh.getBoundingClientRect().top + stickH(sh) + 8;
     const d = box.getBoundingClientRect().top - top;
     sh.scrollTop += d;
   } else if (typeof navScroll === "function") navScroll(box);

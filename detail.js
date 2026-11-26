@@ -195,6 +195,13 @@ function infoCards(it, { md, ns, mv, stv, cs, songRows }) {
 }
 /* 前・次の矢印（文字だと丸の中で上下左右にずれるので図形で描く） */
 const CHEV = d => `<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="${d < 0 ? "M10 3 5 8l5 5" : "M6 3l5 5-5 5"}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+/* タブは上の段（ジャンル・ステータス・編集など）のすぐ下に固定する。上の段の高さを --dhh に入れておく */
+function syncDhh() {
+  const sh = $("#layer .sheet"),
+    hd = sh && sh.querySelector(".dhead");
+  if (hd) sh.style.setProperty("--dhh", hd.offsetHeight + "px");
+}
+addEventListener("resize", () => syncDhh());
 function renderDetail(it) {
   const cs = coursOf(it);
   const stv = mediaLabels(it);
@@ -236,11 +243,19 @@ function renderDetail(it) {
   const nv = navNeighbors(it.id),
     busy = !!(epEdit || arcEdit || slotEdit || subPaste || epOne != null);
   const navB = (d, lab, ic) => `<button type="button" class="u-btn icon sm dnav" data-dnav="${d}" aria-label="${lab}" title="${lab}${TOUCH ? "" : `（${d < 0 ? "←" : "→"}キー）`}" ${nv[d < 0 ? 0 : 1] && !busy ? "" : "disabled"}>${ic}</button>`;
-  return `<div class="dgrid">${detailSide(it, { eps, w, nx, noEp })}<div class="dmain"><div class="dhead"><div class="hdrow"><div class="meta">${kindTag(it)}${(l => (l ? `<button type="button" class="dmt mtag m-${l[1]}" data-jump="fMedia" title="放送形態を変える">${l[0]}</button>` : ""))(mediaLabOf(it))}${stBtn}${stMs.length ? wnMark("st") : ""}</div><div class="hdrow">${navB(-1, "前の作品", CHEV(-1))}${navB(1, "次の作品", CHEV(1))}<button type="button" class="u-btn sm" id="editItem" aria-label="作品を編集">編集</button><button class="u-btn icon sm soft close" type="button" data-close aria-label="閉じる">✕</button></div></div>${stMs.length ? wnNote("st", stMs.map(x => wnText(it, x)).join("")) : ""}
-    <div class="dtit">${it.img ? `<button type="button" class="dtimg" data-imgview="1" aria-label="画像を大きく表示">${imgTag(it, "l", "dtimgi")}</button>` : `<button type="button" class="dtimg none" data-imgadd="1" aria-label="画像を貼り付け">${IMG_ICON}</button>`}<div class="dtc"><h3>${esc(it.t)}<button type="button" class="tcopy" id="copyTitle" aria-label="タイトルをコピー" title="タイトルをコピー"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button></h3>
+  /* 上の大きな見出し（スマホ）：進み具合の％。PCは左の列に出すので出さない */
+  const wn = watchable(eps).length;
+  const pct = Math.round((w / (wn || 1)) * 100);
+  const heroPct = eps.length && !noEp ? `<div class="dhpct"><b class="inum">${pct}<small>%</small></b><span>${w} / ${wn}話 見た</span><span class="dhbar"><i style="width:${pct}%"></i></span></div>` : "";
+  /* 次に見る話（スマホ）：番組情報の一番上に1行だけ。「見た」でその話にチェック。PCは左の列 */
+  const nxI = nextIdx(eps);
+  const nxl = nx && (epVal(nx.n) ? epVal(nx.n) + "話" : nx.n);
+  const nextLine = nx && !noEp && !nx.w ? `<div class="dnextl"><span class="dnl-l">次に見る</span><button type="button" class="dnl-t" data-dtab="ep"><b>${esc(nxl)}</b>${nx.sub ? `「${esc(nx.sub)}」` : ""}</button>${aired(nx) && !nx.na ? `<button type="button" class="u-btn sm dnl-b" data-ep="${nxI}" aria-label="${esc(nxl)}を見た">見た</button>` : ""}</div>` : "";
+  return `<div class="dgrid">${detailSide(it, { eps, w, nx, noEp })}<div class="dmain"><div class="dhead"><div class="hdrow"><div class="meta">${kindTag(it)}${(l => (l ? `<button type="button" class="dmt mtag m-${l[1]}" data-jump="fMedia" title="放送形態を変える">${l[0]}</button>` : ""))(mediaLabOf(it))}${stBtn}${stMs.length ? wnMark("st") : ""}</div><div class="hdrow">${navB(-1, "前の作品", CHEV(-1))}${navB(1, "次の作品", CHEV(1))}<button type="button" class="u-btn sm" id="editItem" aria-label="作品を編集">編集</button><button class="u-btn icon sm soft close" type="button" data-close aria-label="閉じる">✕</button></div></div>${stMs.length ? wnNote("st", stMs.map(x => wnText(it, x)).join("")) : ""}</div>
+    <div class="dtit dhx">${it.img ? `<button type="button" class="dhbg" data-imgview="1" tabindex="-1" aria-hidden="true">${imgTag(it, "l", "dhbgi")}</button>` : ""}<div class="dhrow">${it.img ? `<button type="button" class="dtimg" data-imgview="1" aria-label="画像を大きく表示">${imgTag(it, "l", "dtimgi")}</button>` : `<button type="button" class="dtimg none" data-imgadd="1" aria-label="画像を貼り付け">${IMG_ICON}</button>`}${heroPct}</div><div class="dtc"><h3>${esc(it.t)}<button type="button" class="tcopy" id="copyTitle" aria-label="タイトルをコピー" title="タイトルをコピー"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button></h3>
     ${lnk ? `<div class="dtbtns">${lnk}</div>` : ""}</div></div>
-    ${noEp ? "" : `<div class="dtabs" role="tablist"><button type="button" role="tab" data-dtab="info">番組情報</button><button type="button" role="tab" data-dtab="ep">話数${eps.length ? ` <small>${w}/${watchable(eps).length}</small>` : ""}${epMs ? `<span class="wnt" aria-label="要確認あり">!</span>` : ""}</button></div>`}</div>
-    <div class="dpane dp-info">${infoCards(it, { md, ns, mv, stv, cs, songRows })}
+    ${noEp ? "" : `<div class="dtabs" role="tablist"><button type="button" role="tab" data-dtab="info">番組情報</button><button type="button" role="tab" data-dtab="ep">話数${eps.length ? ` <small>${w}/${watchable(eps).length}</small>` : ""}${epMs ? `<span class="wnt" aria-label="要確認あり">!</span>` : ""}</button></div>`}
+    <div class="dpane dp-info">${nextLine}${infoCards(it, { md, ns, mv, stv, cs, songRows })}
     <div class="links">${typeof alChkOpen === "function" ? `<button type="button" class="u-chip add dlb" data-alcheck="1">${it.k === "a" ? "AniList" : "TMDB"}で確認</button>` : ""}${noEp ? `<button type="button" class="u-chip add dlb" id="epAddMv">＋ 話数を追加</button>` : ""}<button type="button" class="u-btn sm txt danger delsm" id="delItem">削除</button></div></div>
     <div class="dpane dp-ep"><h4><span class="h4l">話数</span>${eps.length && !epEdit ? `<span class="progrow"><span class="progn"><b>${w}</b> / ${watchable(eps).length}話</span><span class="prog"><i style="width:${Math.round((w / (watchable(eps).length || 1)) * 100)}%"></i></span></span>` : ""}${eps.length && it.k === "a" && !epEdit && !arcEdit && !slotEdit && !subPaste ? `<button type="button" class="u-btn sm hpaste" id="spOpen" aria-label="貼り付け" title="貼り付け">${PASTE_IC}</button>` : ""}${eps.length && !epEdit && !arcEdit && !slotEdit && !subPaste ? `<button type="button" class="u-btn sm iedit" id="epEditBtn">編集</button>` : ""}</h4>
     <div id="epArea">${subPaste ? subPasteHtml(it) : arcEdit ? arcEditHtml() : slotEdit ? slotEditHtml(it) : epEdit ? epEditorHtml(it) : epListHtml(it, eps)}</div></div></div></div>`;
@@ -258,6 +273,7 @@ function refreshSheet() {
   const pos = [el, sh].map(x => x && [x.scrollTop, x.scrollLeft]);
   const inner = [".gw", ".sp-list"].map(c => el.querySelector(c)).map((x, i) => x && [[".gw", ".sp-list"][i], x.scrollTop, x.scrollLeft]).filter(Boolean);
   el.innerHTML = renderDetail(it);
+  syncDhh();
   [el, sh].forEach((x, i) => x && pos[i] && ((x.scrollTop = pos[i][0]), (x.scrollLeft = pos[i][1])));
   inner.forEach(([c, t, l]) => {
     const x = el.querySelector(c);
@@ -296,6 +312,7 @@ function openDetail(id, dir, keepNav) {
     sh.setAttribute("aria-label", it.t);
     const w = $("#sheetIn");
     w.innerHTML = renderDetail(it);
+    syncDhh();
     w.classList.remove("dsl-l", "dsl-r");
     void w.offsetWidth;
     w.classList.add(dir > 0 ? "dsl-r" : "dsl-l");
@@ -305,6 +322,7 @@ function openDetail(id, dir, keepNav) {
   }
   $("#layer").innerHTML =
     `<div class="scrim" data-close></div><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(it.t)}"><div class="wrap" id="sheetIn">${renderDetail(it)}</div></div>`;
+  syncDhh();
   setDTab("info");
   if (!TOUCH) $(".sheet .close").focus({ preventScroll: true });
 }
@@ -319,10 +337,9 @@ function setDTab(t) {
     requestAnimationFrame(() => {
       const n = sh.querySelector(".dp-ep .tl.next");
       if (n) {
-        const hd = sh.querySelector(".dhead");
         const sr = sh.getBoundingClientRect(),
           nr = n.getBoundingClientRect();
-        if (nr.bottom > sr.bottom - 20) sh.scrollTop += nr.top - sr.top - (hd ? hd.offsetHeight : 0) - 110;
+        if (nr.bottom > sr.bottom - 20) sh.scrollTop += nr.top - sr.top - stickH(sh) - 110;
       }
     });
 }

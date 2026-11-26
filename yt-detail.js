@@ -256,8 +256,7 @@ function ytOpenInline(target) {
   const sh = box.closest(".sheet");
   if (!card && sh) sh.scrollTop = 0;
   else if (sh) {
-    const hd = sh.querySelector(".dhead");
-    const top = sh.getBoundingClientRect().top + (hd ? hd.getBoundingClientRect().height : 0) + 8;
+    const top = sh.getBoundingClientRect().top + stickH(sh) + 8;
     sh.scrollTop += box.getBoundingClientRect().top - top;
   }
   const i = box.querySelector(".fgrid.only input:not([type=checkbox])");
