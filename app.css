@@ -848,7 +848,7 @@ input[type=date]::-webkit-date-and-time-value{text-align:left}
 .ghd.stuck{box-shadow:0 1px 0 var(--u-line),0 6px 8px -8px rgba(0,0,0,.25)}
 /* ---------- 作品の詳細：上の段の放送形態ラベル・ON AIR・MUSIC ---------- */
 .dmeta .dmt{margin:0;border:0;font-size:var(--fs-s);padding:4px 8px 4px 7px;border-radius:var(--r-s);vertical-align:0;cursor:pointer}
-.ich{display:flex;align-items:center;margin-bottom:8px}
+.ich{display:flex;flex-wrap:wrap;align-items:center;row-gap:6px;margin-bottom:8px}
 .ilamp{font-family:var(--u-num);font-size:var(--fs-xs);font-weight:800;letter-spacing:.12em;line-height:1;padding:4px 7px 4px 8px;border-radius:var(--r-s);color:#fff}
 .ilamp.onair{background:var(--u-live);color:#fff}
 .ilamp.music{background:var(--u-ink);color:var(--u-surface)}
@@ -1378,7 +1378,7 @@ span.mname{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space
 .er input.epbad,.e1 input.epbad{border-color:var(--u-danger)}
 .er input.epbad::placeholder,.e1 input.epbad::placeholder{color:var(--u-danger);opacity:.7}
 /* ===== 話数リスト（タイムライン）：左の印を押したときだけ視聴チェック ===== */
-.eps{background:var(--u-surface);border:1px solid var(--u-line);border-radius:var(--r-l);overflow:hidden;padding:4px 0}
+.eps{background:var(--u-surface);border:2px solid var(--k);border-radius:18px;overflow:hidden;padding:4px 0}
 .tl{display:flex;align-items:stretch;gap:2px;padding:0 2px 0 4px}
 .tlm{flex:none;width:44px;border:0;padding:0;margin:0;background:transparent;font:inherit;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
 .tll{position:absolute;left:21px;width:2px;top:0;bottom:0;background:var(--u-line)}
@@ -1558,7 +1558,7 @@ select#arcJump{cursor:pointer;-webkit-appearance:none;appearance:none;padding-ri
 .progrow{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
 .progn{white-space:nowrap;font-size:var(--fs-m);font-weight:600;color:var(--u-sub)}
 .progn b{color:var(--u-ink);font-size:var(--fs-lg)}
-.progrow .prog{flex:1;margin:0;height:6px;border-radius:var(--r-s);background:var(--u-soft);overflow:hidden}
+.progrow .prog{flex:1;margin:0;height:10px;box-sizing:border-box;border:1.5px solid var(--k2);border-radius:6px;background:var(--u-surface);overflow:hidden}
 .ephead .ephb{flex:1}
 .epwarn{display:flex;align-items:center;width:100%;margin:0 0 8px;border:1px solid color-mix(in srgb,var(--u-danger) 35%,transparent);border-radius:var(--r-m);background:var(--u-danger2);color:var(--u-danger);font:inherit;font-weight:700;text-align:left;cursor:pointer;padding:6px 10px;font-size:var(--fs-m);gap:8px}
 /* ===== 話数の編集：上の操作（貼り付け・1話追加・その他）と、1話1行の表 ===== */
@@ -1925,6 +1925,8 @@ html[data-gsz="l"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(240px,1f
 /* ===== 作品詳細：SERIES（アプリのシリーズ＋AniListのつながり） ===== */
 .ilamp.series{background:#2b6fd6}
 .iser .ich{flex-wrap:nowrap;gap:8px}
+/* シリーズ未登録のとき：狭い画面では「編集」を次の行へ（カードからはみ出さない） */
+.iser .ich:not(:has(.sern)){flex-wrap:wrap}
 .iser .sern{font-size:var(--fs-l);font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .serlkr{margin:0 0 4px}
 .serlk{border:0;background:none;padding:0;color:var(--u-acct);font:inherit;font-size:var(--fs-s);font-weight:700;cursor:pointer}
@@ -2062,6 +2064,13 @@ html[data-gsz="l"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(240px,1f
 /* --- 番組情報のカード（ON AIR・MUSIC など） --- */
 .sheet .icard{background:var(--u-surface);border:2px solid var(--k);border-radius:18px}
 .sheet .ilamp{background:none;color:var(--u-accent);padding:0;font-family:var(--fn);border-radius:0;font-weight:900;font-size:12px;letter-spacing:.14em}
+/* --- 詳細の小さいボタン（前後・編集・✕・カードの編集・話数の編集と貼り付け）：ステッカーの形（太枠＋小さなずらした影） --- */
+.sheet:not(.form) .u-btn.sm:not(.txt):not(.pri){border:2px solid var(--k);background:var(--u-surface);color:var(--u-ink);font-weight:900;box-shadow:2px 2px 0 var(--ks)}
+.sheet:not(.form) .u-btn.sm.pri{border:2px solid var(--k);box-shadow:2px 2px 0 var(--ks)}
+.sheet:not(.form) .u-btn.sm:disabled{box-shadow:none}
+@media (hover:hover){.sheet:not(.form) .u-btn.sm:not(.txt):not(.pri):not(:disabled):hover{background:var(--pop);color:var(--onpop);border-color:var(--k)}}
+/* 上のラベル（ジャンル・放送形態・視聴ステータス）：細い枠 */
+.dmeta .kind,.dmeta .dmt,.dmeta .pill.dst{border:1.5px solid var(--k2)}
 /* --- 話数リスト：太枠の丸、次の話は黄色 --- */
 .tld{border-color:var(--k)}
 .tl.future .tld{border-color:var(--u-strong)}
