@@ -364,7 +364,7 @@ dd{margin:0;min-width:0;overflow-wrap:anywhere}
 .sp-r.same .sp-st{color:var(--u-sub)}
 .sp-r.nomatch .sp-st{color:var(--u-acct)}
 .spaste .ffoot{position:static;margin-top:12px;padding-bottom:0}
-#sheetIn,#ytIn{padding-bottom:16px}
+#sheetIn,#ytIn{padding-bottom:calc(28px + env(safe-area-inset-bottom,0px))}
 /* popups: no background scroll, no iOS zoom on focus。画面の端で引っ張っても余白が出ないように */
 html{scrollbar-gutter:stable}
 html,body{overflow-x:clip;max-width:100%;overscroll-behavior:none}
@@ -566,7 +566,7 @@ input[type=date]::-webkit-date-and-time-value{text-align:left}
 .ilinks{display:flex;gap:8px;margin-bottom:6px}
 
 /* 詳細：基本情報／話数タブ（PC・スマホ共通。上部のタイトル〜タブは固定） */
-.sheet:not(.form) .wrap{padding-top:0;padding-bottom:16px}
+.sheet:not(.form) .wrap{padding-top:0;padding-bottom:calc(28px + env(safe-area-inset-bottom,0px))}
 .sheet:not(.form) .dhead{position:sticky;top:0;z-index:4;margin:0 -16px;padding:14px 16px 0;background:var(--u-bg)}
 .dtabs{display:flex;margin:0 -16px;border-bottom:1px solid var(--u-line)}
 .dtabs button{flex:1;font-size:var(--fs-base);border-bottom:2.5px solid transparent;margin-bottom:-1px;cursor:pointer;position:relative;border:2px solid transparent;border-radius:12px;background:none;color:var(--u-sub);padding:6px 0;margin:0;font-weight:900}
@@ -580,7 +580,7 @@ input[type=date]::-webkit-date-and-time-value{text-align:left}
 .ep.next .epn{color:var(--st-now)}
 @media (max-width:600px){
   .sheet:not(.form){border-radius:var(--r-l);width:calc(100% - 20px);top:calc(56px + env(safe-area-inset-top,0px));transform:translateX(-50%);max-height:calc(100% - 56px - 64px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))}
-  .sheet:not(.form) .wrap{padding:0 16px}
+  .sheet:not(.form) .wrap{padding-left:16px;padding-right:16px}
   .sheet:not(.form) .dhead{padding:12px 16px 0}
   .sheet:not(.form) h3{margin:2px 0 4px;font-size:var(--fs-xl)}
   .sheet:not(.form) .seg{gap:4px;grid-template-columns:repeat(4,1fr);margin:8px 0 6px}
@@ -2072,7 +2072,7 @@ html[data-gsz="s"] .pgrid{--gc:3}
 /* --- PC：作品・YouTubeの詳細は右に開いたままのパネル（幅470px・左に太枠の境目）。一覧は暗くせず、そのまま操作できる --- */
 @media (min-width:900px){
   #layer .sheet.dpanel{top:0;bottom:0;left:auto;right:0;width:var(--pw);max-width:none;max-height:none;transform:none;border-radius:0;border-left:3px solid var(--k);box-shadow:none}
-  #layer .sheet.dpanel .wrap{max-width:none;padding:0 16px}
+  #layer .sheet.dpanel .wrap{max-width:none;padding-left:16px;padding-right:16px}
   #layer .scrim:has(+ .sheet.dpanel){display:none}
   body:has(#layer .sheet.dpanel){padding-right:calc(var(--pw) * var(--z))}
   /* パネルを開いている間：番組表の NEXT UP はパネルと入れかえ、一覧のグリッドは狭い画面なら3列 */
