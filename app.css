@@ -12,10 +12,11 @@
 *{box-sizing:border-box}
 
 /* ===== PC：左の細いアイコンのレール（幅88px・黒地、選択中は黄色の角丸）。スマホでは出さない ===== */
-:root{--sbw:88px}
+:root{--sbw:88px;--pw:470px;--z:1}
 .u-app .sb{display:none}
 @media (min-width:900px){
-  body{padding-left:var(--sbw)}
+  /* body はモニターの拡大（--z）の外なので、レールの幅も拡大後の大きさで空ける */
+  body{padding-left:calc(var(--sbw) * var(--z))}
   .u-app .sb{position:fixed;left:0;top:0;bottom:0;z-index:6;width:var(--sbw);box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 0 12px;background:var(--kbg);overflow-y:auto;overscroll-behavior:none;scrollbar-width:none}
   .u-app .sb::-webkit-scrollbar{display:none}
   .u-app .sb-logo{width:40px;height:40px;flex:none;display:block;margin-bottom:8px}
@@ -1048,7 +1049,8 @@ button.imt[aria-expanded="false"]+.imt,button.imt[aria-expanded="false"]+button.
 .sheet:not(.form) .links{padding-bottom:0}
 /* ===== モニター（幅1600px以上）：全体を少し大きく、一覧を広く、詳細はON AIRとMUSICを左右に ===== */
 @media (min-width:1600px){
-  .u-app{zoom:1.12}
+  :root{--z:1.12}
+  .u-app{zoom:var(--z)}
   header .wrap,.wrap{max-width:1250px}
 }
 /* 詳細のON AIR：シリーズ・公式サイト・配信URLの行（文字のリンク） */
@@ -1826,6 +1828,12 @@ html[data-gsz="l"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(240px,1f
   html[data-gsz="s"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
   html[data-gsz="l"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
 }
+/* iPad 縦など（600〜899px）は4列（小は5列・大は3列） */
+@media (min-width:600px) and (max-width:899px){
+  .pgrid:not(.ygrid){grid-template-columns:repeat(4,minmax(0,1fr))}
+  html[data-gsz="s"] .pgrid:not(.ygrid){grid-template-columns:repeat(5,minmax(0,1fr))}
+  html[data-gsz="l"] .pgrid:not(.ygrid){grid-template-columns:repeat(3,minmax(0,1fr))}
+}
 .vtog .gszb{position:absolute;right:1px;bottom:0;font-size:9px;font-weight:700;line-height:1;color:var(--u-accent)}
 .v-tl .wc-tags>*{flex:none}
 .v-tl .wc-tags .wc-st{white-space:nowrap}
@@ -2150,10 +2158,10 @@ html[data-gsz="l"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(240px,1f
 .nup-tick{background:var(--pop);color:var(--onpop);box-shadow:2px 2px 0 var(--ks)}
 /* --- PC：作品・YouTubeの詳細は右に開いたままのパネル（幅470px・左に太枠の境目）。一覧は暗くせず、そのまま操作できる --- */
 @media (min-width:900px){
-  #layer .sheet.dpanel{top:0;bottom:0;left:auto;right:0;width:470px;max-width:none;max-height:none;transform:none;border-radius:0;border-left:3px solid var(--k);box-shadow:none}
+  #layer .sheet.dpanel{top:0;bottom:0;left:auto;right:0;width:var(--pw);max-width:none;max-height:none;transform:none;border-radius:0;border-left:3px solid var(--k);box-shadow:none}
   #layer .sheet.dpanel .wrap{max-width:none;padding:0 16px}
   #layer .scrim:has(+ .sheet.dpanel){display:none}
-  body:has(#layer .sheet.dpanel){padding-right:470px}
+  body:has(#layer .sheet.dpanel){padding-right:calc(var(--pw) * var(--z))}
   /* パネルを開いている間：番組表の NEXT UP はパネルと入れかえ、一覧のグリッドは狭い画面なら3列 */
   body:has(#layer .sheet.dpanel) .wpc{grid-template-columns:minmax(0,1fr)}
   body:has(#layer .sheet.dpanel) .wpc-side{display:none}
