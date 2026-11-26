@@ -751,11 +751,17 @@ function onDetailClick(e) {
   return !!it && runActions(DETAIL_ACTIONS, e, it);
 }
 
-/* ---------- PC：右の詳細パネルの幅（左の境目をドラッグ。最小は今の幅、最大は画面の真ん中まで。ダブルクリックで元の幅。この端末で覚える） ---------- */
+/* ---------- PC：右の詳細パネルの幅（左の境目をドラッグ。最小は今の幅、最大はアプリの部分（左のレールを除く）の真ん中まで。ダブルクリックで元の幅。この端末で覚える） ---------- */
 const PW_MIN = 470,
   K_PW = "adb.v3.pw";
 const pwZoom = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--z")) || 1;
-const pwMax = () => Math.max(PW_MIN, Math.floor(innerWidth / 2 / pwZoom()));
+/* 最大：左のレールを除いたアプリの部分の真ん中まで */
+/* パネルの右端（スクロールバーの分を除いた画面の右端） */
+const pwRight = () => ($("#layer .sheet.dpanel") ? $("#layer .sheet.dpanel").getBoundingClientRect().right : document.documentElement.clientWidth);
+const pwMax = () => {
+  const rail = $("#sb") ? $("#sb").getBoundingClientRect().width : 0;
+  return Math.max(PW_MIN, Math.floor((pwRight() - rail) / 2 / pwZoom()));
+};
 function pwApply(w) {
   const r = document.documentElement.style;
   if (!w || w <= PW_MIN) r.removeProperty("--pw");
@@ -771,7 +777,8 @@ document.addEventListener("pointerdown", e => {
     g.setPointerCapture(e.pointerId);
   } catch (_) {}
   document.documentElement.classList.add("pwdrag");
-  const move = ev => pwApply(Math.round((innerWidth - ev.clientX) / pwZoom()));
+  const R = pwRight();
+  const move = ev => pwApply(Math.round((R - ev.clientX) / pwZoom()));
   const up = ev => {
     g.removeEventListener("pointermove", move);
     g.removeEventListener("pointerup", up);
