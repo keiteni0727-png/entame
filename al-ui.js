@@ -590,11 +590,12 @@ const alKeyOf = n => alYmd(n.startDate) || (n.seasonYear ? `${n.seasonYear}-00-0
 let serRelOpen = false;
 function seriesCardHtml(it) {
   const ser = it.series || "";
-  const head = `<div class="ich"><span class="ilamp series">SERIES</span>${
+  /* 見出しの下に、シリーズ名（Mochiy）と「作品一覧」。未登録なら点線の札と「シリーズを登録」 */
+  const head = `<div class="ich"><span class="ilamp series">SERIES</span><button type="button" class="u-btn sm iedit" data-jump="fSeries" aria-label="シリーズを編集">編集</button></div><div class="tk-ser">${
     ser
-      ? `<b class="sern">${esc(ser)}</b>`
-      : `<span class="sertag w">未登録</span><button type="button" class="serbtn" data-cardgo="fSeries">シリーズを登録</button>`
-  }<button type="button" class="u-btn sm iedit" data-jump="fSeries" aria-label="シリーズを編集">編集</button></div>${ser ? `<div class="serlkr"><button type="button" class="serlk" data-series="${esc(ser)}">このシリーズの作品一覧 ›</button></div>` : ""}`;
+      ? `<b class="sern">${esc(ser)}</b><button type="button" class="tk-yb" data-series="${esc(ser)}">作品一覧 ›</button>`
+      : `<span class="tk-chip miss">シリーズ 未登録</span><button type="button" class="tk-yb" data-cardgo="fSeries">シリーズを登録</button>`
+  }</div>`;
   let body;
   if (!serRelOpen) body = "";
   else if (!it.al) body = `<p class="sermsg">AniListとまだつながっていません<button type="button" class="serbtn" data-alcheck="1">AniListで確認</button></p>`;

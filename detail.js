@@ -57,64 +57,86 @@ function infoCards(it, { md, ns, mv, stv, cs, songRows }) {
   /* 中身を押しても編集画面は出さない（編集は見出しの右の「編集」ボタンから） */
   /* ks＝この行に出す要確認の項目名。あれば項目名の横に「!」、押すと下に補足 */
   const ms = missingOf(it);
-  const row = (lab, val, _j, cls, ks) => {
-    const l = ks ? ms.filter(x => ks.includes(x.k)) : [];
-    const key = "r:" + lab;
-    return `<dt${cls ? ` class="${cls}"` : ""}>${lab}${l.length ? wnMark(key) : ""}</dt><dd${cls ? ` class="${cls}"` : ""}>${val}</dd>${l.length ? wnNote(key, l.map(x => wnText(it, x)).join("")) : ""}`;
+  /* ON AIR（チケットの形）：項目名は出さず、大きな時刻・期間・札で見せる。
+     未入力は点線の札、要確認は「!」（押すとカードの中に補足）。ks＝その場所に出す要確認の項目名 */
+  const notes = [];
+  const mk = (key, ks) => {
+    const l = ms.filter(x => ks.includes(x.k));
+    if (!l.length) return "";
+    notes.push(wnNote(key, l.map(x => wnText(it, x)).join("")));
+    return wnMark(key);
   };
+  const tkMiss = (t, key, ks) => `<span class="tk-chip miss">${t}${mk(key, ks)}</span>`;
+  const tkChip = (lab, v) => `<span class="tk-chip"><small>${lab}</small>${v}</span>`;
   const TIMEK = ["放送時間", "配信時間", "放送クール", "クールのずれ"];
-  const courChip = cour ? `<span class="icour">${esc(cour)}</span>` : "";
   const edB = (jump, lab) => `<button type="button" class="u-btn sm iedit" data-jump="${jump}" aria-label="${lab}を編集">編集</button>`;
-  const rows = [];
+  const lines = [];
   if (!ns) {
     const tLab = md === "stream" ? "配信時間" : "放送時間";
-    if (when || !nofHas(it, "time")) rows.push(row(tLab, `${when ? `<b class="iwhen">${esc(when)}</b>` : un("未設定")}${courChip}`, "f-time", "", TIMEK));
-    else if (cour || ms.some(x => TIMEK.includes(x.k))) rows.push(row("放送クール", courChip || un("未設定"), "coursBox", "", TIMEK));
+    const dowS = it.dow >= 0 ? DOW[it.dow] + "曜" : "";
+    const big = it.time ? `${dowS ? `<span class="tk-dow">${dowS}</span>` : ""}<b class="tk-time">${esc(it.time)}</b>` : "";
+    const t = big || (nofHas(it, "time") ? "" : `<span class="tk-chip miss">${tLab} 未設定</span>`);
+    const c = cour ? `<span class="tk-cour">${esc(cour)}</span>` : "";
+    const m2 = mk("r:時間", TIMEK);
+    if (t || c || m2) lines.push(`<div class="tk-when">${t}${c}${m2}</div>`);
   }
-  const perLab = mv ? "公開日" : md === "sp" ? "放送日" : md === "ova" ? "発売期間" : md === "stream" ? "配信期間" : "放送期間";
-  rows.push(row(perLab, per ? `<span class="inum">${esc(per)}</span>` : un("未設定"), "f-from", "", ["開始日", "公開日", "発売日", "放送日"]));
-  const labsOr = (l, html, nofKey) => (l.length ? `<span class="labs">${html}</span>` : nofHas(it, nofKey) ? nn("なし") : un("未設定"));
-  if (md === "stream") rows.push(row("配信サイト", labsOr(m.plat, m.plat.map(vlab).join(""), "plat"), "fMedia", "", ["配信サイト"]));
+  const perLab = mv ? "公開日" : md === "sp" ? "放送日" : md === "ova" ? "発売日" : md === "stream" ? "配信開始" : "放送開始";
+  const dd = x => x.replace(/（.）/, "").trim();
+  {
+    const pm = mk("r:期間", ["開始日", "公開日", "発売日", "放送日"]);
+    if (!per) lines.push(`<div class="tk-per">${tkMiss(perLab + " 未設定", "r:期間0", [])}${pm}</div>`);
+    else if (per.includes(" 〜 ")) {
+      const [p1, p2] = per.split(" 〜 ");
+      lines.push(`<div class="tk-per"><span>${esc(dd(p1))}</span><i aria-hidden="true"></i><span${p2 ? "" : ' class="tk-open"'}>${p2 ? esc(dd(p2)) : "放送中"}</span>${pm}</div>`);
+    } else lines.push(`<div class="tk-per"><small class="tk-l">${perLab}</small><span>${esc(dd(per))}</span>${pm}</div>`);
+  }
+  /* 札の行：放送局・放送枠（ドラマ）・配信サイト・シリーズ（アニメ以外）・未入力の公式サイト／配信URL */
+  const chips = [];
+  /* html は値があるときだけ作る（要確認の補足が2回出ないように） */
+  const listChips = (lab, l, html, nofKey, ks) =>
+    l.length ? html() : nofHas(it, nofKey) ? tkChip(lab, `<span class="nosong">なし</span>`) : tkMiss(`<small>${lab}</small>未設定`, "r:" + lab, ks);
+  if (md === "stream") chips.push(listChips("配信", m.plat, () => m.plat.map(vlab).join("") + mk("r:配信", ["配信サイト"]), "plat", ["配信サイト"]));
   else {
-    if (hasSt(md)) rows.push(row("放送局", labsOr(m.stations, m.stations.map(x => `<span class="lab">${esc(x)}</span>`).join(""), "st"), "fMedia", "", ["放送局"]));
-    if (it.k === "d") rows.push(row("放送枠", it.slot ? `<span class="lab sl">${esc(it.slot)}</span>` : nofHas(it, "slot") ? nn("なし") : un("未設定"), "fSlot"));
-    rows.push(row("配信サイト", labsOr(m.vods, m.vods.map(vlab).join(""), "vods"), "fMedia", "", ["配信サイト"]));
+    if (hasSt(md)) chips.push(listChips("放送局", m.stations, () => m.stations.map(x => tkChip("放送局", esc(x))).join("") + mk("r:放送局", ["放送局"]), "st", ["放送局"]));
+    if (it.k === "d") chips.push(it.slot ? tkChip("放送枠", esc(it.slot)) : nofHas(it, "slot") ? "" : tkMiss("<small>放送枠</small>未設定", "r:放送枠", []));
+    chips.push(listChips("配信", m.vods, () => m.vods.map(vlab).join("") + mk("r:配信", ["配信サイト"]), "vods", ["配信サイト"]));
   }
-  /* シリーズ・公式サイト・配信URLも、放送の項目と同じ並びの行で（押すとシリーズの作品一覧・サイトを開く） */
   /* アニメのシリーズは下の SERIES の枠に出す（AniListのつながりと一緒に） */
-  if (it.k !== "a") rows.push(row("シリーズ", it.series ? `<button type="button" class="ilnk" data-series="${esc(it.series)}">${esc(it.series)}<span class="ilar" aria-hidden="true">›</span></button>` : nofHas(it, "ser") ? nn("なし") : un("未設定")));
-  /* 公式サイト・配信URLはタイトルの下（PCは左の列）のボタンで開く。ここには要確認のときだけ行を出す */
-  if (ms.some(x => x.k === "公式サイト")) rows.push(row("公式サイト", un("未設定"), "", "", ["公式サイト"]));
-  if (ms.some(x => x.k === "配信URL" || x.k === "配信URLのずれ"))
-    rows.push(row("配信URL", it.vurl ? `<a class="ilnk" href="${esc(it.vurl)}" target="_blank" rel="noopener">${IC_PLAY}${esc(vodName(it))}</a>` : un("未設定"), "", "", ["配信URL", "配信URLのずれ"]));
-  const bc = `<div class="icard ibc"><div class="ich"><span class="ilamp onair">ON AIR</span>${edB("onair", "基本情報")}</div><dl class="idl">${rows.join("")}</dl></div>`;
+  if (it.k !== "a")
+    chips.push(it.series ? `<button type="button" class="tk-chip tk-go" data-series="${esc(it.series)}"><small>シリーズ</small>${esc(it.series)} ›</button>` : nofHas(it, "ser") ? "" : tkMiss("<small>シリーズ</small>未設定", "r:シリーズ", []));
+  /* 公式サイト・配信URLはタイトルの下のボタンで開く。ここには要確認のときだけ札を出す */
+  if (ms.some(x => x.k === "公式サイト")) chips.push(tkMiss("<small>公式サイト</small>未設定", "r:公式サイト", ["公式サイト"]));
+  if (ms.some(x => x.k === "配信URL" || x.k === "配信URLのずれ")) chips.push(tkMiss(`<small>配信URL</small>${it.vurl ? "確認" : "未設定"}`, "r:配信URL", ["配信URL", "配信URLのずれ"]));
+  lines.push(`<div class="tk-chips">${chips.join("")}</div>`);
+  const bc = `<div class="icard ibc"><div class="ich"><span class="ilamp onair">ON AIR</span>${edB("onair", "基本情報")}</div>${lines.join("")}${notes.join("")}</div>`;
   /* 曲の話数の要確認（core.js の「曲の話数」と同じ判定） */
   const sgMax = Math.max(0, ...episodes(it).filter(e => !e.sp).map(e => epNum(e.n)).filter(n => n != null));
   const sgOver = x => sgMax > 0 && [x.a, x.b, ...exOf(x).flatMap(r => [r.a, r.b])].some(v => v != null && +v > sgMax);
-  /* MUSIC：1曲1行。左に『曲名』アーティスト、右端に使われた話 */
-  /* 種類ごとに小見出し（OP・ED…）を付けて区切る。曲の行は押しても編集しない */
-  const songs = songRows
-    .map((r, j) => {
-      const { st, ar } = songTA(r.x);
-      /* 2行目：「歌」ラベル＋アーティスト、使われた話は枠つきの小さなラベルで見分けやすく */
-      /* 話は範囲ごとに1つずつの枠ラベル（飛び飛びでも [1〜10話] [13話] [20〜30話] と分けて並べる） */
-      const sub = [r.rng.length ? `<span class="ieps">${r.rng.map((t, j) => `<span class="iep inum${j === r.now ? " now " + SG_CLS[r.k] : ""}">${esc(t)}</span>`).join("")}</span>` : ""].filter(Boolean).join("");
-      /* 同じ種類に2曲以上あるときは、小見出しを押してたためる（初めは開いている） */
-      const cnt = songRows.filter(q => q.k === r.k).length;
-      const fold = musFold.has(r.k);
-      const head =
-        j === 0 || songRows[j - 1].k !== r.k
-          ? `<button type="button" class="imt ${SG_CLS[r.k]}" data-imfold="${r.k}" aria-expanded="${!fold}"><b>${r.k}</b><small>${cnt}曲</small>${FOLD_IC}</button>`
-          : "";
-      if (fold) return head;
-      /* 曲ごとの要確認：曲名・アーティストのどちらかだけ／使われた話が登録されている話数を超えている */
-      const sw = [];
-      if (st.trim() && !ar.trim()) sw.push("アーティストが未入力です");
-      if (!st.trim() && ar.trim()) sw.push("曲名が未入力です");
-      if (sgOver(r.x)) sw.push(`使われた話が、登録されている話数（${sgMax}話）を超えています`);
-      const sk = "s:" + r.i;
-      const swHtml = sw.length ? wnNote(sk, `<p>${sw.map(esc).join("<br>")}<button type="button" data-jump="sgList">入力する</button></p>`) : "";
-      return `${head}<div class="imsg ${SG_CLS[r.k]}${songRows.nowN == null ? "" : r.now >= 0 ? " isnow" : " notnow"}"><span class="imn">${st.trim() ? `『${esc(st)}』` : un("曲名 未設定")}${ar.trim() ? `<span class="iarn">${esc(ar)}</span>` : ""}${sw.length ? wnMark(sk) : ""}</span>${sub ? `<span class="ima">${sub}</span>` : ""}${swHtml}</div>`;
+  /* MUSIC：種類ごとにまとめる。左に傾いた種類の札（押すとその種類をたたむ）、右にその種類の曲。
+     曲は『曲名』（Mochiy）とアーティスト、右端に使われた話（範囲ごとの札。最後に見た話の範囲は塗る） */
+  const epT = t => String(t).replace(/話$/, "").replace(/〜/g, "–");
+  const types = [...new Set(songRows.map(r => r.k))];
+  const songs = types
+    .map(k => {
+      const l = songRows.filter(r => r.k === k);
+      const cls = SG_CLS[k] || "";
+      if (musFold.has(k))
+        return `<button type="button" class="tk-fold" data-imfold="${esc(k)}" aria-expanded="false"><span class="tk-tp ${cls}">${esc(k)}</span>${l.length}曲（たたんでいます）<span aria-hidden="true">›</span></button>`;
+      const rows = l
+        .map(r => {
+          const { st, ar } = songTA(r.x);
+          /* 曲ごとの要確認：曲名・アーティストのどちらかだけ／使われた話が登録されている話数を超えている */
+          const sw = [];
+          if (st.trim() && !ar.trim()) sw.push("アーティストが未入力です");
+          if (!st.trim() && ar.trim()) sw.push("曲名が未入力です");
+          if (sgOver(r.x)) sw.push(`使われた話が、登録されている話数（${sgMax}話）を超えています`);
+          const sk = "s:" + r.i;
+          const swHtml = sw.length ? wnNote(sk, `<p>${sw.map(esc).join("<br>")}<button type="button" data-jump="sgList">入力する</button></p>`) : "";
+          const eps = r.rng.length ? `<span class="tk-eps">${r.rng.map((t, j) => `<span class="tk-ep${j === r.now ? " now" : ""}">${esc(epT(t))}</span>`).join("")}</span>` : "";
+          return `<div class="tk-song${songRows.nowN == null ? "" : r.now >= 0 ? " isnow" : " notnow"}"><span class="tk-sn"><b>${st.trim() ? esc(st) : un("曲名 未設定")}</b>${ar.trim() ? `<small>${esc(ar)}</small>` : ""}</span>${eps}${sw.length ? wnMark(sk) : ""}</div>${swHtml}`;
+        })
+        .join("");
+      return `<div class="tk-grp"><button type="button" class="tk-tp ${cls}" data-imfold="${esc(k)}" aria-expanded="true" aria-label="${esc(k)}をたたむ">${esc(k)}<small>${l.length}曲</small></button><div class="tk-gs">${rows}</div></div>`;
     })
     .join("");
 
