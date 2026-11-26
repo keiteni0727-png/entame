@@ -80,10 +80,12 @@ function ytOpenDetail(id, dir) {
     sh.setAttribute("aria-label", x.t);
     inn.innerHTML = ytDetailHtml(x);
     sh.scrollTop = 0;
+    markSel();
     return;
   }
   $("#layer").innerHTML =
-    `<div class="scrim" data-close></div><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(x.t)}"><div class="wrap" id="ytIn">${ytDetailHtml(x)}</div></div>`;
+    `<div class="scrim" data-close></div><div class="sheet dpanel" role="dialog" aria-modal="true" aria-label="${esc(x.t)}"><div class="wrap" id="ytIn">${ytDetailHtml(x)}</div></div>`;
+  markSel();
 }
 function ytRefresh() {
   const x = ytItems.find(y => y.id === ytOpen);

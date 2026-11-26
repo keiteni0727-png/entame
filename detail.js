@@ -46,14 +46,6 @@ function wnText(it, x) {
   const nb = x.ns ? `<button type="button" data-nosong="all">なし</button>` : x.n ? `<button type="button" data-nof="${x.n}">なし</button>` : "";
   return `<p>${esc(tx)}${go}${nb}</p>`;
 }
-/* PCの詳細の左の列：ポスター・進み具合・配信／公式サイトのボタン・次に見る話・要確認（スマホでは出さない。スマホはタイトルの左に小さく出す＝renderDetail の .dtimg） */
-function detailSide(it, { eps, w, noEp }) {
-  const wn = watchable(eps).length;
-  const prog = eps.length && !noEp ? `<div class="dprog"><span class="dpn"><b>${w}</b> / ${wn}話</span><span class="dpbar"><i style="width:${Math.round((w / (wn || 1)) * 100)}%"></i></span></div>` : "";
-  const vod = it.vurl ? `<a class="u-btn dpb vod" href="${esc(it.vurl)}" target="_blank" rel="noopener">${IC_PLAY}${esc(vodName(it))}で見る</a>` : "";
-  const off = it.url ? `<a class="u-btn dpb" href="${esc(it.url)}" target="_blank" rel="noopener">公式サイト${IC_EXT}</a>` : "";
-  return `<aside class="dside">${posterSlot(it)}${prog}${vod || off ? `<div class="dpbs">${vod}${off}</div>` : ""}</aside>`;
-}
 function infoCards(it, { md, ns, mv, stv, cs, songRows }) {
   const un = t => `<span class="unset">${t}</span>`;
   const nn = t => `<span class="nosong">${t}</span>`;
@@ -211,14 +203,14 @@ function renderDetail(it) {
   const nv = navNeighbors(it.id),
     busy = !!(epEdit || arcEdit || slotEdit || subPaste || epOne != null);
   const navB = (d, lab, ic) => `<button type="button" class="u-btn icon sm dnav" data-dnav="${d}" aria-label="${lab}" title="${lab}${TOUCH ? "" : `（${d < 0 ? "←" : "→"}キー）`}" ${nv[d < 0 ? 0 : 1] && !busy ? "" : "disabled"}>${ic}</button>`;
-  return `<div class="dgrid">${detailSide(it, { eps, w, noEp })}<div class="dmain"><div class="dhead"><div class="hdrow dnavrow"><div class="hdrow">${navB(-1, "前の作品", CHEV(-1))}${navB(1, "次の作品", CHEV(1))}<button type="button" class="u-btn sm" id="editItem" aria-label="作品を編集">編集</button><button class="u-btn icon sm soft close" type="button" data-close aria-label="閉じる">✕</button></div></div></div>
+  return `<div class="dmain"><div class="dhead"><div class="hdrow dnavrow"><div class="hdrow">${navB(-1, "前の作品", CHEV(-1))}${navB(1, "次の作品", CHEV(1))}<button type="button" class="u-btn sm" id="editItem" aria-label="作品を編集">編集</button><button class="u-btn icon sm soft close" type="button" data-close aria-label="閉じる">✕</button></div></div></div>
     <div class="dtit dhx"><div class="dhrow">${it.img ? `<button type="button" class="dtimg" data-imgview="1" aria-label="画像を大きく表示">${imgTag(it, "l", "dtimgi")}</button>` : `<button type="button" class="dtimg none" data-imgadd="1" aria-label="画像を貼り付け">${IMG_ICON}</button>`}<div class="dtc"><div class="meta dmeta">${kindTag(it)}${(l => (l ? `<button type="button" class="dmt mtag m-${l[1]}" data-jump="fMedia" title="放送形態を変える">${l[0]}</button>` : ""))(mediaLabOf(it))}${stBtn}${stMs.length ? wnMark("st") : ""}</div>${stMs.length ? wnNote("st", stMs.map(x => wnText(it, x)).join("")) : ""}<h3>${esc(it.t)}<button type="button" class="tcopy" id="copyTitle" aria-label="タイトルをコピー" title="タイトルをコピー"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button></h3>
     ${lnk ? `<div class="dtbtns">${lnk}</div>` : ""}</div></div></div>
     ${noEp ? "" : `<div class="dtabs" role="tablist"><button type="button" role="tab" data-dtab="info">番組情報</button><button type="button" role="tab" data-dtab="ep">話数${eps.length ? ` <small>${w}/${watchable(eps).length}</small>` : ""}${epMs ? `<span class="wnt" aria-label="要確認あり">!</span>` : ""}</button></div>`}
     <div class="dpane dp-info">${infoCards(it, { md, ns, mv, stv, cs, songRows })}
     <div class="links">${typeof alChkOpen === "function" ? `<button type="button" class="u-chip add dlb" data-alcheck="1">${it.k === "a" ? "AniList" : "TMDB"}で確認</button>` : ""}${noEp ? `<button type="button" class="u-chip add dlb" id="epAddMv">＋ 話数を追加</button>` : ""}<button type="button" class="u-btn sm txt danger delsm" id="delItem">削除</button></div></div>
     <div class="dpane dp-ep"><h4><span class="h4l">話数</span>${eps.length && !epEdit ? `<span class="progrow"><span class="progn"><b>${w}</b> / ${watchable(eps).length}話</span><span class="prog"><i style="width:${Math.round((w / (watchable(eps).length || 1)) * 100)}%"></i></span></span>` : ""}${eps.length && it.k === "a" && !epEdit && !arcEdit && !slotEdit && !subPaste ? `<button type="button" class="u-btn sm hpaste" id="spOpen" aria-label="貼り付け" title="貼り付け">${PASTE_IC}</button>` : ""}${eps.length && !epEdit && !arcEdit && !slotEdit && !subPaste ? `<button type="button" class="u-btn sm iedit" id="epEditBtn">編集</button>` : ""}</h4>
-    <div id="epArea">${subPaste ? subPasteHtml(it) : arcEdit ? arcEditHtml() : slotEdit ? slotEditHtml(it) : epEdit ? epEditorHtml(it) : epListHtml(it, eps)}</div></div></div></div>`;
+    <div id="epArea">${subPaste ? subPasteHtml(it) : arcEdit ? arcEditHtml() : slotEdit ? slotEditHtml(it) : epEdit ? epEditorHtml(it) : epListHtml(it, eps)}</div></div></div>`;
 }
 /* 詳細のアラート：ふだんは1行に畳み、開くと項目ボタン。ボタンを押すとその項目だけの編集画面へ */
 function refreshSheet() {
@@ -278,12 +270,14 @@ function openDetail(id, dir, keepNav) {
     w.classList.add(dir > 0 ? "dsl-r" : "dsl-l");
     setDTab(tab);
     noTabInfo();
+    markSel();
     return;
   }
   $("#layer").innerHTML =
-    `<div class="scrim" data-close></div><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(it.t)}"><div class="wrap" id="sheetIn">${renderDetail(it)}</div></div>`;
+    `<div class="scrim" data-close></div><div class="sheet dpanel" role="dialog" aria-modal="true" aria-label="${esc(it.t)}"><div class="wrap" id="sheetIn">${renderDetail(it)}</div></div>`;
   syncDhh();
   setDTab("info");
+  markSel();
   if (!TOUCH) $(".sheet .close").focus({ preventScroll: true });
 }
 /* 詳細を「基本情報／話数」タブで切り替え（PC・スマホ共通）（タブの状態はシート自体のクラスで持つ） */

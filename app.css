@@ -1782,15 +1782,32 @@ select.sg-t{height:var(--h-in);width:auto;max-width:120px;cursor:pointer;-webkit
 .vtog button[aria-pressed="true"]{background:var(--u-surface);color:var(--u-ink);box-shadow:0 1px 3px rgba(16,24,40,.15)}
 .count .vtog ~ .gbulk{margin-left:12px!important}
 @media (max-width:899px){.count .vtog ~ .gbulk{flex-basis:auto!important}}
-.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:16px 10px}
-@media (min-width:900px){.pgrid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:20px 14px}}
-.pcell{display:flex;flex-direction:column;gap:6px;min-width:0;padding:0;border:0;background:none;text-align:left;font:inherit;color:var(--u-ink);cursor:pointer;-webkit-tap-highlight-color:transparent}
-.pimg{position:relative;display:block;aspect-ratio:2/3;border-radius:var(--r-m);overflow:hidden;background:var(--u-soft)}
+/* グリッド：スマホ2列・PC5列（大きさ「小」は3列・7列、「大」は2列・4列）。ポスターは太枠＋影で1枚ずつ少し傾け、左上に斜めのステータスのシール */
+.pgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 18px;padding:6px 4px 0}
+@media (min-width:900px){.pgrid{grid-template-columns:repeat(5,minmax(0,1fr));gap:28px 22px}}
+.pcell{position:relative;display:flex;flex-direction:column;gap:8px;min-width:0;padding:0;border:0;background:none;text-align:left;font:inherit;color:var(--u-ink);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.pimg{position:relative;display:block;aspect-ratio:2/3;border:2px solid var(--k);border-radius:14px;box-shadow:4px 4px 0 var(--ks);overflow:hidden;background:var(--u-soft);transform:rotate(var(--rot,0deg))}
+.pcell:nth-child(5n+1){--rot:-3deg}
+.pcell:nth-child(5n+2){--rot:1.5deg}
+.pcell:nth-child(5n+3){--rot:-1.5deg}
+.pcell:nth-child(5n+4){--rot:1deg}
+.pcell:nth-child(5n){--rot:-2deg}
 .pimgi{display:block;width:100%;height:100%;object-fit:cover}
 .pimgi:not([src]){visibility:hidden}
-.pttl{font-size:var(--fs-s);font-weight:700;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
-@media (hover:hover){.pcell:hover .pimg{outline:2px solid var(--u-accent);outline-offset:2px}}
+.pttl{font-family:var(--fd);font-weight:400;font-size:13px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.pseal{position:absolute;z-index:1;left:-6px;top:10px;transform:rotate(-8deg);padding:2px 8px;border:2px solid var(--k);border-radius:8px;box-shadow:2px 2px 0 var(--ks);font-size:11px;font-weight:900;line-height:1.4;white-space:nowrap;pointer-events:none;color:var(--onpop);background:#fff}
+.pseal.s-視聴中{background:var(--pop)}
+.pseal.s-視聴済み{background:var(--seen)}
+.pseal.s-見ない{background:#c9c2b8}
+.pprog{display:flex;align-items:center;gap:6px;margin-top:-2px}
+.pbar{flex:1;min-width:0;height:8px;border:1.5px solid var(--k2);border-radius:5px;background:var(--u-surface);overflow:hidden}
+.pbar i{display:block;height:100%;background:var(--u-accent)}
+.pprog b{flex:none;font-family:var(--fn);font-weight:800;font-size:11px;color:var(--u-sub)}
+@media (hover:hover){.pcell:hover .pimg{box-shadow:4px 4px 0 var(--u-accent)}}
 .pcell:active .pimg{opacity:.85}
+/* PCの右のパネルで開いている作品：オレンジの影＋外側のオレンジ線 */
+.pcell.sel .pimg{box-shadow:4px 4px 0 var(--u-accent);outline:3px solid var(--u-accent);outline-offset:3px}
+.slot.sel{box-shadow:inset 0 0 0 3px var(--u-accent)}
 .cgroup .pgrid{margin-top:4px}
 /* YouTube：一覧のサムネは横長、グリッドも横長 */
 .row.thr.yrow .slot{grid-template-columns:48px 64px minmax(0,1fr) auto!important}
@@ -1799,17 +1816,13 @@ select.sg-t{height:var(--h-in);width:auto;max-width:120px;cursor:pointer;-webkit
 .ygrid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
 @media (min-width:900px){.ygrid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}}
 .ygrid .pimg{aspect-ratio:16/9}
-.pimg .ptags{position:absolute;left:5px;top:5px;right:5px;z-index:1;display:flex;flex-wrap:wrap;gap:4px;align-items:center;pointer-events:none}
-.ptags .mtag{margin:0;vertical-align:0}
-.ptags .gst{font-size:var(--fs-xs);line-height:1;padding:3px 7px;align-self:auto;box-shadow:0 1px 2px rgba(0,0,0,.25)}
-/* グリッドの大きさ：小・大（中は上の今までの大きさ） */
-html[data-gsz="s"] .pgrid{grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:12px 8px}
-html[data-gsz="l"] .pgrid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+/* グリッドの大きさ：小・大（中は上の大きさ）。YouTubeは横長のサムネなので別 */
+html[data-gsz="s"] .pgrid:not(.ygrid){grid-template-columns:repeat(3,minmax(0,1fr));gap:20px 12px}
 html[data-gsz="s"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}
 html[data-gsz="l"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
 @media (min-width:900px){
-  html[data-gsz="s"] .pgrid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:16px 10px}
-  html[data-gsz="l"] .pgrid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+  html[data-gsz="s"] .pgrid:not(.ygrid){grid-template-columns:repeat(7,minmax(0,1fr));gap:24px 16px}
+  html[data-gsz="l"] .pgrid:not(.ygrid){grid-template-columns:repeat(4,minmax(0,1fr))}
   html[data-gsz="s"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
   html[data-gsz="l"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
 }
@@ -1827,35 +1840,6 @@ html[data-gsz="l"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(240px,1f
 .dtimgi:not([src]){visibility:hidden}
 .dtimg.none{display:flex;align-items:center;justify-content:center;box-sizing:border-box;border:1.5px dashed var(--u-line);background:var(--u-soft);color:var(--u-sub);cursor:pointer}
 .dtimg.none svg{width:22px;height:22px;color:var(--u-strong)}
-@media (min-width:900px){.dgrid .dtimg{display:none}}
-/* ===== 作品の詳細（PC・幅900px以上）：左メニューにかぶらないよう一覧の場所の真ん中に出し、左にポスターの列。ON AIRの下にMUSIC（ノートPC・モニター共通） ===== */
-.dside,.dgrid .dside{display:none}
-@media (min-width:900px){
-  #layer .sheet:not(.form):has(.dgrid){left:calc(var(--sbw) + (100% - var(--sbw)) / 2);width:calc(100% - var(--sbw) - 48px);max-width:900px}
-  .dgrid{display:grid;grid-template-columns:200px minmax(0,1fr);gap:20px;align-items:start}
-  .dgrid .dside{display:flex;flex-direction:column;gap:10px;position:sticky;top:0;padding:16px 0}
-  .dgrid .dmain{min-width:0}
-  .dgrid .dhead{margin-left:0!important;padding-left:0!important}
-  .dpimg{display:block;width:100%;aspect-ratio:2/3;padding:0;border:0;border-radius:var(--r-m);overflow:hidden;background:var(--u-chip);cursor:zoom-in}
-  .dpimgi{display:block;width:100%;height:100%;object-fit:cover}
-  .dpimgi:not([src]){visibility:hidden}
-  .dpimg.none{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border:1.5px dashed var(--u-line);background:var(--u-soft);color:var(--u-sub);font:inherit;font-size:var(--fs-s);cursor:pointer}
-  .dpimg.none svg{width:30px;height:30px;color:var(--u-strong)}
-  .dpimg.none:hover{border-color:var(--u-accent);color:var(--u-acct)}
-  .dprog{display:grid;gap:5px;padding:2px 2px 0}
-  .dprog .dpn{font-size:var(--fs-s);color:var(--u-sub)}
-  .dprog .dpn b{font-size:var(--fs-l);color:var(--u-ink)}
-  .dpbar{display:block;height:6px;border-radius:3px;background:var(--u-chip);overflow:hidden}
-  .dpbar i{display:block;height:100%;background:var(--u-accent);border-radius:3px}
-  .dpbs{display:grid;gap:6px}
-  .dpb.u-btn{display:flex;justify-content:center;align-items:center;gap:6px;width:100%;box-sizing:border-box;text-decoration:none;font-size:var(--fs-m)}
-  .dpb .iic{width:14px;height:14px;flex:none}
-  .dpb.vod{background:var(--u-ink);color:var(--u-surface);border-color:var(--u-ink)}
-  .dpb.vod .iic.ply circle{fill:var(--u-surface)}
-  .dpb.vod .iic.ply path{fill:var(--u-ink)}
-  .dside .dmiss{margin:0;max-height:none;overflow:visible}
-  /* 公式サイト・配信URLは左の列のボタンにあるので、ON AIRには出さない（スマホは出す） */
-}
 /* ===== AniList：作品の追加画面の検索・番組表の新作・続編のお知らせ ===== */
 .alx{margin:2px 0 12px;padding:10px;border:1px solid var(--u-line);border-radius:var(--r-l);background:var(--u-bg)}
 .alx-row{display:flex;gap:8px;align-items:center}
@@ -1937,7 +1921,6 @@ html[data-gsz="l"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(240px,1f
 .dtb.vod{background:var(--u-ink);color:var(--u-surface);border-color:var(--u-ink)}
 .dtb.vod .iic.ply circle{fill:var(--u-surface)}
 .dtb.vod .iic.ply path{fill:var(--u-ink)}
-@media (min-width:900px){.dtbtns{display:none}}
 
 /* ===== 作品詳細：SERIES（アプリのシリーズ＋AniListのつながり） ===== */
 .ilamp.series{background:#2b6fd6}
@@ -2072,14 +2055,6 @@ html[data-gsz="l"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(240px,1f
 .dhx .dtb.vod .iic.ply path{fill:var(--kbg)}
 /* 上の段：前後・編集・✕だけ（右寄せ） */
 .dnavrow{justify-content:flex-end}
-@media (min-width:900px){
-  .dhx{margin:0;padding:0;background:none}
-  .dhx .dtc{gap:6px;padding-top:6px}
-  .dhx h3{font-size:24px}
-  .dmain>.dtabs{margin:14px 0 0;padding-left:4px;padding-right:4px}
-  .dmain>.dtabs::before{inset:8px 0}
-  .dpimg,.dpimg.none{border:2px solid var(--k);box-shadow:5px 5px 0 var(--ks);border-radius:16px}
-}
 /* --- タブ：溝の中に並べ、選択中だけ黄色のステッカーの札 --- */
 .dtabs button{position:relative;border:2px solid transparent;border-radius:12px;background:none;color:var(--u-sub);padding:6px 0;margin:0;font-weight:900}
 .sheet.t-info .dtabs [data-dtab="info"],.sheet.t-ep .dtabs [data-dtab="ep"]{background:var(--pop);color:var(--onpop);border-color:var(--k);box-shadow:2px 2px 0 var(--ks)}
@@ -2164,3 +2139,16 @@ html[data-gsz="l"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(240px,1f
 .nup-vod .iic.ply circle{fill:#fff}
 .nup-vod .iic.ply path{fill:var(--kbg)}
 .nup-tick{background:var(--pop);color:var(--onpop);box-shadow:2px 2px 0 var(--ks)}
+/* --- PC：作品・YouTubeの詳細は右に開いたままのパネル（幅470px・左に太枠の境目）。一覧は暗くせず、そのまま操作できる --- */
+@media (min-width:900px){
+  #layer .sheet.dpanel{top:0;bottom:0;left:auto;right:0;width:470px;max-width:none;max-height:none;transform:none;border-radius:0;border-left:3px solid var(--k);box-shadow:none}
+  #layer .sheet.dpanel .wrap{max-width:none;padding:0 16px}
+  #layer .scrim:has(+ .sheet.dpanel){display:none}
+  body:has(#layer .sheet.dpanel){padding-right:470px}
+  /* パネルを開いている間：番組表の NEXT UP はパネルと入れかえ、一覧のグリッドは狭い画面なら3列 */
+  body:has(#layer .sheet.dpanel) .wpc{grid-template-columns:minmax(0,1fr)}
+  body:has(#layer .sheet.dpanel) .wpc-side{display:none}
+}
+@media (min-width:900px) and (max-width:1279px){
+  body:has(#layer .sheet.dpanel) .pgrid:not(.ygrid){grid-template-columns:repeat(3,minmax(0,1fr))}
+}

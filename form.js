@@ -582,7 +582,8 @@ async function submitForm() {
 /* ポップアップ表示中は背景を固定する（共通部品 U.lock） */
 const TOUCH = U.TOUCH;
 const lockScroll = U.lock;
-new MutationObserver(() => lockScroll(!!$("#layer").firstElementChild)).observe($("#layer"), { childList: true });
+/* 後ろの画面を止めるのは、真ん中に出す画面のときだけ（PCの右のパネルで開いた詳細は、一覧もそのまま動かせる） */
+new MutationObserver(() => lockScroll(!!$("#layer").firstElementChild && !(IS_PC() && $("#layer .sheet.dpanel")))).observe($("#layer"), { childList: true });
 /* 作品の追加・編集画面：入力中の内容を読み取ってから変えて、描き直す */
 let sgExK = -1; // 飛び飛びの話を足した曲（足したあとその入力欄へ移るため）
 const formEdit = (fn, after) => el => {

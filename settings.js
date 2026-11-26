@@ -391,6 +391,7 @@ function close() {
   epEdit = null;
   form = null;
   $("#layer").innerHTML = "";
+  markSel();
 }
 /* 通知は共通部品（U.toast） */
 function toastUndo(m, undo) {

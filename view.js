@@ -710,6 +710,7 @@ function render() {
     body = body.slice(0, ce) + gb[0] + body.slice(ce);
   }
   setMain(navTabsHtml() + body);
+  markSel();
   if (xserY != null) {
     scrollTo(0, xserY);
     xserY = null;

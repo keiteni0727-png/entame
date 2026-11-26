@@ -1239,7 +1239,9 @@ if (!MODE_KEYS.includes(state.mode)) state.mode = "w";
 if (!(SUBS[state.mode] || ["all"]).includes(state.sub)) state.sub = "all";
 if (typeof state.vod !== "string") state.vod = "";
 if (typeof state.slot !== "string") state.slot = "";
-if (state.view !== "grid") state.view = "list";
+/* ライブラリは最初ポスターのグリッド（2026-11 のデザイン刷新で、リストにしていた端末も一度だけグリッドに戻す） */
+if (state.view !== "list" || !ls.get("adb.v3.grid1")) state.view = "grid";
+ls.set("adb.v3.grid1", 1);
 state.missOnly = !!state.missOnly;
 if (typeof state.missKey !== "string") state.missKey = "";
 /* 今の一覧のジャンル：all＝すべて、a＝アニメ、d＝ドラマ（映画では実写映画も）、x＝アニメ以外 */

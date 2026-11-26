@@ -260,12 +260,7 @@ function cleanWideImages() {
     });
 }
 
-/* ---------- 詳細での出し方（PCの左の列） ---------- */
 /* 縦の画像。画像がなければ押すと貼り付け、あれば押すと大きく表示（変更・外すはそこから） */
-const posterSlot = it =>
-  it.img
-    ? `<button type="button" class="dpimg" data-imgview="1" aria-label="画像を大きく表示">${imgTag(it, "l", "dpimgi")}</button>`
-    : `<button type="button" class="dpimg none" data-imgadd="1" aria-label="画像を貼り付け">${IMG_ICON}<span>押して画像を貼り付け</span></button>`;
 
 /* ---------- 大きく表示（変更・外すもここから） ---------- */
 function openImgView(it) {
@@ -334,16 +329,24 @@ const viewTog = (cur, attr) =>
       return `<button type="button" ${attr}="${v}" aria-pressed="${cur === v}" aria-label="${g ? `大きさ：${GSZ_L[gsz()]}（押すと切り替え）` : l + "で表示"}" title="${g ? "押すと大きさを切り替え" : l}">${VIEW_IC[v]}${g ? `<small class="gszb">${GSZ_L[gsz()]}</small>` : ""}</button>`;
     })
     .join("")}</span>`;
-/* グリッドの1マス：縦長の画像（なければ灰色の枠）とタイトル。作品は画像の左上に放送形態（TV・映画など）のラベル */
-/* その右に視聴ステータスのラベル（未設定なら出さない） */
-const gridMtag = (it, attr) => {
+/* グリッドの1マス：太枠と影の縦長の画像（1枚ずつ少し傾ける）とタイトル。作品は左上に斜めのステータスのシール、下に進み具合 */
+const gridSeal = (it, attr) => (attr === "data-id" && it.s ? `<span class="pseal s-${esc(it.s)}">${esc(stLabel(it.s))}</span>` : "");
+const gridProg = (it, attr) => {
   if (attr !== "data-id") return "";
-  const l = mediaLabOf(it);
-  const t = (l ? `<span class="mtag m-${l[1]}">${l[0]}</span>` : "") + (it.s ? `<span class="pill gst s-${esc(it.s)}">${esc(stLabel(it.s))}</span>` : "");
-  return t ? `<span class="ptags">${t}</span>` : "";
+  const l = watchable(episodes(it));
+  if (!l.length) return "";
+  const w = l.filter(e => e.w).length;
+  return `<span class="pprog"><span class="pbar"><i style="width:${Math.round((w / l.length) * 100)}%"></i></span><b class="inum">${w}/${l.length}</b></span>`;
 };
 const gridCell = (it, attr = "data-id", ik = it) =>
-  `<button type="button" class="pcell${it.s === "視聴済み" ? " done" : ""}" ${attr}="${esc(it.id)}"><span class="pimg">${gridMtag(it, attr)}${posterTag(ik, "s", "pimgi") || `<span class="wc-noimg">${IMG_ICON}</span>`}</span><span class="pttl">${esc(it.t || "（タイトルなし）")}</span></button>`;
+  `<button type="button" class="pcell${it.s === "視聴済み" ? " done" : ""}" ${attr}="${esc(it.id)}">${gridSeal(it, attr)}<span class="pimg">${posterTag(ik, "s", "pimgi") || `<span class="wc-noimg">${IMG_ICON}</span>`}</span><span class="pttl">${esc(it.t || "（タイトルなし）")}</span>${gridProg(it, attr)}</button>`;
+/* 詳細で開いている作品を一覧で目立たせる（PCの右のパネルで開いている間） */
+function markSel() {
+  document.querySelectorAll("#main .sel").forEach(el => el.classList.remove("sel"));
+  const id = openId || ytOpen;
+  if (!id || !$("#layer .sheet.dpanel")) return;
+  document.querySelectorAll(`#main [data-id="${CSS.escape(id)}"], #main [data-yt="${CSS.escape(id)}"]`).forEach(el => el.classList.add("sel"));
+}
 document.addEventListener("click", e => {
   const b = e.target.closest && e.target.closest("[data-lview],[data-yview]");
   if (!b) return;
