@@ -751,11 +751,11 @@ function onDetailClick(e) {
   return !!it && runActions(DETAIL_ACTIONS, e, it);
 }
 
-/* ---------- PC：右の詳細パネルの幅（左の境目をドラッグ。最小は今の幅、最大は画面の右側3分の2。ダブルクリックで元の幅。この端末で覚える） ---------- */
+/* ---------- PC：右の詳細パネルの幅（左の境目をドラッグ。最小は今の幅、最大は画面の真ん中まで。ダブルクリックで元の幅。この端末で覚える） ---------- */
 const PW_MIN = 470,
   K_PW = "adb.v3.pw";
 const pwZoom = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--z")) || 1;
-const pwMax = () => Math.max(PW_MIN, Math.floor((innerWidth * 2) / 3 / pwZoom()));
+const pwMax = () => Math.max(PW_MIN, Math.floor(innerWidth / 2 / pwZoom()));
 function pwApply(w) {
   const r = document.documentElement.style;
   if (!w || w <= PW_MIN) r.removeProperty("--pw");
