@@ -744,11 +744,6 @@ input[type=date]::-webkit-date-and-time-value{text-align:left}
 .wt-clock{display:flex;align-items:baseline;gap:12px;flex:1;min-width:0;padding:4px 2px}
 .wt-clock time{font-size:var(--fs-3xl);line-height:1;font-variant-numeric:tabular-nums}
 .wt-clock span{font-size:var(--fs-base);font-weight:700;color:var(--u-sub)}
-.wt-un{display:grid;justify-items:start;gap:1px;min-width:180px;background:var(--u-surface);border:1px solid var(--u-line);border-radius:var(--r-l);padding:8px 14px;font:inherit;color:var(--u-ink);text-align:left}
-.wt-un b{font-family:var(--u-num);font-size:var(--fs-xl);font-weight:700;line-height:1.1}
-.wt-un small{font-size:var(--fs-xs);color:var(--u-sub);margin:0 2px;font-weight:600}
-.wt-un .wt-go{font-size:var(--fs-s);color:var(--u-sub);font-weight:700}
-.wt-un.on .wt-go{color:var(--st-now)}
 
 .wcard.live{border:2px solid var(--u-live);box-shadow:0 0 0 4px color-mix(in srgb,var(--u-live) 14%,transparent)}
 
@@ -800,7 +795,6 @@ body.sbc .u-app .sb .sb-it i{margin:0}
   .wt-clock{flex-direction:column;gap:4px;justify-content:center}
   .wt-clock time{font-size:var(--fs-3xl)}
   .wt-clock span{font-size:var(--fs-m)}
-  .wt-un{min-width:0;flex:none;width:46%}
   .wday{margin-top:12px}
   .wc-time{font-size:var(--fs-2xl)}
   .wc-ttl{font-size:var(--fs-xl)}
@@ -869,8 +863,8 @@ body.sbc .u-app .sb .sb-it i{margin:0}
 @media (max-width:560px){
   .pill.dst{font-size:var(--fs-s);padding:4px 9px 4px 11px}
 }
-.dhead .meta .kind{font-size:var(--fs-s);padding:4px 8px;border-radius:var(--r-s);align-self:center}
-@media (max-width:560px){.dhead .meta .kind{font-size:var(--fs-s);padding:4px 7px}}
+.dmeta .kind{font-size:var(--fs-s);padding:4px 8px;border-radius:var(--r-s);align-self:center}
+@media (max-width:560px){.dmeta .kind{font-size:var(--fs-s);padding:4px 7px}}
 /* 作品・YouTubeの詳細（PC）：スマホと同じく上端を固定し、中身の量で下の長さだけ変わる。いちばん長いときの大きさは今までどおり（上下24pxずつあける） */
 @media (min-width:601px){
   .sheet:not(.form){top:calc(24px + env(safe-area-inset-top,0px));transform:translateX(-50%);scrollbar-gutter:stable}
@@ -879,7 +873,7 @@ body.sbc .u-app .sb .sb-it i{margin:0}
 /* 一覧：画面の上に貼りついたグループ見出し */
 .ghd.stuck{box-shadow:0 1px 0 var(--u-line),0 6px 8px -8px rgba(0,0,0,.25)}
 /* ---------- 作品の詳細：上の段の放送形態ラベル・ON AIR・MUSIC ---------- */
-.dhead .meta .dmt{margin:0;border:0;font-size:var(--fs-s);padding:4px 8px 4px 7px;border-radius:var(--r-s);vertical-align:0;cursor:pointer}
+.dmeta .dmt{margin:0;border:0;font-size:var(--fs-s);padding:4px 8px 4px 7px;border-radius:var(--r-s);vertical-align:0;cursor:pointer}
 .ich{display:flex;align-items:center;margin-bottom:8px}
 .ilamp{font-family:var(--u-num);font-size:var(--fs-xs);font-weight:800;letter-spacing:.12em;line-height:1;padding:4px 7px 4px 8px;border-radius:var(--r-s);color:#fff}
 .ilamp.onair{background:var(--u-live);color:#fff}
@@ -900,7 +894,7 @@ body.sbc .u-app .sb .sb-it i{margin:0}
 @media (max-width:560px){
   .idl{gap:7px 12px}
   .idl .iwhen{font-size:var(--fs-l)}
-  .dhead .meta .dmt{font-size:var(--fs-s);padding:4px 7px 4px 6px}
+  .dmeta .dmt{font-size:var(--fs-s);padding:4px 7px 4px 6px}
 }
 .dhead+.ined{margin-top:12px}
 
@@ -970,8 +964,8 @@ header .hbar{box-sizing:border-box;height:56px;padding-block:0}
 .sheet:not(.form) .dhead h3{text-wrap:wrap}
 /* 上段のラベル（アニメ・映画・視聴ステータス）と、矢印・編集・✕の高さを30pxにそろえる */
 .dhead .hdrow{align-items:center}
-.dhead .meta{gap:6px;display:flex;flex-wrap:wrap;align-items:center}
-.dhead .meta .kind,.dhead .meta .dmt,.dhead .meta .dst{box-sizing:border-box;height:var(--h-chip);display:inline-flex;align-items:center;padding-top:0;padding-bottom:0;line-height:1}
+.dmeta{gap:6px;display:flex;flex-wrap:wrap;align-items:center}
+.dmeta .kind,.dmeta .dmt,.dmeta .dst{box-sizing:border-box;height:var(--h-chip);display:inline-flex;align-items:center;padding-top:0;padding-bottom:0;line-height:1}
 
 /* YouTubeの詳細も作品の詳細と同じカード表示 */
 .ydhead{padding-bottom:10px!important}
@@ -1127,7 +1121,6 @@ body.sbc .u-app .sb .sb-logo{display:none}
 /* ===================== 2026-11 新デザイン（AB案）：番組表 ===================== */
 .wt-clock time{font-family:var(--fn);font-weight:800;letter-spacing:0;color:var(--u-acct)}
 .wtop-side{display:flex;gap:12px;align-items:stretch;min-width:0;flex:1}
-.wt-un.on{border:2px solid var(--st-now);border-color:var(--u-live);background:var(--u-live2)}
 .wt-l{display:block;font-family:var(--u-num);font-size:var(--fs-xs);font-weight:700;letter-spacing:.1em;margin-bottom:2px;color:var(--u-live)}
 .wtabs button[aria-selected="true"]{background:var(--u-accent);color:var(--u-on);box-shadow:none}
 .wtabs .wdot{position:absolute;top:6px;right:calc(50% - 22px);width:7px;height:7px;border-radius:50%;background:var(--u-live)}
@@ -1215,7 +1208,7 @@ body.sbc .u-app .sb .sb-logo{display:none}
 .dd-yb:hover{background:var(--u-soft)}
 /* 一度だけの確認：曲の範囲を全話に戻す */
 /* YouTube詳細：上段のジャンル（押すと編集）。作品の種別ラベルと同じ形 */
-.dhead .meta .dmt.lab{background:color-mix(in srgb,var(--accent) 10%,transparent);color:var(--accent);font-weight:700}
+.dmeta .dmt.lab{background:color-mix(in srgb,var(--accent) 10%,transparent);color:var(--accent);font-weight:700}
 
 @media (max-width:899px){header .hthm{display:none}header .hact{display:inline-flex}}
 /* ===================== 2026-11 見直し：上の帯・下メニュー・絞り込みシート・プルダウン ===================== */
@@ -1860,7 +1853,6 @@ select.sg-t{height:var(--h-in);width:auto;max-width:120px;cursor:pointer;-webkit
   .wpc-side .wtop-side{flex-direction:column;gap:14px}
   .wpc-side .wt-clock{flex-direction:column;align-items:flex-start;gap:4px;background:var(--u-surface);border:1px solid var(--u-line);border-radius:var(--r-l);padding:16px 18px}
   .wpc-side .wt-clock time{font-size:56px}
-  .wpc-side .wt-un{width:100%;box-sizing:border-box;padding:14px 18px}
   .wcard.v-tl{grid-template-columns:80px 20px 120px minmax(0,1fr);grid-template-areas:"time line img body";column-gap:16px}
   .v-tl .wc-time{font-size:40px}
   .v-tl .wc-line i{margin-top:13px;width:14px;height:14px;box-shadow:0 0 0 4px var(--u-bg)}
@@ -1955,12 +1947,6 @@ html[data-gsz="l"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(240px,1f
   .dpb.vod{background:var(--u-ink);color:var(--u-surface);border-color:var(--u-ink)}
   .dpb.vod .iic.ply circle{fill:var(--u-surface)}
   .dpb.vod .iic.ply path{fill:var(--u-ink)}
-  .dnext{display:grid;gap:3px;text-align:left;width:100%;padding:10px 12px;border:1px solid var(--u-line);border-left:3px solid var(--u-accent);border-radius:0 var(--r-m) var(--r-m) 0;background:var(--u-surface);color:var(--u-ink);font:inherit;cursor:pointer}
-  .dnext:hover{background:var(--u-soft)}
-  .dnext small{font-size:var(--fs-xs);font-weight:700;color:var(--u-acct)}
-  .dnext b{font-size:var(--fs-m);line-height:1.45}
-  .dnext b span{font-weight:500}
-  .dnext em{font-style:normal;font-size:var(--fs-s);color:var(--u-sub)}
   .dside .dmiss{margin:0;max-height:none;overflow:visible}
   /* 公式サイト・配信URLは左の列のボタンにあるので、ON AIRには出さない（スマホは出す） */
 }
@@ -2122,10 +2108,10 @@ html[data-gsz="l"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(240px,1f
   .dhead>.hdrow{gap:4px}
   .dhead .hdrow>.meta{flex-wrap:nowrap;min-width:0;gap:4px}
   .dhead .hdrow>.hdrow{flex:none;gap:4px}
-  .dhead .meta .kind,.dhead .meta .dmt,.dhead .meta .pill.dst{font-size:var(--fs-xs)}
-  .dhead .meta .kind{padding-left:6px;padding-right:6px}
-  .dhead .meta .dmt{padding-left:5px;padding-right:6px}
-  .dhead .meta .pill.dst{padding-left:7px;padding-right:6px;gap:2px}
+  .dmeta .kind,.dmeta .dmt,.dmeta .pill.dst{font-size:var(--fs-xs)}
+  .dmeta .kind{padding-left:6px;padding-right:6px}
+  .dmeta .dmt{padding-left:5px;padding-right:6px}
+  .dmeta .pill.dst{padding-left:7px;padding-right:6px;gap:2px}
   .dhead .hdrow>.hdrow .u-btn.icon.sm{width:30px}
   .dhead .hdrow>.hdrow #editItem{padding:0 9px}
 }
@@ -2150,7 +2136,7 @@ html[data-gsz="l"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(240px,1f
 }
 /* 小さいタグ：左の太線が「（」に見えるので外し、表示タグ（.u-tag）と同じ色だけの形に */
 .mtag{border-left:0;padding-left:5px}
-.dhead .meta .dmt{border-left:0}
+.dmeta .dmt{border-left:0}
 
 /* バラつきの統一：選ぶ行・進む行・見出し・詳細シートの下余白 */
 /* 詳細シート：下余白をほかのシート（16px）にそろえる */
@@ -2174,31 +2160,27 @@ html[data-gsz="l"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(240px,1f
 .dmain>.dtabs{position:sticky;top:var(--dhh,0px);z-index:3;background:var(--u-bg);margin:14px -16px 0;padding:12px 20px;gap:4px;border-bottom:0}
 /* タブは1本の溝（へこんだ面＋太枠）の中に並べ、ボタン（公式サイトなど）と見分けやすくする */
 .dmain>.dtabs::before{content:"";position:absolute;inset:8px 16px;border:2px solid var(--k);border-radius:16px;background:var(--u-chip)}
-/* --- 大きな見出し（スマホ）：傾けたポスター＋大きな％、右上に黄色の丸 --- */
-.dhx{position:relative;display:block;margin:0 -16px;padding:12px 16px 2px;overflow:hidden}
-.dhx::before{content:"";position:absolute;right:-70px;top:-40px;width:230px;height:230px;border-radius:50%;background:var(--pop)}
-.dhrow{position:relative;z-index:1;display:flex;gap:16px;align-items:flex-end}
-.dhx .dtc{position:relative;z-index:1;margin-top:14px}
-.dhx h3{font-size:24px;line-height:1.3;margin:0}
+/* --- 大きな見出し（スマホ）：左に傾けたポスター（後ろに黄色の丸）、右にラベル・タイトル・配信と公式サイトのボタン --- */
+.dhx{position:relative;display:block;margin:0 -16px;padding:14px 16px 4px;background:radial-gradient(circle at 70px 96px,var(--pop) 84px,transparent 85px)}
+.dhrow{display:flex;gap:18px;align-items:flex-start}
+.dhx .dtc{display:flex;flex-direction:column;gap:8px;padding-top:2px}
+.dhx .dmeta{margin:0}
+.dhx .wnn{margin:0}
+.dhx h3{font-size:20px;line-height:1.35;margin:0}
 .dhx .dtimg{width:116px;margin:4px 0 0 4px;border:2px solid var(--k);border-radius:16px;box-shadow:5px 5px 0 var(--ks);transform:rotate(-3deg)}
 .dhx .dtimg.none{background:var(--u-surface)}
-.dhpct{flex:1;min-width:0;padding-bottom:4px}
-.dhpct b{display:block;font-family:var(--fn);font-weight:900;font-size:44px;line-height:1;color:var(--u-accent)}
-.dhpct b small{font-size:18px;margin-left:1px}
-.dhpct>span:not(.dhbar){display:block;font-size:var(--fs-xs);font-weight:800;margin-top:3px}
-.dhbar{display:block;height:10px;border-radius:6px;overflow:hidden;margin-top:8px;border:2px solid var(--k2);background:var(--u-surface)}
-.dhbar i{display:block;height:100%;background:var(--u-accent)}
-/* 配信・公式サイトのボタン */
-.dhx .dtbtns{margin-top:12px;gap:8px}
-.dhx .dtb.u-btn{height:46px;border-radius:14px;font-weight:900;border:2px solid var(--k);background:var(--u-surface);color:var(--u-ink)}
+/* 配信・公式サイトのボタン（縦に並べる） */
+.dhx .dtbtns{flex-direction:column;margin-top:2px;gap:8px}
+.dhx .dtb.u-btn{flex:none;height:40px;border-radius:14px;font-weight:900;border:2px solid var(--k);background:var(--u-surface);color:var(--u-ink)}
 .dhx .dtb.vod{background:var(--kbg);color:#fff;box-shadow:3px 3px 0 var(--u-accent)}
 .dhx .dtb.vod .iic.ply circle{fill:#fff}
 .dhx .dtb.vod .iic.ply path{fill:var(--kbg)}
+/* 上の段：前後・編集・✕だけ（右寄せ） */
+.dnavrow{justify-content:flex-end}
 @media (min-width:900px){
-  .dhpct{display:none!important}
-  .dhx{margin:0;padding:0;overflow:visible;min-height:0}
-  .dhx::before{display:none}
-  .dhx .dtc{margin-top:6px}
+  .dhx{margin:0;padding:0;background:none}
+  .dhx .dtc{gap:6px;padding-top:6px}
+  .dhx h3{font-size:24px}
   .dmain>.dtabs{margin:14px 0 0;padding-left:4px;padding-right:4px}
   .dmain>.dtabs::before{inset:8px 0}
   .dpimg,.dpimg.none{border:2px solid var(--k);box-shadow:5px 5px 0 var(--ks);border-radius:16px}
@@ -2207,12 +2189,6 @@ html[data-gsz="l"] .ygrid{grid-template-columns:repeat(auto-fill,minmax(240px,1f
 .dtabs button{position:relative;border:2px solid transparent;border-radius:12px;background:none;color:var(--u-sub);padding:6px 0;margin:0;font-weight:900}
 .sheet.t-info .dtabs [data-dtab="info"],.sheet.t-ep .dtabs [data-dtab="ep"]{background:var(--pop);color:var(--onpop);border-color:var(--k);box-shadow:2px 2px 0 var(--ks)}
 .dtabs small{font-family:var(--fn);font-weight:800;color:var(--u-accent)}
-/* --- 次に見る（スマホ・番組情報の一番上に1行） --- */
-.dnextl{display:flex;align-items:center;gap:8px;margin:12px 0;padding:7px 7px 7px 12px;border-radius:14px;background:var(--u-surface);border:2px solid var(--k)}
-.dnl-l{flex:none;font-size:10px;font-weight:900;line-height:1.5;color:var(--u-on);background:var(--u-accent);border-radius:6px;padding:1px 6px}
-.dnl-t{flex:1;min-width:0;border:0;background:none;padding:0;text-align:left;font:inherit;font-size:var(--fs-s);font-weight:700;color:var(--u-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
-.dnl-b.u-btn{flex:none;height:32px;padding:0 12px;border-radius:16px;font-size:var(--fs-s);font-weight:900;border:2px solid var(--k);background:var(--pop);color:var(--onpop)}
-@media (min-width:900px){.dnextl{display:none}}
 /* --- 番組情報のカード（ON AIR・MUSIC など） --- */
 .sheet .icard{background:var(--u-surface);border:2px solid var(--k);border-radius:18px}
 .sheet .ilamp{background:none;color:var(--u-accent);padding:0;font-family:var(--fn);border-radius:0;font-weight:900;font-size:12px;letter-spacing:.14em}

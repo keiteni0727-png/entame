@@ -23,16 +23,7 @@ const NAV_ACTIONS = [
     "[data-tb]",
     el => {
       state.wday = el.dataset.tb;
-      state.unOnly = false;
       go();
-    },
-  ],
-  [
-    "[data-unsw]",
-    () => {
-      state.unOnly = !state.unOnly;
-      saveUI();
-      render();
     },
   ],
   /* スマホの下メニュー・「その他」のタイル・上の「‹」 */

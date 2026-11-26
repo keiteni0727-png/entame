@@ -1221,7 +1221,6 @@ const state = Object.assign(
     grp: "cour",
     vod: "",
     slot: "",
-    unOnly: false,
     missOnly: false,
     missKey: "",
     fm: {},
@@ -1240,7 +1239,6 @@ if (!MODE_KEYS.includes(state.mode) && state.mode !== "o") state.mode = "w";
 if (!(SUBS[state.mode] || ["all"]).includes(state.sub)) state.sub = "all";
 if (typeof state.vod !== "string") state.vod = "";
 if (typeof state.slot !== "string") state.slot = "";
-state.unOnly = !!state.unOnly;
 if (state.view !== "grid") state.view = "list";
 state.missOnly = !!state.missOnly;
 if (typeof state.missKey !== "string") state.missKey = "";
@@ -1253,7 +1251,6 @@ const saveUI = () =>
     sub: state.sub,
     vod: state.vod,
     slot: state.slot,
-    unOnly: state.unOnly,
     missOnly: state.missOnly,
     missKey: state.missKey,
     sf: state.sf,

@@ -225,7 +225,7 @@ const spDay = i => {
 /* TV SP で話数を登録していない作品は、ステータスで見たかどうかを決める（放送後で視聴中なら「見た」ボタン） */
 const spUnseen = i => isSp(i) && !episodes(i).length && i.s === "視聴中" && spT(i) && spT(i) <= NOWMIN();
 function weekPool() {
-  return items.filter(i => ofKind(i) && i.s === "視聴中" && onAirNow(i) && (!state.unOnly || nextInfo(i).back.length));
+  return items.filter(i => ofKind(i) && i.s === "視聴中" && onAirNow(i));
 }
 /* 日ごとにまとめる：[{k:その日0時のms or "free", day:Date, list:[作品]}]（今日から順。曜日なしは最後に「その他」） */
 function weekGroups() {
@@ -256,14 +256,6 @@ function weekGroups() {
   if (free.length) g.push({ k: "free", day: null, list: free.sort((a, b) => a.t.localeCompare(b.t, "ja")) });
   return g;
 }
-/* 未視聴だけの表示中でも、曜日タブ・NEXT・ON AIR は全作品で決める */
-function weekGroupsAll() {
-  const keep = state.unOnly;
-  state.unOnly = false;
-  const g = weekGroups();
-  state.unOnly = keep;
-  return g;
-}
 const t0Today = () => {
   const n = new Date();
   return new Date(n.getFullYear(), n.getMonth(), n.getDate()).getTime();
@@ -276,29 +268,26 @@ const dayName = g => {
 /* スマホ：上の帯の曜日タブ（未視聴がある日は点） */
 function weekDayTabs() {
   if (!loaded) return [];
-  const g = weekGroupsAll();
+  const g = weekGroups();
   if (!g.length) return [];
   const cur = g.some(x => x.k === state.wday) ? state.wday : g[0].k;
   return g.map(x => {
     const lab = x.day ? DOW[(x.day.getDay() + 6) % 7] : "他";
     const sub = x.day ? (x.day.getTime() === t0Today() ? "今日" : `${x.day.getDate()}`) : "";
     const dot = x.list.some(i => nextInfo(i).back.length || spUnseen(i));
-    return [x.k, lab, null, !state.unOnly && x.k === cur, `<b>${lab}</b>${sub ? `<small>${sub}</small>` : ""}${dot ? '<i class="wdot" aria-label="未視聴あり"></i>' : ""}`];
+    return [x.k, lab, null, x.k === cur, `<b>${lab}</b>${sub ? `<small>${sub}</small>` : ""}${dot ? '<i class="wdot" aria-label="未視聴あり"></i>' : ""}`];
   });
 }
-/* 番組表の上：今の時刻と、未視聴のまとめ（押すと曜日に関係なく未視聴の作品だけを出す） */
+/* 番組表の上：今の時刻と、新作・続編のお知らせ */
 function weekTopHtml() {
   const d = new Date();
   const hm = `${d.getHours()}:${String(d.getMinutes()).padStart(2, "0")}`;
   const date = `${d.getMonth() + 1}月${d.getDate()}日（${"日月火水木金土"[d.getDay()]}）`;
-  const unI = items.filter(i => ofKind(i) && i.s === "視聴中" && onAirNow(i) && nextInfo(i).back.length);
-  const unE = unI.reduce((n, i) => n + nextInfo(i).back.length, 0);
-  return `<div class="wt-clock"><time datetime="${d.toISOString()}">${hm}</time><span>${date}</span></div>
-    <button type="button" class="wt-un${state.unOnly ? " on" : ""}" data-unsw aria-pressed="${state.unOnly}"${unI.length || state.unOnly ? "" : " disabled"}><span class="wt-l">未視聴</span><b>${unI.length}<small>作品</small> ${unE}<small>話</small></b><span class="wt-go">${state.unOnly ? "✕ 曜日に戻る" : unI.length ? "まとめて見る ›" : "なし"}</span></button>${typeof alNoteBtn === "function" ? alNoteBtn() : ""}`;
+  return `<div class="wt-clock"><time datetime="${d.toISOString()}">${hm}</time><span>${date}</span></div>${typeof alNoteBtn === "function" ? alNoteBtn() : ""}`;
 }
 /* カード1枚：時間（左の列）、ラベル（状態・ジャンル・配信サイト・放送局）、タイトル、その日の話、進み具合、視聴ボタン
    v＝"row"：スマホのタイムライン・PCの曜日の列の1件 ／ "hero"：放送中・次の放送を大きく（上に1枚） */
-function weekEp(i, dayKey, preferBack) {
+function weekEp(i, dayKey) {
   const eps = episodes(i);
   const { back, up } = nextInfo(i);
   return (
@@ -307,7 +296,8 @@ function weekEp(i, dayKey, preferBack) {
         const j = jst(x.t);
         return j && j.day === dayKey;
       })) ||
-    (preferBack ? back[0] || up : up || back[0])
+    up ||
+    back[0]
   );
 }
 /* 話の1行：「次回：7話「サブタイトル」」の形（放送中・未視聴・放送済も同じ形） */
@@ -321,13 +311,13 @@ function weekEpLine(i, e, onAir) {
   const pre = onAir ? "放送中" : !aired(e) ? "次回" : e.w ? "放送済" : "未視聴";
   return `<span class="wc-ep"><em class="p-${pre}">${pre}：</em>${esc(e.n)}${e.sub ? `「${esc(e.sub)}」` : ""}</span>`;
 }
-function weekCard(i, dayKey, isNext, onAir, preferBack) {
+function weekCard(i, dayKey, isNext, onAir) {
   const eps = episodes(i);
   const { back } = nextInfo(i);
   /* 進み具合は見ない話（配信にない総集編など）を除いて数える */
   const w = watchable(eps).filter(e => e.w).length,
     wn = watchable(eps).length;
-  const e = weekEp(i, dayKey, preferBack);
+  const e = weekEp(i, dayKey);
   const m = mediaOf(i);
   const st = i.dow < 0 ? "" : stationTxt(i);
   const fin = dayKey && isFinOn(i, dayKey);
@@ -365,14 +355,13 @@ function renderWeek() {
   /* 新作・続編のお知らせ：1日1回だけ AniList に確認（終わったら上の札を描き直す） */
   if (typeof alRefresh === "function" && isSynced()) setTimeout(() => alRefresh(), 0);
   const g = weekGroups();
-  const gAll = weekGroupsAll();
   const nowMs = Date.now();
   const startOf = (x, i) => x.day.getTime() + mins(i.time) * 60000;
   const hasT = i => mins(i.time) < 9999;
   /* 放送中（開始から放送の長さの間）は ON AIR、その次に始まる枠を NEXT（どちらも今日以降の枠でいちばん近いもの） */
   let liveIds = new Set(),
     nxId = null;
-  for (const x of gAll) {
+  for (const x of g) {
     if (!x.day) continue;
     for (const i of x.list) {
       if (!hasT(i)) continue;
@@ -384,34 +373,22 @@ function renderWeek() {
   }
   weekSig = g.map(x => x.k + ":" + x.list.map(i => i.id).join(",")).join("|") + "#" + [...liveIds].join(",") + "#" + nxId;
   const pc = IS_PC();
-  const card = (x, i, preferBack) => {
+  const card = (x, i) => {
     const key = i.id + "@" + x.k;
-    return weekCard(i, x.day && !preferBack ? dkey(x.day) : null, key === nxId, liveIds.has(key), preferBack);
+    return weekCard(i, x.day ? dkey(x.day) : null, key === nxId, liveIds.has(key));
   };
-  /* PC：左に1日のタイムライン、右に時計と未視聴。スマホ：上に時計と未視聴、その下に1日のタイムライン（どちらも曜日タブで1日ずつ） */
+  /* PC：左に1日のタイムライン、右に時計。スマホ：上に時計、その下に1日のタイムライン（どちらも曜日タブで1日ずつ） */
   const top = `<div class="wtop"><div class="wtop-side" id="clock">${weekTopHtml()}</div></div>`;
   const wrap = body => (pc ? `<div class="wpc"><div class="wpc-main">${body}</div><aside class="wpc-side">${top}</aside></div>` : top + body);
   if (!g.length) {
-    return wrap(
-      state.unOnly
-        ? `<p class="empty">未視聴の作品はありません。</p>`
-        : `<p class="empty">放送中の視聴中の作品はありません。アニメ・ドラマのライブラリで作品を開き「視聴中」にすると、放送期間中はここに曜日ごとに並びます。</p>`,
-    );
-  }
-  /* 未視聴だけ：曜日に関係なく1つにまとめる（未視聴の多い順） */
-  if (state.unOnly) {
-    const seen = new Set();
-    const l = [];
-    g.forEach(x => x.list.forEach(i => !seen.has(i.id) && (seen.add(i.id), l.push([x, i]))));
-    l.sort((a, b) => nextInfo(b[1]).back.length - nextInfo(a[1]).back.length);
-    return wrap(`<section class="wday"><div class="wdayhd"><h2>未視聴のある作品</h2><small>${l.length}本</small></div><div class="wline">${l.map(([x, i]) => card(x, i, true)).join("")}</div></section>`);
+    return wrap(`<p class="empty">放送中の視聴中の作品はありません。アニメ・ドラマのライブラリで作品を開き「視聴中」にすると、放送期間中はここに曜日ごとに並びます。</p>`);
   }
   const tabs = `<div class="wtabs" role="tablist" aria-label="曜日">${weekDayTabs()
     .map(([v, , , on, html]) => `<button type="button" role="tab" data-tb="${esc(v)}" aria-selected="${on}">${html}</button>`)
     .join("")}</div>`;
   const cur = g.find(x => x.k === state.wday) || g[0];
   return wrap(
-    `${tabs}<section class="wday"><div class="wdayhd"><h2>${dayName(cur)}</h2>${cur.day ? `<span>${cur.day.getMonth() + 1}/${cur.day.getDate()}（${DOW[(cur.day.getDay() + 6) % 7]}）</span>` : `<span>曜日が決まっていない作品</span>`}<small>${cur.list.length}本</small></div><div class="wline">${cur.list.map(i => card(cur, i, false)).join("")}</div></section>`,
+    `${tabs}<section class="wday"><div class="wdayhd"><h2>${dayName(cur)}</h2>${cur.day ? `<span>${cur.day.getMonth() + 1}/${cur.day.getDate()}（${DOW[(cur.day.getDay() + 6) % 7]}）</span>` : `<span>曜日が決まっていない作品</span>`}<small>${cur.list.length}本</small></div><div class="wline">${cur.list.map(i => card(cur, i)).join("")}</div></section>`,
   );
 }
 function filtered() {

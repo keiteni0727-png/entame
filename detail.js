@@ -47,15 +47,12 @@ function wnText(it, x) {
   return `<p>${esc(tx)}${go}${nb}</p>`;
 }
 /* PCの詳細の左の列：ポスター・進み具合・配信／公式サイトのボタン・次に見る話・要確認（スマホでは出さない。スマホはタイトルの左に小さく出す＝renderDetail の .dtimg） */
-function detailSide(it, { eps, w, nx, noEp }) {
+function detailSide(it, { eps, w, noEp }) {
   const wn = watchable(eps).length;
   const prog = eps.length && !noEp ? `<div class="dprog"><span class="dpn"><b>${w}</b> / ${wn}話</span><span class="dpbar"><i style="width:${Math.round((w / (wn || 1)) * 100)}%"></i></span></div>` : "";
   const vod = it.vurl ? `<a class="u-btn dpb vod" href="${esc(it.vurl)}" target="_blank" rel="noopener">${IC_PLAY}${esc(vodName(it))}で見る</a>` : "";
   const off = it.url ? `<a class="u-btn dpb" href="${esc(it.url)}" target="_blank" rel="noopener">公式サイト${IC_EXT}</a>` : "";
-  const nl = nx && (epVal(nx.n) ? epVal(nx.n) + "話" : nx.n);
-  const when = nx ? epWhen(nx, it) : "";
-  const next = nx && !noEp ? `<button type="button" class="dnext" data-dtab="ep"><small>次に見る</small><b>${esc(nl)}${nx.sub ? `<span>「${esc(nx.sub)}」</span>` : ""}</b>${when ? `<em class="inum">${esc(when)}</em>` : ""}</button>` : "";
-  return `<aside class="dside">${posterSlot(it)}${prog}${vod || off ? `<div class="dpbs">${vod}${off}</div>` : ""}${next}${chkHtml(it)}</aside>`;
+  return `<aside class="dside">${posterSlot(it)}${prog}${vod || off ? `<div class="dpbs">${vod}${off}</div>` : ""}${chkHtml(it)}</aside>`;
 }
 /* ---------- チェックリスト（PCの左の列・一時的な機能。設定で消せる） ----------
    1作品ずつ内容を確かめるためのチェックリスト。チェックは作品データの chk（項目キーの配列）に保存。
@@ -230,7 +227,6 @@ function renderDetail(it) {
     ns = noSched(md);
   const eps = episodes(it);
   const w = watchable(eps).filter(e => e.w).length;
-  const nx = eps[nextIdx(eps)];
   /* 映画・OVA・TV SPで話数が1話以下のときは話数タブを出さず、番組情報の下に目立たない「＋ 話数を追加」だけ置く */
   const noEp = ns && eps.length < 2 && !epEdit;
   /* 視聴ステータスはラベル1つ。押すと4つの選択肢が開く */
@@ -238,24 +234,16 @@ function renderDetail(it) {
   /* ステータスの要確認：ラベルの横に「!」、補足は上の段の下に出す */
   const stMs = upcoming(it) ? [] : missingOf(it).filter(x => x.k === "ステータス" || x.k === "ステータスのずれ");
   const epMs = missingOf(it).some(x => ["サブタイトル", "話数の表記", "話数の抜け", "話数の重複", "日付の確認", "未チェックの話"].includes(x.k));
-  /* スマホ：タイトルの下に配信・公式サイトのボタン（PCは左の列） */
+  /* スマホ：ポスターの右（タイトルの下）に配信・公式サイトのボタン（PCは左の列） */
   const lnk = [it.vurl ? `<a class="u-btn dtb vod" href="${esc(it.vurl)}" target="_blank" rel="noopener">${IC_PLAY}<span>${esc(vodName(it))}で見る</span></a>` : "", it.url ? `<a class="u-btn dtb" href="${esc(it.url)}" target="_blank" rel="noopener"><span>公式サイト</span>${IC_EXT}</a>` : ""].join("");
   const nv = navNeighbors(it.id),
     busy = !!(epEdit || arcEdit || slotEdit || subPaste || epOne != null);
   const navB = (d, lab, ic) => `<button type="button" class="u-btn icon sm dnav" data-dnav="${d}" aria-label="${lab}" title="${lab}${TOUCH ? "" : `（${d < 0 ? "←" : "→"}キー）`}" ${nv[d < 0 ? 0 : 1] && !busy ? "" : "disabled"}>${ic}</button>`;
-  /* 上の大きな見出し（スマホ）：進み具合の％。PCは左の列に出すので出さない */
-  const wn = watchable(eps).length;
-  const pct = Math.round((w / (wn || 1)) * 100);
-  const heroPct = eps.length && !noEp ? `<div class="dhpct"><b class="inum">${pct}<small>%</small></b><span>${w} / ${wn}話 見た</span><span class="dhbar"><i style="width:${pct}%"></i></span></div>` : "";
-  /* 次に見る話（スマホ）：番組情報の一番上に1行だけ。「見た」でその話にチェック。PCは左の列 */
-  const nxI = nextIdx(eps);
-  const nxl = nx && (epVal(nx.n) ? epVal(nx.n) + "話" : nx.n);
-  const nextLine = nx && !noEp && !nx.w ? `<div class="dnextl"><span class="dnl-l">次に見る</span><button type="button" class="dnl-t" data-dtab="ep"><b>${esc(nxl)}</b>${nx.sub ? `「${esc(nx.sub)}」` : ""}</button>${aired(nx) && !nx.na ? `<button type="button" class="u-btn sm dnl-b" data-ep="${nxI}" aria-label="${esc(nxl)}を見た">見た</button>` : ""}</div>` : "";
-  return `<div class="dgrid">${detailSide(it, { eps, w, nx, noEp })}<div class="dmain"><div class="dhead"><div class="hdrow"><div class="meta">${kindTag(it)}${(l => (l ? `<button type="button" class="dmt mtag m-${l[1]}" data-jump="fMedia" title="放送形態を変える">${l[0]}</button>` : ""))(mediaLabOf(it))}${stBtn}${stMs.length ? wnMark("st") : ""}</div><div class="hdrow">${navB(-1, "前の作品", CHEV(-1))}${navB(1, "次の作品", CHEV(1))}<button type="button" class="u-btn sm" id="editItem" aria-label="作品を編集">編集</button><button class="u-btn icon sm soft close" type="button" data-close aria-label="閉じる">✕</button></div></div>${stMs.length ? wnNote("st", stMs.map(x => wnText(it, x)).join("")) : ""}</div>
-    <div class="dtit dhx"><div class="dhrow">${it.img ? `<button type="button" class="dtimg" data-imgview="1" aria-label="画像を大きく表示">${imgTag(it, "l", "dtimgi")}</button>` : `<button type="button" class="dtimg none" data-imgadd="1" aria-label="画像を貼り付け">${IMG_ICON}</button>`}${heroPct}</div><div class="dtc"><h3>${esc(it.t)}<button type="button" class="tcopy" id="copyTitle" aria-label="タイトルをコピー" title="タイトルをコピー"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button></h3>
-    ${lnk ? `<div class="dtbtns">${lnk}</div>` : ""}</div></div>
+  return `<div class="dgrid">${detailSide(it, { eps, w, noEp })}<div class="dmain"><div class="dhead"><div class="hdrow dnavrow"><div class="hdrow">${navB(-1, "前の作品", CHEV(-1))}${navB(1, "次の作品", CHEV(1))}<button type="button" class="u-btn sm" id="editItem" aria-label="作品を編集">編集</button><button class="u-btn icon sm soft close" type="button" data-close aria-label="閉じる">✕</button></div></div></div>
+    <div class="dtit dhx"><div class="dhrow">${it.img ? `<button type="button" class="dtimg" data-imgview="1" aria-label="画像を大きく表示">${imgTag(it, "l", "dtimgi")}</button>` : `<button type="button" class="dtimg none" data-imgadd="1" aria-label="画像を貼り付け">${IMG_ICON}</button>`}<div class="dtc"><div class="meta dmeta">${kindTag(it)}${(l => (l ? `<button type="button" class="dmt mtag m-${l[1]}" data-jump="fMedia" title="放送形態を変える">${l[0]}</button>` : ""))(mediaLabOf(it))}${stBtn}${stMs.length ? wnMark("st") : ""}</div>${stMs.length ? wnNote("st", stMs.map(x => wnText(it, x)).join("")) : ""}<h3>${esc(it.t)}<button type="button" class="tcopy" id="copyTitle" aria-label="タイトルをコピー" title="タイトルをコピー"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button></h3>
+    ${lnk ? `<div class="dtbtns">${lnk}</div>` : ""}</div></div></div>
     ${noEp ? "" : `<div class="dtabs" role="tablist"><button type="button" role="tab" data-dtab="info">番組情報</button><button type="button" role="tab" data-dtab="ep">話数${eps.length ? ` <small>${w}/${watchable(eps).length}</small>` : ""}${epMs ? `<span class="wnt" aria-label="要確認あり">!</span>` : ""}</button></div>`}
-    <div class="dpane dp-info">${nextLine}${infoCards(it, { md, ns, mv, stv, cs, songRows })}
+    <div class="dpane dp-info">${infoCards(it, { md, ns, mv, stv, cs, songRows })}
     <div class="links">${typeof alChkOpen === "function" ? `<button type="button" class="u-chip add dlb" data-alcheck="1">${it.k === "a" ? "AniList" : "TMDB"}で確認</button>` : ""}${noEp ? `<button type="button" class="u-chip add dlb" id="epAddMv">＋ 話数を追加</button>` : ""}<button type="button" class="u-btn sm txt danger delsm" id="delItem">削除</button></div></div>
     <div class="dpane dp-ep"><h4><span class="h4l">話数</span>${eps.length && !epEdit ? `<span class="progrow"><span class="progn"><b>${w}</b> / ${watchable(eps).length}話</span><span class="prog"><i style="width:${Math.round((w / (watchable(eps).length || 1)) * 100)}%"></i></span></span>` : ""}${eps.length && it.k === "a" && !epEdit && !arcEdit && !slotEdit && !subPaste ? `<button type="button" class="u-btn sm hpaste" id="spOpen" aria-label="貼り付け" title="貼り付け">${PASTE_IC}</button>` : ""}${eps.length && !epEdit && !arcEdit && !slotEdit && !subPaste ? `<button type="button" class="u-btn sm iedit" id="epEditBtn">編集</button>` : ""}</h4>
     <div id="epArea">${subPaste ? subPasteHtml(it) : arcEdit ? arcEditHtml() : slotEdit ? slotEditHtml(it) : epEdit ? epEditorHtml(it) : epListHtml(it, eps)}</div></div></div></div>`;
