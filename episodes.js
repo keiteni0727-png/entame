@@ -39,7 +39,7 @@ function epWarn(it) {
   const subA = it.k === "a" && missingOf(it).some(x => x.k === "サブタイトル");
   const dc = epDateCheck(it);
   const gd = epGD(it, episodes(it));
-  return (e, i) => ({ n: !epVal(e.n) && !e.sp, s: subA && !(e.sub || "").trim(), d: dc.eps[i] || null, gap: gd.gap.get(i) || null, dup: gd.dup.has(i) });
+  return (e, i) => ({ n: !epVal(e.n) && !e.sp, s: subA && subMiss(e), d: dc.eps[i] || null, gap: gd.gap.get(i) || null, dup: gd.dup.has(i) });
 }
 const warnAny = x => x.n || x.s || x.d || x.gap || x.dup;
 function epListHtml(it, eps) {

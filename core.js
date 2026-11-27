@@ -1807,6 +1807,8 @@ async function migrateProg() {
   }
 }
 const aired = e => !e.t || e.t <= NOWMIN();
+/* サブタイトルの要確認：放送済みの話だけ（放送前・未放送の話はサブタイトル未定が多いので見ない） */
+const subMiss = e => !(e.sub || "").trim() && !e.na && aired(e);
 /* 見ない話（配信にない総集編など）：視聴チェックの対象にしない。done＝見た話か見ない話 */
 const done = e => e.w || e.x;
 const watchable = l => l.filter(e => !e.x);
@@ -1981,9 +1983,9 @@ const normVod = v => {
 const MISS_CHECKS = [
   { g: "基本情報", k: "ステータス", test: c => !c.i.s },
   { g: "話数", k: "話数", test: c => !c.ns && !c.eps.length },
-  /* アニメ：登録済みの話のうち、1話でもサブタイトルが空なら（「なし」にはできない。サブタイトル欄はアニメだけ）
+  /* アニメ：放送済みの話のうち、1話でもサブタイトルが空なら（「なし」にはできない。サブタイトル欄はアニメだけ）
      今クール・通年の作品はサブタイトル未定が多いので対象外 */
-  { g: "話数", k: "サブタイトル", test: c => c.i.k === "a" && !(c.ns && c.eps.length < 2) && !coursOf(c.i).some(x => x === ALLYEAR || x === nowCour()) && c.eps.some(e => !(e.sub || "").trim()) },
+  { g: "話数", k: "サブタイトル", test: c => c.i.k === "a" && !(c.ns && c.eps.length < 2) && !coursOf(c.i).some(x => x === ALLYEAR || x === nowCour()) && c.eps.some(subMiss) },
   { g: "話数", k: "話数の表記", test: c => c.eps.some(e => !epVal(e.n) && !e.sp) },
   { g: "話数", k: "日付の確認", test: c => epDateCheck(c.i).n > 0 },
   /* 話数の抜け（1・2・4話…）・重複（同じ話数が2つ）。数字の話数だけ見る（5.5話などは抜けに数えない） */
