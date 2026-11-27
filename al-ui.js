@@ -297,10 +297,13 @@ function alChkHtml() {
       ${same.length ? `<p class="alc-same">同じ：${same.map(r => esc(r.lab)).join("・")}</p>` : ""}`;
   }
   const n = alC.step === "cmp" ? alC.rows.filter(r => !r.same && !r.skip).length : 0;
+  /* つないでいる作品と違う作品を選んだときは、更新する項目がなくても「つなぎ直す」を押せるように */
+  const cur = it[S.idKey],
+    relink = alC.step === "cmp" && !!cur && String(cur) !== String(alC.m.id);
   return `<div class="scrim" data-alc="back"></div><div class="sheet alchk" role="dialog" aria-modal="true" aria-label="${N}で確認"><div class="wrap">
     <div class="hdrow"><h3><small>${esc(it.t)}</small>${N}で確認</h3><button class="u-btn icon sm soft close" type="button" data-alc="back" aria-label="戻る">✕</button></div>
     ${alC.err ? `<p class="alx-msg err">${esc(alC.err)}</p>` : ""}${body}
-    ${alC.step === "cmp" ? `<div class="ffoot"><button type="button" class="u-btn" data-alc="back">キャンセル</button><button type="button" class="u-btn pri primary" data-alc="apply"${n || !it[S.idKey] ? "" : " disabled"}>${n ? `${n}項目を更新する` : it[S.idKey] ? "更新なし" : "つなぐだけ"}</button></div>` : ""}</div></div>`;
+    ${alC.step === "cmp" ? `<div class="ffoot"><button type="button" class="u-btn" data-alc="back">キャンセル</button><button type="button" class="u-btn pri primary" data-alc="apply"${n || !cur || relink ? "" : " disabled"}>${n ? `${n}項目を更新する` : relink ? "つなぎ直す" : cur ? "更新なし" : "つなぐだけ"}</button></div>` : ""}</div></div>`;
 }
 const alChkDraw = () => alC && ($("#layer").innerHTML = alChkHtml());
 async function alChkOpen(id) {
@@ -397,7 +400,8 @@ async function alChkApply() {
     cover = on.has("img") ? v.cover : "";
   alC = null;
   close();
-  await saveTitle(id, patch, on.size ? `${S.name}から${on.size}項目を更新しました` : `${S.name}とつなぎました`);
+  const relink = !!it[S.idKey] && String(it[S.idKey]) !== String(patch[S.idKey]);
+  await saveTitle(id, patch, on.size ? `${S.name}から${on.size}項目を更新しました` : relink ? `${S.name}の作品をつなぎ直しました` : `${S.name}とつなぎました`);
   openDetail(id);
   if (cover) alSaveCover(id, cover);
 }
