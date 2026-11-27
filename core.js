@@ -1126,7 +1126,6 @@ const stLabel = s => String(s ?? "").replace(/視聴済み/g, "視聴済");
 const COLLAB_SUBS_DEF = ["TOP4", "最俺", "P-P"];
 const TV_STATIONS = ["フジテレビ", "日本テレビ", "テレビ朝日", "TBS", "テレビ東京", "TOKYO MX", "NHK", "BS", "その他"];
 /* よく見る3つ（Netflix・Disney＋・ABEMA）を先頭に固定 */
-const VOD_TOP = ["Netflix", "Disney＋", "ABEMA"];
 const VODS = [
   "Netflix",
   "Disney＋",
