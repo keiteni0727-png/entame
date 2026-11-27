@@ -717,7 +717,6 @@ input[type=date]::-webkit-date-and-time-value{text-align:left}
 @keyframes swr{from{opacity:.4;transform:translateX(-24px)}to{opacity:1;transform:none}}
 /* メニューのアイコン */
 /* ===== 番組表（新） ===== */
-.wtop{display:flex;gap:12px;align-items:stretch;padding-top:16px}
 
 .wcard.live{border:2px solid var(--u-live);box-shadow:0 0 0 4px color-mix(in srgb,var(--u-live) 14%,transparent)}
 
@@ -752,7 +751,6 @@ input[type=date]::-webkit-date-and-time-value{text-align:left}
 .xser span{flex:1;min-width:0}
 .xser .u-btn{flex:none}
 @media (max-width:899px){
-  .wtop{padding-top:10px;gap:8px}
   .wday{margin-top:12px}
   .wc-time{font-size:var(--fs-2xl)}
   .wc-ttl{font-size:var(--fs-xl)}
@@ -1035,7 +1033,6 @@ button.imt[aria-expanded="false"]+.imt,button.imt[aria-expanded="false"]+button.
 .idl .ilnk .ilar{font-size:var(--fs-l);line-height:1}
 
 /* ===================== 番組表 ===================== */
-.wtop-side{display:flex;gap:12px;align-items:stretch;min-width:0;flex:1}
 .wt-l{display:block;font-family:var(--u-num);font-size:var(--fs-xs);font-weight:700;letter-spacing:.1em;margin-bottom:2px;color:var(--u-live)}
 .wtabs button[aria-selected="true"]{background:var(--u-accent);color:var(--u-on);box-shadow:3px 3px 0 var(--ks)}
 .wtabs .wdot{position:absolute;top:6px;right:calc(50% - 22px);width:7px;height:7px;border-radius:50%;background:var(--u-live)}
@@ -1716,11 +1713,6 @@ select.sg-t{height:var(--h-in);width:auto;max-width:120px;cursor:pointer;-webkit
 .wline .v-tl:first-of-type .wc-line::before{top:14px}
 .wline{display:flex;flex-direction:column;margin-top:4px}
 @media (min-width:900px){
-  .wpc{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:28px;align-items:start;padding-top:16px}
-  .wpc-main .wtabs{margin-top:0}
-  .wpc-side{position:sticky;top:16px}
-  .wpc-side .wtop{padding-top:0}
-  .wpc-side .wtop-side{flex-direction:column;gap:14px}
   .wcard.v-tl{grid-template-columns:80px 20px 120px minmax(0,1fr);grid-template-areas:"time line img body";column-gap:16px;padding-bottom:34px!important}
   .v-tl .wc-line i{margin-top:13px;width:14px;height:14px;box-shadow:0 0 0 4px var(--u-bg)}
   .v-tl.nx .wc-line i{box-shadow:0 0 0 4px var(--u-accent2)}
@@ -1820,11 +1812,12 @@ html[data-gsz="s"] .pgrid{--gc:3}
 .alx-ok .alx-tx{flex:1}
 .alx-ok .alx-tx small{white-space:normal}
 .alx-ok .alx-tx b{color:var(--u-ok)}
-.wt-al{display:grid;justify-items:start;gap:1px;min-width:120px;background:var(--u-surface);border:1px solid color-mix(in srgb,var(--u-accent) 40%,var(--u-line));border-radius:var(--r-l);padding:8px 14px;font:inherit;color:var(--u-ink);text-align:left;cursor:pointer}
-.wt-al .wt-l{color:var(--u-accent);font-weight:700;font-size:var(--fs-s)}
-.wt-al b{font-family:var(--u-num);font-size:var(--fs-xl);font-weight:700;line-height:1.1}
+.wt-al{display:inline-flex;align-items:center;gap:6px;height:32px;box-sizing:border-box;padding:0 12px;border:2px solid var(--k);border-radius:999px;background:var(--u-surface);box-shadow:2px 2px 0 var(--ks);font:inherit;color:var(--u-ink);white-space:nowrap;cursor:pointer}
+.wt-al .wt-l{color:var(--u-ink);font-weight:900;font-size:12px}
+.wt-al b{display:inline-flex;align-items:baseline;gap:1px;font-family:var(--fn);font-size:15px;font-weight:900;line-height:1;color:var(--u-accent);white-space:nowrap}
+.wt-al b small{margin:0}
 .wt-al small{font-size:var(--fs-xs);color:var(--u-sub);margin:0 2px;font-weight:600}
-.wt-al .wt-go{font-size:var(--fs-s);color:var(--u-sub);font-weight:700}
+.wt-al .wt-go{font-size:12px;color:var(--u-sub);font-weight:900}
 .aln-note{margin:0 0 10px;font-size:var(--fs-s);color:var(--u-sub)}
 .aln-list{display:grid;gap:8px;padding-bottom:14px}
 .aln{display:flex;gap:12px;padding:10px;border:1px solid var(--u-line);border-radius:var(--r-m);background:var(--u-surface)}
@@ -1836,13 +1829,6 @@ html[data-gsz="s"] .pgrid{--gc:3}
 .aln-when,.aln-fmt{display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:var(--r-s);background:var(--u-chip);color:var(--u-sub);font:700 var(--fs-xs)/1 var(--u-f)}
 .aln-when.now{background:color-mix(in srgb,var(--u-live) 14%,transparent);color:var(--u-live)}
 .aln-btns{display:flex;gap:6px;margin-top:4px}
-/* スマホ：新作・続編のお知らせは見出しの下に1行で */
-@media (max-width:899px){
-  .wtop .wtop-side:has(.wt-al){flex-wrap:wrap}
-  .wt-al{flex-basis:100%;display:flex;align-items:center;gap:8px;padding:8px 14px}
-  .wt-al b{font-size:var(--fs-l)}
-  .wt-al .wt-go{margin-left:auto}
-}
 /* AniListで確認：今の値と AniList の値を並べる */
 .alchk h3 small{display:block;font-size:var(--fs-s);color:var(--u-sub);font-weight:600}
 .alchk .alx-row{margin-bottom:8px}
@@ -2034,10 +2020,11 @@ html[data-gsz="s"] .pgrid{--gc:3}
   .gtabs [aria-selected="true"] b{font-size:22px}
 }
 /* --- 番組表：上の見出し（小さな TONIGHT ＋大きな「今夜の番組表」） --- */
-.whd{padding-top:18px}
+.whd{display:flex;align-items:flex-end;gap:10px;padding-top:18px}
+.whd-t{flex:1;min-width:0}
+.whd-al{flex:none;margin-bottom:2px}
 .whd small{display:block;font-family:var(--fn);font-weight:900;font-size:12px;letter-spacing:.24em;color:var(--u-accent)}
 .whd h1{margin:2px 0 0;font-family:var(--fd);font-weight:400;font-size:28px;line-height:1.25}
-.wtop:has(.wtop-side:empty){display:none}
 /* カードの右上に斜めに貼ったシール（ON AIR・NEXT・見た） */
 .wc-seal{position:absolute;z-index:2;top:-16px;right:-12px;transform:rotate(7deg);padding:2px 9px;border:2px solid var(--k);border-radius:8px;box-shadow:2px 2px 0 var(--ks);font-family:var(--fn);font-weight:900;font-size:11px;letter-spacing:.08em;line-height:1.4;white-space:nowrap;pointer-events:none}
 .wc-seal.live{background:var(--u-live);color:#fff}
@@ -2052,32 +2039,12 @@ html[data-gsz="s"] .pgrid{--gc:3}
   .whd h1{font-size:40px}
   .wnow{margin-bottom:24px}
 }
-/* PC：NEXT UP（次に始まる作品を大きなポスターで） */
-.nup{position:relative;margin-bottom:16px;padding:16px;border:2px solid var(--k);border-radius:18px;background:var(--u-surface);box-shadow:4px 4px 0 var(--ks)}
-.nup-h{font-family:var(--fn);font-weight:900;font-size:12px;letter-spacing:.2em;color:var(--u-accent);margin-bottom:12px}
-.nup-img{position:relative;display:block;width:150px;aspect-ratio:2/3;margin:0 auto 14px;padding:0;border:2px solid var(--k);border-radius:14px;box-shadow:4px 4px 0 var(--ks);overflow:hidden;background:var(--u-soft);transform:rotate(-2deg);cursor:pointer}
-.nup-imgi{display:block;width:100%;height:100%;object-fit:cover}
-.nup-imgi:not([src]){visibility:hidden}
-.nup-in{font-family:var(--fn);font-weight:900;font-size:22px;color:var(--u-accent);line-height:1.2}
-.nup-t{display:block;margin:4px 0 0;padding:0;border:0;background:none;text-align:left;font-family:var(--fd);font-weight:400;font-size:18px;line-height:1.35;color:var(--u-ink);cursor:pointer}
-.nup-ep{margin-top:4px;font-size:var(--fs-m);color:var(--u-sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.nup-btns{display:flex;flex-direction:column;gap:8px;margin-top:12px}
-.nup-btns:empty{display:none}
-.nup-btns .u-btn{height:42px;justify-content:center;gap:6px;border-radius:14px;font-weight:900;text-decoration:none;border:2px solid var(--k)}
-.nup-vod{background:var(--kbg);color:#fff;box-shadow:3px 3px 0 var(--u-accent)}
-.nup-vod .iic{width:15px;height:15px}
-.nup-vod .iic.ply circle{fill:#fff}
-.nup-vod .iic.ply path{fill:var(--kbg)}
-.nup-tick{background:var(--pop);color:var(--onpop);box-shadow:2px 2px 0 var(--ks)}
 /* --- PC：作品・YouTubeの詳細は右に開いたままのパネル（幅470px・左に太枠の境目）。一覧は暗くせず、そのまま操作できる --- */
 @media (min-width:900px){
   #layer .sheet.dpanel{top:0;bottom:0;left:auto;right:0;width:var(--pw);max-width:none;max-height:none;transform:none;border-radius:0;border-left:3px solid var(--k);box-shadow:none}
   #layer .sheet.dpanel .wrap{flex:1 1 auto;width:100%;min-width:0;max-width:none;padding-left:16px;padding-right:16px}
   #layer:has(.sheet.dpanel) .scrim{display:none}
   body:has(#layer .sheet.dpanel){padding-right:calc(var(--pw) * var(--z))}
-  /* パネルを開いている間：番組表の NEXT UP はパネルと入れかえ、一覧のグリッドは狭い画面なら3列 */
-  body:has(#layer .sheet.dpanel) .wpc{grid-template-columns:minmax(0,1fr)}
-  body:has(#layer .sheet.dpanel) .wpc-side{display:none}
 }
 /* --- YouTubeの詳細の見出し：上に少し傾けた横長の画像（太枠＋影）、その下にラベル・タイトル・YouTubeで見る／まとめ動画 --- */
 .yhx .yimg{display:block;width:calc(100% - 8px);aspect-ratio:16/9;margin:6px 0 16px 4px;padding:0;border:2px solid var(--k);border-radius:16px;box-shadow:5px 5px 0 var(--ks);overflow:hidden;background:var(--u-soft);transform:rotate(-1.5deg);cursor:zoom-in}

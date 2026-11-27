@@ -130,7 +130,6 @@ setInterval(() => {
   if (c) c.innerHTML = weekTopHtml();
   const nt = $("#wnowT");
   if (nt) nt.textContent = hmNow();
-  document.querySelectorAll("[data-until]").forEach(el => (el.textContent = untilTxt(+el.dataset.until)));
   /* 放送が終わった番組を翌週へ移すため、並びが変わるときだけ描き直す */
   if (c && state.mode === "w" && !$("#layer").innerHTML) {
     const old = weekSig;
@@ -301,11 +300,6 @@ function weekDayTabs(g) {
 /* 番組表の札：新作・続編のお知らせ */
 const weekTopHtml = () => (typeof alNoteBtn === "function" ? alNoteBtn() : "");
 const hmNow = () => (d => `${d.getHours()}:${String(d.getMinutes()).padStart(2, "0")}`)(new Date());
-/* 放送までの残り時間（「あと1時間49分」） */
-const untilTxt = ms => {
-  const m = Math.max(0, Math.ceil((ms - Date.now()) / 60000));
-  return m >= 1440 ? `あと${Math.floor(m / 1440)}日` : m >= 60 ? `あと${Math.floor(m / 60)}時間${m % 60 ? (m % 60) + "分" : ""}` : `あと${m}分`;
-};
 /* カード1枚：時間（左の列）、ラベル（状態・ジャンル・配信サイト・放送局）、タイトル、その日の話、進み具合、視聴ボタン
    v＝"row"：スマホのタイムライン・PCの曜日の列の1件 ／ "hero"：放送中・次の放送を大きく（上に1枚） */
 function weekEp(i, dayKey) {
@@ -387,7 +381,6 @@ function renderWeek() {
     }
     if (nxId) break;
   }
-  const pc = IS_PC();
   const card = (x, i) => {
     const key = i.id + "@" + x.k;
     return weekCard(i, x.day ? dkey(x.day) : null, key === nxId, liveIds.has(key));
@@ -397,10 +390,9 @@ function renderWeek() {
   const isToday = cur.day && cur.k === String(t0Today());
   const nowAt = isToday ? (k => (k < 0 ? cur.list.length : k))(cur.list.findIndex(i => hasT(i) && startOf(cur, i) > nowMs)) : -1;
   weekSig = g.map(x => x.k + ":" + x.list.map(i => i.id).join(",")).join("|") + "#" + [...liveIds].join(",") + "#" + nxId + "#" + nowAt;
-  const head = `<div class="whd"><small>TONIGHT</small><h1>今夜の番組表</h1></div>`;
-  const top = `<div class="wtop"><div class="wtop-side" id="clock">${weekTopHtml()}</div></div>`;
-  /* PC：左に1日のタイムライン、右に NEXT UP（次に始まる作品）と札。スマホ：見出しと札の下に1日のタイムライン */
-  const wrap = body => head + (pc ? `<div class="wpc"><div class="wpc-main">${body}</div><aside class="wpc-side">${nextUpHtml(g, nxId, startOf)}${top}</aside></div>` : top + body);
+  /* 見出し（TONIGHT・今夜の番組表）の行の右端に、新作・続編のお知らせの札。その下に1日のタイムライン（PC・スマホ共通） */
+  const head = `<div class="whd"><div class="whd-t"><small>TONIGHT</small><h1>今夜の番組表</h1></div><span class="whd-al" id="clock">${weekTopHtml()}</span></div>`;
+  const wrap = body => head + body;
   if (!g.some(x => x.list.length)) {
     return wrap(`<p class="empty">放送中の視聴中の作品はありません。アニメ・ドラマのライブラリで作品を開き「視聴中」にすると、放送期間中はここに曜日ごとに並びます。</p>`);
   }
@@ -413,22 +405,6 @@ function renderWeek() {
   return wrap(
     `${tabs}<section class="wday"><div class="wdayhd"><h2>${dayName(cur)}</h2>${cur.day ? `<span>${cur.day.getMonth() + 1}/${cur.day.getDate()}（${DOW[(cur.day.getDay() + 6) % 7]}）</span>` : `<span>曜日が決まっていない作品</span>`}<small>${cur.list.length}本</small></div>${cur.list.length ? `<div class="wline">${rows.join("")}</div>` : `<p class="empty">この日の放送はありません</p>`}</section>`,
   );
-}
-/* PC：NEXT UP。次に始まる作品を大きなポスターで（残り時間・タイトル・話・配信で見る・○話を見た） */
-function nextUpHtml(g, nxId, startOf) {
-  if (!nxId) return "";
-  const [id, k] = nxId.split("@");
-  const x = g.find(y => y.k === k),
-    i = x && x.list.find(y => y.id === id);
-  if (!i) return "";
-  const at = startOf(x, i);
-  const e = weekEp(i, dkey(x.day));
-  const back = nextInfo(i).back[0];
-  const bl = back && (epVal(back.n) ? epVal(back.n) + "話" : back.n);
-  const img = posterTag(i, "l", "nup-imgi") || `<span class="wc-noimg">${IMG_ICON}</span>`;
-  return `<section class="nup"><div class="nup-h">NEXT UP</div><button type="button" class="nup-img" data-id="${i.id}" aria-label="${esc(i.t)}を開く">${img}</button>
-    <div class="nup-in" data-until="${at}">${untilTxt(at)}</div><button type="button" class="nup-t" data-id="${i.id}">${esc(i.t)}</button>${e ? `<div class="nup-ep">${esc(e.n)}${e.sub ? `「${esc(e.sub)}」` : ""}</div>` : ""}
-    <div class="nup-btns">${i.vurl ? `<a class="u-btn nup-vod" href="${esc(i.vurl)}" target="_blank" rel="noopener">${IC_PLAY}<span>${esc(vodName(i))}で見る</span></a>` : ""}${back ? `<button type="button" class="u-btn nup-tick" data-tick="${i.id}" aria-label="${esc(i.t)} ${esc(bl)}を視聴済にする">${esc(bl)}を見た</button>` : ""}</div></section>`;
 }
 function filtered() {
   let list = items.filter(i => ofKind(i) && vodOk(i) && slotOk(i) && typeOk(i) && courOk(i) && seriesOk(i) && sfOk(i) && eraOk(i) && missOk(i));
