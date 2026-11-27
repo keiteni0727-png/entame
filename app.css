@@ -1761,9 +1761,11 @@ html[data-gsz="s"] .pgrid{--gc:3}
 .pimgi:not([src]){visibility:hidden}
 .pttl{font-family:var(--fd);font-weight:400;font-size:13px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
 .pseal{position:absolute;z-index:1;left:-6px;top:10px;transform:rotate(-8deg);padding:2px 8px;border:2px solid var(--k);border-radius:8px;box-shadow:2px 2px 0 var(--ks);font-size:11px;font-weight:900;line-height:1.4;white-space:nowrap;pointer-events:none;color:var(--onpop);background:#fff}
-.pseal.s-視聴中{background:var(--pop)}
-.pseal.s-視聴済み{background:var(--seen)}
-.pseal.s-見ない{background:#c9c2b8}
+/* 色は一覧の行・詳細のステータスと同じ（--st-*） */
+.pseal.s-未視聴{background:var(--st-want);color:#fff}
+.pseal.s-視聴中{background:var(--st-now);color:#fff}
+.pseal.s-視聴済み{background:var(--st-done);color:#fff}
+.pseal.s-見ない{background:var(--st-drop);color:#fff}
 .pprog{display:flex;align-items:center;gap:6px;margin-top:-2px}
 .pbar{flex:1;min-width:0;height:8px;border:1.5px solid var(--k2);border-radius:5px;background:var(--u-surface);overflow:hidden}
 .pbar i{display:block;height:100%;background:var(--u-accent)}
