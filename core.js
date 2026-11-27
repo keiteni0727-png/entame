@@ -1116,9 +1116,8 @@ U.pick = (() => {
    ファイルの読み込み順：core → view → filters → paste → detail → episodes → epaste → dropdown → form → settings → yt → yt-detail → lists → anilist → al-ui → events → helpers → boot（最後に起動） */
 
 const DOW = ["月", "火", "水", "木", "金", "土", "日"];
-/* 左メニュー */
+/* 画面の名前（メニューは view.js の NAV_OF でまとめて見せる） */
 const MODE_NAME = { w: "番組表", a: "アニメ", d: "ドラマ", m: "映画", s: "バラエティ", yt: "YouTube", sr: "シリーズ", mu: "主題歌" };
-/* o＝スマホの下メニュー「その他」（映画・バラエティ・YouTube・シリーズ・主題歌のタイル）。左メニューには出さない */
 const MODE_KEYS = Object.keys(MODE_NAME);
 const STATUSES = ["未視聴", "視聴中", "視聴済み", "見ない"];
 /* 表示の言い回し：保存データの値は「視聴済み」のまま、画面では「視聴済」と出す */

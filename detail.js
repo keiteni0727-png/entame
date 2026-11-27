@@ -62,7 +62,6 @@ function infoCards(it, { md, ns, mv, stv, cs, songRows }) {
   const eps = episodes(it);
   const un = t => `<span class="unset">${t}</span>`;
   const nn = t => `<span class="nosong">${t}</span>`;
-  const when = [it.dow >= 0 ? DOW[it.dow] + "曜 " : "", it.time || ""].join("").trim();
   const per = periodOf(it);
   const cour = cs.map(courLabel).join("・");
   /* ON AIR：「項目名　内容」を1行ずつ */

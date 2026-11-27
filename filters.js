@@ -640,61 +640,6 @@ function fshFocusQ(sel) {
   i.setSelectionRange(i.value.length, i.value.length);
 }
 
-/* ---------- スマホ：シートを下にスワイプして閉じる（並び順・保存フィルタのシートも） ---------- */
-(() => {
-  let d = null;
-  const sheetOf = t => t.closest && t.closest(".fsh,.fsdrop.fpop");
-  const scrollerTop = (t, sh) => {
-    for (let e = t; e && e !== sh.parentNode; e = e.parentNode) if (e.scrollHeight > e.clientHeight + 2 && getComputedStyle(e).overflowY !== "visible" && e.scrollTop > 0) return false;
-    return true;
-  };
-  document.addEventListener(
-    "touchstart",
-    e => {
-      d = null;
-      /* 絞り込み・並び替え・保存フィルタはボタンの下に出す形になったので、下スワイプで閉じる動きは使わない */
-      if (true || IS_PC() || e.touches.length !== 1) return;
-      const sh = sheetOf(e.target);
-      if (!sh || e.target.closest("input,textarea,.serbox,.mkeys")) return;
-      d = { sh, y: e.touches[0].clientY, x: e.touches[0].clientX, dy: 0, top: scrollerTop(e.target, sh), go: false };
-    },
-    { passive: true },
-  );
-  document.addEventListener(
-    "touchmove",
-    e => {
-      if (!d) return;
-      const dy = e.touches[0].clientY - d.y,
-        dx = e.touches[0].clientX - d.x;
-      if (!d.go) {
-        if (!d.top || dy < 8 || Math.abs(dx) > Math.abs(dy)) {
-          if (Math.abs(dy) > 8 || Math.abs(dx) > 8) d = null;
-          return;
-        }
-        d.go = true;
-        d.sh.style.transition = "none";
-      }
-      d.dy = Math.max(0, dy);
-      d.sh.style.transform = `translateY(${d.dy}px)`;
-      e.preventDefault();
-    },
-    { passive: false },
-  );
-  document.addEventListener("touchend", () => {
-    if (!d || !d.go) return (d = null);
-    const { sh, dy } = d;
-    d = null;
-    sh.style.transition = "transform .18s ease-out";
-    if (dy > Math.min(120, sh.offsetHeight * 0.25)) {
-      sh.style.transform = "translateY(100%)";
-      setTimeout(() => {
-        const x = document.querySelector(sh.classList.contains("fsh") ? ".fsh-x" : ".fpop-scrim");
-        if (x) x.click();
-      }, 150);
-    } else sh.style.transform = "";
-  });
-})();
-
 /* ---------- 並び替え：① 分け方 → ② その中の順番 の2段（全メニュー共通） ---------- */
 const sortSteps = steps =>
   steps
