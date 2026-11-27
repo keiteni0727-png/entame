@@ -340,9 +340,10 @@ async function alChkLoad(alId) {
   }
   alChkDraw();
 }
-async function alChkSearch() {
-  const q = ($("#alCQ")?.value || "").trim();
-  if (!q) return;
+/* q を渡したときはそれで探す（「違う作品」から開いたときは、まだ検索欄が画面にないため） */
+async function alChkSearch(q0) {
+  const q = (q0 ?? $("#alCQ")?.value ?? "").trim();
+  if (!q) return alChkDraw();
   const S = SRC[alC.src];
   Object.assign(alC, { q, step: "busy", msg: `${S.name}で探しています…`, err: "" });
   alChkDraw();
@@ -412,8 +413,9 @@ const AL_CHK_ACTIONS = [
   [
     '[data-alc="other"]',
     () => {
+      const it = items.find(x => x.id === alC.id);
       Object.assign(alC, { step: "pick", res: null, err: "" });
-      alChkSearch();
+      alChkSearch(alC.q || (it && it.t) || "");
     },
   ],
   ['[data-alc="apply"]', () => alChkApply()],
