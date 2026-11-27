@@ -94,7 +94,10 @@
     const later = seasonNo(sn) < (x.number_of_seasons || 0);
     const allAired = !!last && last <= today && (!eps || aired.length === eps.length);
     /* 話の一覧がないとき（検索結果）は、後のシーズンがある・番組が終わっていれば放送済み */
-    const done = eps ? allAired : later || STATUS[x.status] === "FINISHED";
+    /* 最後のシーズンで、最後の放送（わからなければ開始）から半年以上たっていれば放送済み（次のシーズンを待っている番組） */
+    const ref = last || sn.air_date || "";
+    const old = !!ref && Date.parse(today) - Date.parse(ref) > 183 * 86400e3;
+    const done = eps ? allAired : later || STATUS[x.status] === "FINISHED" || old;
     const status = !sn.air_date || sn.air_date > today ? "NOT_YET_RELEASED" : done ? "FINISHED" : "RELEASING";
     const poster = sn.poster_path || x.poster_path;
     return {

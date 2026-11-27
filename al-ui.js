@@ -352,10 +352,10 @@ function alChkBack() {
   $("#alLayer")?.replaceChildren();
   if (id && (openId !== id || !$("#layer .sheet"))) openDetail(id);
 }
-async function alChkOpen(id) {
+async function alChkOpen(id, src) {
   const it = items.find(x => x.id === id);
   if (!it) return;
-  const S = SRC[alSrcOf(it)];
+  const S = SRC[src || alSrcOf(it)];
   alC = { id, step: "busy", q: it.t, src: S.idKey };
   alChkDraw();
   if (it[S.idKey]) return alChkLoad(it[S.idKey]);
@@ -457,7 +457,8 @@ async function alChkApply() {
   if (cover) alSaveCover(id, cover);
 }
 const AL_CHK_ACTIONS = [
-  ["[data-alcheck]", (el, ctx) => alChkOpen(openId)],
+  /* data-alcheck="al"：AniList で開く（SERIES の「AniListで確認」。TMDB とつないだアニメでも AniList） */
+  ["[data-alcheck]", el => alChkOpen(openId, el.dataset.alcheck === "al" ? "al" : "")],
   ["[data-alcpick]", el => alChkLoad(alPid(el.dataset.alcpick))],
   ['[data-alc="search"]', () => alChkSearch()],
   [
@@ -659,7 +660,7 @@ function seriesCardHtml(it) {
   }</div>`;
   let body;
   if (!serRelOpen) body = "";
-  else if (!it.al) body = `<p class="sermsg">AniListとまだつながっていません<button type="button" class="serbtn" data-alcheck="1">AniListで確認</button></p>`;
+  else if (!it.al) body = `<p class="sermsg">AniListとまだつながっていません<button type="button" class="serbtn" data-alcheck="al">AniListで確認</button></p>`;
   else {
     const r = alRelCache.get(it.al);
     if (!r) alRelLoad(it.al);

@@ -24,6 +24,8 @@ document.addEventListener("keydown", e => {
   if ((e.key !== "ArrowLeft" && e.key !== "ArrowRight") || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
   const yt = ytOpen && $("#layer .sheet:not(.form) #ytIn");
   if (!yt && (!openId || !$("#layer .sheet:not(.form) #sheetIn") || subAsk)) return;
+  /* AniList・TMDBの確認画面を重ねているときは、後ろの詳細を切り替えない */
+  if (typeof alC !== "undefined" && alC) return;
   const t = e.target;
   if (t && t.closest && t.closest("input,textarea,select,[contenteditable]")) return;
   e.preventDefault();
