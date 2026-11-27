@@ -516,11 +516,12 @@ function fSubBody(k) {
   if (k === "miss") {
     const keep = [state.missOnly, state.missKey];
     state.missOnly = false;
-    const mBase = filtered().map(missingOf);
+    const mBase = filtered().map(i => missingOf(i, true));
     [state.missOnly, state.missKey] = keep;
     const cnt = {};
     mBase.forEach(l => l.forEach(x => (cnt[x.k] = (cnt[x.k] || 0) + 1)));
-    return missPanel("data-fmiss", state.missOnly, state.missKey, cnt, mBase.filter(l => l.length).length, MISS_GROUPS);
+    const fo = new Set(MISS_CHECKS.filter(x => x.fo).map(x => x.k));
+    return missPanel("data-fmiss", state.missOnly, state.missKey, cnt, mBase.filter(l => l.some(x => !fo.has(x.k))).length, MISS_GROUPS);
   }
   return "";
 }

@@ -2009,6 +2009,8 @@ const MISS_CHECKS = [
   { g: "基本情報", k: "配信URL", j: "f-vurl", n: "vurl", test: c => !(c.i.vurl || "").trim() && !nofHas(c.i, c.md === "stream" ? "plat" : "vods") },
   /* 配信URLのサイトが、作品の配信サイトに入っていない（URLからサイトが分かるときだけ） */
   { g: "ずれ", k: "配信URLのずれ", j: "f-vurl", test: c => { const us = vurlSite(c.i.vurl); return !!us && ![...c.m.plat, ...c.m.vods].some(v => normVod(v) === us); } },
+  /* fo＝絞り込みだけ（一覧のバッジ・詳細のアラートには出さない） */
+  { g: "基本情報", k: "画像", fo: 1, test: c => !c.i.img },
 ];
 /* 判定の材料：話数リストなどを作品ごとに1回だけ作る */
 function missCtx(i) {
@@ -2028,14 +2030,14 @@ function missCtx(i) {
     ta: sl.filter(x => (x.s || "").trim()).map(x => ({ st: songTA(x).st.trim(), ar: songTA(x).ar.trim() })),
   };
 }
-/* 作品の要確認の項目：[{k, j, n, ns}] */
-function missingOf(i) {
+/* 作品の要確認の項目：[{k, j, n, ns}]。all＝絞り込み用（絞り込みだけの項目も入れる） */
+function missingOf(i, all) {
   if (upcoming(i)) return [];
   const c = missCtx(i),
     nf = i.noF || [];
   const out = [];
   MISS_CHECKS.forEach(x => {
-    if (x.n && nf.includes(x.n)) return;
+    if ((x.n && nf.includes(x.n)) || (x.fo && !all)) return;
     const r = x.test(c);
     if (r) out.push({ k: typeof r === "string" ? r : x.k, j: x.j || "", n: x.n || "", ...(x.ns ? { ns: 1 } : {}) });
   });
@@ -2060,8 +2062,8 @@ function missBadge(i) {
 }
 function missOk(i) {
   if (!state.missOnly) return true;
-  const l = missingOf(i);
-  return state.missKey ? l.some(x => x.k === state.missKey) : l.length > 0;
+  /* 「全項目」は絞り込みだけの項目（画像）を数えない。項目を選んだときだけ入れる */
+  return state.missKey ? missingOf(i, true).some(x => x.k === state.missKey) : missingOf(i).length > 0;
 }
 /* 話数は数字だけ（5.5 など小数も可）。「1話」「第1話」「1」「第一話」「第一幕」は数字の話数（漢数字・「第◯」の後ろの単位も可。EP_NUM・EP_NOT・kanjiNum は paste.js）。
    それ以外（OVA・総集編など）は名前の話（sp）。話数の欄に名前を入れると sp になる（parseEpIn）。sp でない古い書き方の話数は表記アラートの対象 */

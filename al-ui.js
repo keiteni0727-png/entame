@@ -116,22 +116,31 @@ const SRC = {
   tm: { name: "TMDB", api: () => TM, toForm: m => tmToForm(m), idKey: "tm", err: TM_ERR, ph: "TMDBで作品を検索（例：アンナチュラル）" },
 };
 const srcOfK = k => (k === "a" ? "al" : "tm");
+/* 登録済みの作品の確認先：アニメは AniList。AniList とつないでおらず TMDB とつないでいるアニメは TMDB */
+const alSrcOf = it => (it.k === "a" && !it.al && it.tm ? "tm" : srcOfK(it.k));
+/* アニメだけ、AniList ⇔ TMDB を切り替えられる（AniList にない作品用） */
+const SWAP = { al: "tm", tm: "al" };
 const srcErr = (e, S) => (e && e.noKey ? e.message || TM_NOKEY : S.err);
 /* 検索結果の番号：AniList は数字、TMDB は「tv:123」 */
 const alPid = v => (/^\d+$/.test(v) ? +v : v);
 
 /* ---------- 作品の追加画面：AniList から探す ---------- */
-let alS = { q: "", busy: "", res: null, err: "", got: null };
-const alReset = () => (alS = { q: "", busy: "", res: null, err: "", got: null });
+let alS = { q: "", busy: "", res: null, err: "", got: null, src: "" };
+const alReset = () => (alS = { q: "", busy: "", res: null, err: "", got: null, src: "" });
+/* 追加画面で探す先（アニメは切り替えたときだけ TMDB） */
+const alFormSrc = () => (form.k === "a" && alS.src ? alS.src : srcOfK(form.k));
+/* アニメの検索結果の下：「TMDBで探す」／「AniListで探す」 */
+const alSwapBtn = (cur, attr, verb) => `<button type="button" class="u-btn sm" ${attr}>${SRC[SWAP[cur]].name}で${verb}</button>`;
 function alBoxHtml() {
   if (!form || form.id || form.only) return "";
-  const S = SRC[srcOfK(form.k)];
+  const S = SRC[alFormSrc()];
   const g = alS.got;
   if (g)
     return `<div class="alx done" id="alBox"><div class="alx-ok"><span class="alx-im">${g.cover ? `<img src="${esc(g.cover)}" alt="">` : ""}</span><span class="alx-tx"><b>${S.name}から入力しました</b><small>${esc(g.sum)}</small><small>違うところは下で直せます${form.al?.cover ? "。画像は「追加する」で一緒に保存します" : ""}</small></span><button type="button" class="u-btn sm txt" data-alclear>やめる</button></div></div>`;
-  if (S.idKey === "tm" && !TM.hasKey()) return `<div class="alx" id="alBox"><p class="alx-msg">${TM_NOKEY}</p></div>`;
+  const swap = form.k === "a" ? `<div class="alx-swap">${alSwapBtn(S.idKey, "data-alswap", "探す")}</div>` : "";
+  if (S.idKey === "tm" && !TM.hasKey()) return `<div class="alx" id="alBox"><p class="alx-msg">${TM_NOKEY}</p>${swap}</div>`;
   return `<div class="alx" id="alBox"><div class="alx-row"><input id="alQ" class="u-input" type="search" enterkeyhint="search" autocomplete="off" placeholder="${S.ph}" value="${esc(alS.q)}"><button type="button" class="u-btn sm pri" data-alsearch>${alS.busy === "q" ? "検索中…" : "検索"}</button></div>
-    ${alS.busy === "p" ? `<p class="alx-msg">作品の情報を取得しています…</p>` : ""}${alS.err ? `<p class="alx-msg err">${esc(alS.err)}</p>` : ""}${alS.busy || !alS.res ? "" : alResHtml(alS.res, "data-alpick")}</div>`;
+    ${alS.busy === "p" ? `<p class="alx-msg">作品の情報を取得しています…</p>` : ""}${alS.err ? `<p class="alx-msg err">${esc(alS.err)}</p>` : ""}${alS.busy || !alS.res ? "" : alResHtml(alS.res, "data-alpick")}${alS.busy ? "" : swap}</div>`;
 }
 function alRedrawBox() {
   const b = $("#alBox");
@@ -146,7 +155,7 @@ async function alSearch() {
   readForm();
   Object.assign(alS, { q, busy: "q", err: "", res: null });
   alRedrawBox();
-  const S = SRC[srcOfK(form.k)];
+  const S = SRC[alFormSrc()];
   try {
     alS.res = await S.api().search(q);
   } catch (e) {
@@ -161,7 +170,7 @@ async function alPick(id, extra = {}) {
   if (form) readForm();
   Object.assign(alS, { busy: "p", err: "" });
   alRedrawBox();
-  const S = SRC[srcOfK(form.k)];
+  const S = SRC[alFormSrc()];
   try {
     const m = await S.api().detail(id);
     if (!form) return;
@@ -200,6 +209,17 @@ const AL_FORM_ACTIONS = [
   ["[data-alsearch]", () => alSearch()],
   ["[data-alpick]", el => alPick(alPid(el.dataset.alpick))],
   [
+    "[data-alswap]",
+    () => {
+      /* 探す先を切り替えて、入っている言葉で探し直す */
+      readForm();
+      const q = ($("#alQ")?.value || "").trim() || alS.q || form.t || "";
+      Object.assign(alS, { src: SWAP[alFormSrc()], res: null, err: "", q });
+      alRedrawBox();
+      if (q && (alS.src !== "tm" || TM.hasKey())) alSearch();
+    },
+  ],
+  [
     "[data-alclear]",
     () => {
       /* 入れた値を消して、空の追加画面に戻す */
@@ -212,12 +232,18 @@ const AL_FORM_ACTIONS = [
   ],
 ];
 function onAlClick(e) {
-  if (!$("#alBox") && !e.target.closest("[data-alnote],[data-alcheck],.alsheet,.alchk")) return false;
+  if (!$("#alBox") && !e.target.closest("[data-alnote],[data-alcheck],.alsheet,#alLayer")) return false;
   return runActions(AL_FORM_ACTIONS, e) || runActions(AL_NOTE_ACTIONS, e) || runActions(AL_CHK_ACTIONS, e);
 }
 document.addEventListener(
   "keydown",
   e => {
+    /* 確認画面を開いているときの Esc は確認画面だけ閉じる（下の詳細は開いたまま） */
+    if (e.key === "Escape" && alC && !e.isComposing && !$("#pkPop,#ddPop")) {
+      e.preventDefault();
+      e.stopPropagation();
+      return alChkBack();
+    }
     const id = e.target && e.target.id;
     if ((id === "alQ" || id === "alCQ") && e.key === "Enter" && !e.isComposing) {
       e.preventDefault();
@@ -279,7 +305,7 @@ function alChkHtml() {
   else if (alC.step === "pick")
     body = `<p class="aln-note">${N}の作品を選んでください</p>
       <div class="alx-row"><input id="alCQ" class="u-input" type="search" enterkeyhint="search" autocomplete="off" value="${esc(alC.q)}" aria-label="${N}で探す"><button type="button" class="u-btn sm pri" data-alc="search">検索</button></div>
-      ${alC.res ? alResHtml(alC.res, "data-alcpick") : ""}`;
+      ${alC.res ? alResHtml(alC.res, "data-alcpick") : ""}${it.k === "a" ? `<div class="ffoot">${alSwapBtn(alC.src, 'data-alc="swap"', "確認")}</div>` : ""}`;
   else if (alC.step === "cmp") {
     const diff = alC.rows.filter(r => !r.same),
       same = alC.rows.filter(r => r.same);
@@ -300,21 +326,42 @@ function alChkHtml() {
   /* つないでいる作品と違う作品を選んだときは、更新する項目がなくても「つなぎ直す」を押せるように */
   const cur = it[S.idKey],
     relink = alC.step === "cmp" && !!cur && String(cur) !== String(alC.m.id);
-  return `<div class="scrim" data-alc="back"></div><div class="sheet alchk" role="dialog" aria-modal="true" aria-label="${N}で確認"><div class="wrap">
+  return `<div class="scrim alc-scrim" data-alc="back"></div><div class="sheet alchk" role="dialog" aria-modal="true" aria-label="${N}で確認"><div class="wrap">
     <div class="hdrow"><h3><small>${esc(it.t)}</small>${N}で確認</h3><button class="u-btn icon sm soft close" type="button" data-alc="back" aria-label="戻る">✕</button></div>
     ${alC.err ? `<p class="alx-msg err">${esc(alC.err)}</p>` : ""}${body}
     ${alC.step === "cmp" ? `<div class="ffoot"><button type="button" class="u-btn" data-alc="back">キャンセル</button><button type="button" class="u-btn pri primary" data-alc="apply"${n || !cur || relink ? "" : " disabled"}>${n ? `${n}項目を更新する` : relink ? "つなぎ直す" : cur ? "更新なし" : "つなぐだけ"}</button></div>` : ""}</div></div>`;
 }
-const alChkDraw = () => alC && ($("#layer").innerHTML = alChkHtml());
+/* 確認画面は詳細とは別の場所（#alLayer）に出して、詳細の上に重ねる（閉じると詳細がそのまま残る） */
+function alChkDraw() {
+  if (!alC) return;
+  let l = $("#alLayer");
+  if (!l) {
+    l = document.createElement("div");
+    l.id = "alLayer";
+    $("#layer").after(l);
+  }
+  const q = $("#alCQ"),
+    keep = q && document.activeElement === q;
+  l.innerHTML = alChkHtml();
+  if (keep && $("#alCQ")) $("#alCQ").focus();
+}
+/* 確認画面だけ閉じる。詳細が開いていなければ開く */
+function alChkBack() {
+  const id = alC && alC.id;
+  alC = null;
+  $("#alLayer")?.replaceChildren();
+  if (id && (openId !== id || !$("#layer .sheet"))) openDetail(id);
+}
 async function alChkOpen(id) {
   const it = items.find(x => x.id === id);
   if (!it) return;
-  const S = SRC[srcOfK(it.k)];
+  const S = SRC[alSrcOf(it)];
   alC = { id, step: "busy", q: it.t, src: S.idKey };
   alChkDraw();
   if (it[S.idKey]) return alChkLoad(it[S.idKey]);
   try {
     const res = await S.api().search(it.t);
+    if (!alC || alC.id !== id) return;
     /* 同じタイトル（括弧・記号の違いは無視）で、開始年も合うものが1つだけなら、それに決める */
     const n = alNorm(it.t),
       y = yearOf(it);
@@ -322,6 +369,7 @@ async function alChkOpen(id) {
     if (ok.length === 1) return alChkLoad(ok[0].id);
     Object.assign(alC, { step: "pick", res });
   } catch (e) {
+    if (!alC || alC.id !== id) return;
     Object.assign(alC, { step: "pick", res: null, err: srcErr(e, S) });
   }
   alChkDraw();
@@ -332,10 +380,12 @@ async function alChkLoad(alId) {
   const S = SRC[alC.src];
   try {
     const m = await S.api().detail(alId);
+    if (!alC) return;
     const it = items.find(x => x.id === alC.id);
     const v = S.toForm(m);
     Object.assign(alC, { step: "cmp", m, v, rows: alRowsOf(it, v, S) });
   } catch (e) {
+    if (!alC) return;
     Object.assign(alC, { step: "pick", err: e && e.noKey ? srcErr(e, S) : "作品の情報を取得できませんでした。少し時間をおいてお試しください" });
   }
   alChkDraw();
@@ -347,11 +397,13 @@ async function alChkSearch(q0) {
   const S = SRC[alC.src];
   Object.assign(alC, { q, step: "busy", msg: `${S.name}で探しています…`, err: "" });
   alChkDraw();
+  const c = alC;
   try {
-    alC.res = await S.api().search(q);
+    c.res = await S.api().search(q);
   } catch (e) {
-    alC.err = srcErr(e, S);
+    c.err = srcErr(e, S);
   }
+  if (alC !== c) return;
   alC.step = "pick";
   alChkDraw();
 }
@@ -399,11 +451,9 @@ async function alChkApply() {
   }
   const id = it.id,
     cover = on.has("img") ? v.cover : "";
-  alC = null;
-  close();
+  alChkBack();
   const relink = !!it[S.idKey] && String(it[S.idKey]) !== String(patch[S.idKey]);
   await saveTitle(id, patch, on.size ? `${S.name}から${on.size}項目を更新しました` : relink ? `${S.name}の作品をつなぎ直しました` : `${S.name}とつなぎました`);
-  openDetail(id);
   if (cover) alSaveCover(id, cover);
 }
 const AL_CHK_ACTIONS = [
@@ -420,14 +470,19 @@ const AL_CHK_ACTIONS = [
   ],
   ['[data-alc="apply"]', () => alChkApply()],
   [
-    '[data-alc="back"]',
+    '[data-alc="swap"]',
     () => {
-      const id = alC && alC.id;
-      alC = null;
-      close();
-      if (id) openDetail(id);
+      /* アニメ：AniList ⇔ TMDB を切り替えて、同じ言葉で探し直す */
+      const q = ($("#alCQ")?.value || "").trim() || alC.q;
+      Object.assign(alC, { src: SWAP[alC.src], res: null, err: "" });
+      if (alC.src === "tm" && !TM.hasKey()) {
+        alC.err = TM_NOKEY;
+        return alChkDraw();
+      }
+      alChkSearch(q);
     },
   ],
+  ['[data-alc="back"]', () => alChkBack()],
 ];
 document.addEventListener("change", e => {
   const k = e.target && e.target.dataset && e.target.dataset.alcskip;

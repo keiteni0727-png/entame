@@ -1850,6 +1850,10 @@ html[data-gsz="s"] .pgrid{--gc:3}
 .alc-x input{width:18px;height:18px}
 .alc-same{margin:10px 2px 0;font-size:var(--fs-s);color:var(--u-sub)}
 .alchk .ffoot{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;padding-bottom:14px}
+/* 確認画面は詳細の上に重ねる（#alLayer。PCの右の詳細パネルも開いたまま） */
+#alLayer .scrim{z-index:24}
+#alLayer .sheet{z-index:25}
+.alx-swap{display:flex;justify-content:flex-end;margin-top:8px}
 
 /* ===== 要確認の「!」と補足（作品詳細のON AIR・MUSIC・ステータス・話数リスト） ===== */
 .wnm{position:relative;display:inline-grid;place-items:center;width:18px;height:18px;margin-left:5px;padding:0;border:0;border-radius:var(--r-full);background:var(--u-warn2);color:var(--u-warn);font:900 11px/1 var(--u-num);vertical-align:middle;cursor:pointer;flex:none}

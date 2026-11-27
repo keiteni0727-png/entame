@@ -137,8 +137,9 @@ function infoCards(it, { md, ns, mv, stv, cs, songRows }) {
     chips.push(listChips("配信", m.vods, () => m.vods.map(vlab).join("") + mk("r:配信", ["配信サイト"]), "vods", ["配信サイト"]));
   }
   /* アニメのシリーズは下の SERIES の枠に出す（AniListのつながりと一緒に） */
+  /* ドラマはシリーズがないことが多いので、未設定の札は出さない */
   if (it.k !== "a")
-    chips.push(it.series ? `<button type="button" class="tk-chip tk-go" data-series="${esc(it.series)}"><small>シリーズ</small>${esc(it.series)} ›</button>` : nofHas(it, "ser") ? "" : tkMiss("<small>シリーズ</small>未設定", "r:シリーズ", []));
+    chips.push(it.series ? `<button type="button" class="tk-chip tk-go" data-series="${esc(it.series)}"><small>シリーズ</small>${esc(it.series)} ›</button>` : nofHas(it, "ser") || it.k === "d" ? "" : tkMiss("<small>シリーズ</small>未設定", "r:シリーズ", []));
   /* 公式サイト・配信URLはタイトルの下のボタンで開く。ここには要確認のときだけ札を出す */
   if (ms.some(x => x.k === "公式サイト")) chips.push(tkMiss("<small>公式サイト</small>未設定", "r:公式サイト", ["公式サイト"]));
   if (ms.some(x => x.k === "配信URL" || x.k === "配信URLのずれ")) chips.push(tkMiss(`<small>配信URL</small>${it.vurl ? "確認" : "未設定"}`, "r:配信URL", ["配信URL", "配信URLのずれ"]));
@@ -265,7 +266,7 @@ function renderDetail(it) {
     ${lnk ? `<div class="dtbtns">${lnk}</div>` : ""}</div></div></div>
     ${noEp ? "" : `<div class="dtabs" role="tablist"><button type="button" role="tab" data-dtab="info">番組情報</button><button type="button" role="tab" data-dtab="ep">話数${eps.length ? ` <small>${w}/${watchable(eps).length}</small>` : ""}${epMs ? `<span class="wnt" aria-label="要確認あり">!</span>` : ""}</button></div>`}
     <div class="dpane dp-info">${infoCards(it, { md, ns, mv, stv, cs, songRows })}
-    <div class="links">${typeof alChkOpen === "function" ? `<button type="button" class="u-chip add dlb" data-alcheck="1">${it.k === "a" ? "AniList" : "TMDB"}で確認</button>` : ""}${noEp ? `<button type="button" class="u-chip add dlb" id="epAddMv">＋ 話数を追加</button>` : ""}<button type="button" class="u-btn sm txt danger delsm" id="delItem">削除</button></div></div>
+    <div class="links">${typeof alChkOpen === "function" ? `<button type="button" class="u-chip add dlb" data-alcheck="1">${SRC[alSrcOf(it)].name}で確認</button>` : ""}${noEp ? `<button type="button" class="u-chip add dlb" id="epAddMv">＋ 話数を追加</button>` : ""}<button type="button" class="u-btn sm txt danger delsm" id="delItem">削除</button></div></div>
     <div class="dpane dp-ep"><h4><span class="h4l">話数</span>${eps.length && !epEdit ? `<span class="progrow"><span class="progn"><b>${w}</b> / ${watchable(eps).length}話</span><span class="prog"><i style="width:${Math.round((w / (watchable(eps).length || 1)) * 100)}%"></i></span></span>` : ""}${eps.length && it.k === "a" && !epEdit && !arcEdit && !slotEdit && !subPaste ? `<button type="button" class="u-btn sm hpaste" id="spOpen" aria-label="貼り付け" title="貼り付け">${PASTE_IC}</button>` : ""}${eps.length && !epEdit && !arcEdit && !slotEdit && !subPaste ? `<button type="button" class="u-btn sm iedit" id="epEditBtn">編集</button>` : ""}</h4>
     <div id="epArea">${subPaste ? subPasteHtml(it) : arcEdit ? arcEditHtml() : slotEdit ? slotEditHtml(it) : epEdit ? epEditorHtml(it) : epListHtml(it, eps)}</div></div></div>`;
 }

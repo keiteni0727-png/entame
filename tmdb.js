@@ -53,19 +53,105 @@
     };
   }
 
-  /* タイトルで探す（ドラマと映画をまとめて）。日本の作品を先に */
-  async function search(q) {
-    const j = await get("/search/multi", { query: q, include_adult: "false" });
-    const l = (j.results || []).filter(x => x.media_type === "tv" || x.media_type === "movie").map(x => shape(x, x.media_type));
-    const jp = m => (m.country === "JP" || m.country === "ja" ? 0 : 1);
-    return l.sort((a, b) => jp(a) - jp(b)).slice(0, 12);
+  /* 検索語からシーズンの番号を外す（TMDB はシーズンごとの作品がなく、1つの番組の中にシーズンが入っているため）
+     「シーズン2」「Season 2」「2nd season」「第2シリーズ」「第二期」「Ⅱ」「 2」（最後の数字は前に空白があるときだけ） */
+  const KAN = { 一: 1, 二: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9, 十: 10 };
+  const ROMAN = { II: 2, III: 3, IV: 4, VI: 6, VII: 7, VIII: 8, IX: 9 };
+  function splitSeason(q0) {
+    const q = String(q0 || "").normalize("NFKC").trim();
+    const pats = [
+      [/[\s　]*(?:シーズン|season)[\s　]*(\d{1,2})[\s　]*$/i, m => +m[1]],
+      [/[\s　]*(\d{1,2})(?:st|nd|rd|th)[\s　]*season[\s　]*$/i, m => +m[1]],
+      [/[\s　]*第[\s　]*(\d{1,2}|[一二三四五六七八九十])[\s　]*(?:シリーズ|シーズン|期|章|部)[\s　]*$/, m => +m[1] || KAN[m[1]]],
+      /* Ⅱ などは NFKC で II になる。英字の続きでないときだけ */
+      [/(?<![A-Za-z])[\s　]*(II|III|IV|VI|VII|VIII|IX)[\s　]*$/, m => ROMAN[m[1]]],
+      [/[\s　]+(\d{1})$/, m => +m[1]],
+    ];
+    for (const [re, f] of pats) {
+      const m = re.exec(q);
+      if (m && m.index > 0) {
+        const n = f(m);
+        if (n >= 1) return { base: q.slice(0, m.index).replace(/[\s　:：\-]+$/, ""), n };
+      }
+    }
+    return { base: q, n: 0 };
+  }
+  const seasonNo = s => +s.season_number || 0;
+  /* 番組名にシーズン名を付ける（シーズン名に番組名が入っていればそのまま） */
+  const seasonTitle = (show, sn) => {
+    const nm = (sn.name || "").trim() || `シーズン${sn.season_number}`;
+    return nm.includes(show) ? nm : `${show} ${nm}`;
+  };
+  /* 番組（くわしい情報）＋シーズン → AniList と同じ形。番号は「tv:123:2」 */
+  function shapeSeason(x, sn, eps) {
+    const m = shape(x, "tv");
+    const show = m.title.native;
+    const s = ymd(sn.air_date);
+    const aired = (eps || []).map(e => e.air_date).filter(Boolean).sort();
+    const today = new Date(Date.now() + 540 * 60000).toISOString().slice(0, 10);
+    const n = eps ? eps.length : sn.episode_count || null;
+    const last = aired.length ? aired[aired.length - 1] : "";
+    const later = seasonNo(sn) < (x.number_of_seasons || 0);
+    const allAired = !!last && last <= today && (!eps || aired.length === eps.length);
+    /* 話の一覧がないとき（検索結果）は、後のシーズンがある・番組が終わっていれば放送済み */
+    const done = eps ? allAired : later || STATUS[x.status] === "FINISHED";
+    const status = !sn.air_date || sn.air_date > today ? "NOT_YET_RELEASED" : done ? "FINISHED" : "RELEASING";
+    const poster = sn.poster_path || x.poster_path;
+    return {
+      ...m,
+      id: `tv:${x.id}:${seasonNo(sn)}`,
+      season_number: seasonNo(sn),
+      title: { native: seasonTitle(show, sn), romaji: m.title.romaji },
+      synonyms: [show, ...m.synonyms],
+      status,
+      episodes: n,
+      seasonYear: s.year || null,
+      startDate: s,
+      endDate: status === "FINISHED" ? ymd(last) : {},
+      coverImage: { medium: poster ? `${IMG}w185${poster}` : "", large: poster ? `${IMG}w500${poster}` : "" },
+    };
   }
 
-  /* 1作品のくわしい情報：放送局・公式サイト・配信サイト（日本） */
+  /* タイトルで探す（ドラマと映画をまとめて）。日本の作品を先に。
+     シーズンが2つ以上あるドラマは、シーズンごとの候補に分ける（検索語にシーズンの番号があれば、そのシーズンを先頭に） */
+  async function search(q) {
+    const { base, n } = splitSeason(q);
+    const runs = [get("/search/multi", { query: base, include_adult: "false" })];
+    if (base !== String(q).trim()) runs.push(get("/search/multi", { query: q, include_adult: "false" }).catch(() => ({ results: [] })));
+    const all = (await Promise.all(runs)).flatMap(j => j.results || []);
+    const seen = new Set();
+    const raw = all.filter(x => (x.media_type === "tv" || x.media_type === "movie") && !seen.has(x.media_type + x.id) && seen.add(x.media_type + x.id));
+    const jp = x => ((x.origin_country || []).includes("JP") || x.original_language === "ja" ? 0 : 1);
+    const l = raw.sort((a, b) => jp(a) - jp(b)).slice(0, 12);
+    /* 上の方のドラマだけ、シーズンの一覧を取る（取れなければ番組のまま） */
+    const tvTop = new Set(l.filter(x => x.media_type === "tv").slice(0, 4).map(x => x.id));
+    const out = await Promise.all(
+      l.map(async x => {
+        if (x.media_type !== "tv" || !tvTop.has(x.id)) return [shape(x, x.media_type)];
+        try {
+          const d = await get(`/tv/${x.id}`);
+          const ss = (d.seasons || []).filter(s => seasonNo(s) > 0);
+          if (ss.length < 2) return [shape({ ...x, ...d }, "tv")];
+          return ss.map(s => shapeSeason(d, s));
+        } catch (e) {
+          return [shape(x, "tv")];
+        }
+      }),
+    );
+    let res = out.flat();
+    if (n) res = [...res.filter(m => m.season_number === n), ...res.filter(m => m.season_number !== n)];
+    return res.slice(0, 24);
+  }
+
+  /* 1作品のくわしい情報：放送局・公式サイト・配信サイト（日本）。「tv:123:2」はシーズン2の開始日・終了日・話数・画像 */
   async function detail(id) {
-    const [type, n] = String(id).split(":");
+    const [type, n, sno] = String(id).split(":");
     const x = await get(`/${type}/${n}`, { append_to_response: type === "movie" ? "watch/providers,release_dates" : "watch/providers" });
-    const m = shape(x, type);
+    let m = shape(x, type);
+    if (type === "tv" && sno) {
+      const sn = await get(`/tv/${n}/season/${sno}`);
+      m = shapeSeason(x, sn, sn.episodes || []);
+    }
     /* 映画の公開日は日本の劇場公開日があればそちら */
     if (type === "movie") {
       const jp = (x.release_dates?.results || []).find(r => r.iso_3166_1 === "JP");
@@ -85,5 +171,5 @@
     return r.blob();
   }
 
-  globalThis.TM = { search, detail, image, hasKey: () => !!key() };
+  globalThis.TM = { search, detail, image, splitSeason, hasKey: () => !!key() };
 })();
