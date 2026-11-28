@@ -632,7 +632,6 @@ const AL_NOTE_ACTIONS = [
    アプリに登録済みの作品は、開いた作品と同じシリーズが付いているかを1作品ずつ見る。
    つながりは作品を開いたときに AniList から読み、アプリを開いている間だけ覚える（保存はしない） */
 const AL_REL_LAB = { PREQUEL: "前の作品", SEQUEL: "続編", PARENT: "本編", SIDE_STORY: "外伝", ALTERNATIVE: "別バージョン", SPIN_OFF: "スピンオフ", SUMMARY: "総集編", COMPILATION: "総集編" };
-const AL_MAIN = new Set(["PREQUEL", "SEQUEL"]);
 const alRelCache = new Map(); // AniList の作品番号 → { cur, list } / "busy" / "err"
 async function alRelLoad(id) {
   if (alRelCache.has(id)) return;
