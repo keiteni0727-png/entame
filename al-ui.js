@@ -235,9 +235,9 @@ function onAlClick(e) {
   if (!$("#alBox") && !e.target.closest("[data-alnote],[data-alcheck],.alsheet,#alLayer")) return false;
   return runActions(AL_FORM_ACTIONS, e) || runActions(AL_NOTE_ACTIONS, e) || runActions(AL_CHK_ACTIONS, e);
 }
-/* SERIES の行（押せる div）：Enter・スペースでも押せる */
+/* SERIES の行・たたむ行（押せる div）：Enter・スペースでも押せる */
 document.addEventListener("keydown", e => {
-  if ((e.key === "Enter" || e.key === " ") && e.target.matches && e.target.matches('.serit[role="button"]')) {
+  if ((e.key === "Enter" || e.key === " ") && e.target.matches && e.target.matches('.serit[role="button"],.sersub[role="button"]')) {
     e.preventDefault();
     e.target.click();
   }
@@ -657,7 +657,8 @@ const alKeyOf = n => alYmd(n.startDate) || (n.seasonYear ? `${n.seasonYear}-00-0
 /* ---------- 作品の詳細の SERIES ----------
    同じシリーズのアプリの作品を放送順に並べる。押すとその作品の詳細へ。
    開いているときだけ「AniListのつながり」のトグルを出し、オンにすると AniList でつながっている未登録の作品を、AniList の日付で間に入れる
-   （押すと AniList の情報で新規登録の画面へ。「非表示」にした作品は、その作品の詳細には出さない＝作品データの alHide）。
+   （押すと AniList の情報で新規登録の画面へ。「非表示」は番組表の「新作・続編のお知らせ」の「表示しない」と同じ設定 master.alHide で、
+   どの作品の詳細にもお知らせにも出さない。前に作品ごとに入れた alHide も見る）。
    たたむ・トグルの状態はこの端末で覚え、作品をまたいで同じ */
 const K_SERUI = "entame.ser.ui.v1";
 let serUI = Object.assign({ fold: false, al: false }, ls.get(K_SERUI) || {});
@@ -683,12 +684,13 @@ function seriesCardHtml(it) {
   /* 見出し・編集はほかのカードと同じ。作品の一覧は前と同じ形の行（.sersub）でたたむ */
   const head = `<div class="ich"><span class="ilamp series">SERIES</span><button type="button" class="u-btn sm iedit" data-jump="fSeries" aria-label="シリーズを編集">編集</button></div><div class="tk-ser">${
     ser ? `<b class="sern">${esc(ser)}</b>` : `<span class="tk-chip miss">シリーズ 未登録</span><button type="button" class="tk-yb" data-cardgo="fSeries">シリーズを登録</button>`
-  }</div><button type="button" class="sersub" data-serfold="1" aria-expanded="${!fold}"><span>${ser ? "このシリーズの作品（放送順）" : "この作品"}</span><small>${mine.length}作品</small>${FOLD_IC}</button>`;
+  }</div><div class="sersub" role="button" tabindex="0" data-serfold="1" aria-expanded="${!fold}"><span>${ser ? "シリーズの作品" : "この作品"}</span><small>${mine.length}作品</small>${
+    fold ? "" : `<span class="vtog vtx" role="group" aria-label="AniListのつながり"><button type="button" data-sertog="0" aria-pressed="${!serUI.al}">アプリ</button><button type="button" data-sertog="1" aria-pressed="${serUI.al}">AniList</button></span>`
+  }${FOLD_IC}</div>`;
   if (fold) return `<div class="icard iser">${head}</div>`;
   const rows = mine.map(i => ({ key: serKeyOf(i), html: serAppRow(i, it) }));
   /* AniList のつながり（未登録だけ。非表示にしたものは出さない） */
   let msg = "",
-    hidN = 0,
     alN = 0;
   if (serUI.al) {
     if (!it.al) msg = `<p class="sermsg">AniListとまだつながっていません<button type="button" class="serbtn" data-alcheck="al">AniListで確認</button></p>`;
@@ -698,24 +700,20 @@ function seriesCardHtml(it) {
       if (!r || r === "busy") msg = `<p class="sermsg">AniListから読み込み中…</p>`;
       else if (r === "err") msg = `<p class="sermsg">AniListから読み込めませんでした<button type="button" class="serbtn" data-alrelre="1">もう一度</button></p>`;
       else {
-        const hide = new Set(it.alHide || []);
+        const hide = new Set([...(master.alHide || []), ...(it.alHide || [])]);
         r.list
           .filter(n => AL_REL_LAB[n.rel] && !alOwnOf(n))
           .forEach(n => {
-            if (hide.has(n.id)) return void hidN++;
+            if (hide.has(n.id)) return;
             alN++;
             rows.push({ key: alKeyOf(n), html: serAlRow(n) });
           });
-        if (!alN && !hidN) msg = `<p class="sermsg">AniListにある関連作品は、すべて登録済みです</p>`;
+        if (!alN) msg = `<p class="sermsg">AniListにある関連作品は、すべて登録済みです</p>`;
       }
     }
   }
   rows.sort((a, b) => (a.key < b.key ? -1 : a.key > b.key ? 1 : 0));
-  /* AniListのつながり：絞り込みなどと同じ、押すとオン・オフが切りかわる札。一覧の上に */
-  const tog = `<div class="chips"><button type="button" class="u-chip${serUI.al ? " on" : ""}" data-sertog="1" aria-pressed="${serUI.al}">AniListのつながり</button>${
-    serUI.al && hidN ? `<button type="button" class="serbtn" data-alunhide="1">非表示にした${hidN}件を戻す</button>` : ""
-  }</div>`;
-  return `<div class="icard iser">${head}${tog}${msg}<div class="sertl">${rows.map(x => x.html).join("")}</div></div>`;
+  return `<div class="icard iser">${head}${msg}<div class="sertl">${rows.map(x => x.html).join("")}</div></div>`;
 }
 /* アプリの作品の行（押すとその作品の詳細。開いている作品は「この作品」） */
 function serAppRow(i, it) {

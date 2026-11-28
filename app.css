@@ -1888,7 +1888,12 @@ html[data-gsz="s"] .pgrid{--gc:3}
 .sertag.cur{background:var(--u-accent2);color:var(--u-acct)}
 .sersub{display:flex;align-items:center;gap:6px;width:100%;font:inherit;font-size:var(--fs-xs);font-weight:700;color:var(--u-sub);margin:8px 0 2px;padding:8px 0 0;border:0;border-top:1px solid var(--u-line);background:none;text-align:left;cursor:pointer}
 .sersub small{font-size:var(--fs-xs);font-weight:600}
+.sersub>span:first-child,.sersub small{white-space:nowrap}
 .sersub .fic{margin-left:auto}
+/* アプリ／AniList の切り替え（リスト／グリッドの切り替えと同じ形。文字のボタン）。たたむ矢印の左 */
+.sersub .vtog{margin-left:auto}
+.sersub .vtog+.fic{margin-left:4px}
+.vtog.vtx button{width:auto;padding:0 8px;font:700 var(--fs-xs)/1 var(--u-f)}
 .sermsg{margin:6px 0 2px;font-size:var(--fs-s);color:var(--u-sub);display:flex;align-items:center;flex-wrap:wrap;gap:8px}
 .sertl{position:relative;padding-left:20px}
 .sertl::before{content:"";position:absolute;left:6px;top:10px;bottom:10px;width:2px;background:var(--u-line)}
@@ -1898,7 +1903,8 @@ html[data-gsz="s"] .pgrid{--gc:3}
 .serit[role="button"]{cursor:pointer;border-radius:10px;margin:0 -6px;padding-left:6px;padding-right:6px}
 .serit[role="button"]::before{left:-13px}
 @media (hover:hover){.serit[role="button"]:hover{background:var(--u-soft)}}
-.serit.al .sertx b{color:var(--u-sub)}
+/* AniList の未登録の作品の行は黄色の地で目立たせる（話数の「次に見る」の行と同じ色） */
+.serit.al{background:var(--pop2);margin-top:2px;margin-bottom:2px}
 .serit.has::before{background:var(--u-ok);border-color:var(--u-ok)}
 .serit.cur::before{background:var(--u-accent);border-color:var(--u-accent)}
 .serim{flex:none;width:28px;height:40px;border-radius:4px;overflow:hidden;background:var(--u-chip)}

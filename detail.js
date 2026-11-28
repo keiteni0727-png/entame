@@ -514,17 +514,23 @@ const DETAIL_ACTIONS = [
       else openForm(it, t);
     },
   ],
-  /* SERIES：AniList の未登録の作品を、この作品の詳細に出さない（元に戻せる）。行を押したときの新規登録より先に受ける */
+  /* SERIES：AniList の未登録の作品を出さない。番組表の「新作・続編のお知らせ」の「表示しない」と同じ設定（master.alHide）なので、
+     同じシリーズのほかの作品の詳細にも、お知らせにも出なくなる（元に戻せる）。行を押したときの新規登録より先に受ける */
   [
     "[data-alhide]",
-    (el, it) => {
+    el => {
       const id = +el.dataset.alhide,
-        prev = it.alHide || [];
-      saveTitle(it.id, { alHide: [...new Set([...prev, id])] });
-      toastUndo(`「${el.dataset.altitle}」をこの作品の詳細に出さないようにしました`, () => saveTitle(it.id, { alHide: prev }));
+        prev = master.alHide || [];
+      const set = l => {
+        master.alHide = l;
+        saveMaster();
+        refreshSheet();
+        if (state.mode === "w" && $("#clock")) $("#clock").innerHTML = weekTopHtml();
+      };
+      set([...new Set([...prev, id])]);
+      toastUndo(`「${el.dataset.altitle}」を表示しないようにしました（新作・続編のお知らせにも出しません）`, () => set(prev));
     },
   ],
-  ["[data-alunhide]", (el, it) => saveTitle(it.id, { alHide: [] }, "非表示にした作品を戻しました")],
   /* SERIES：未登録の作品を AniList の情報で追加（シリーズは開いている作品と同じ） */
   [
     "[data-alreladd]",
@@ -539,19 +545,19 @@ const DETAIL_ACTIONS = [
     },
   ],
   ["[data-relopen]", el => openDetail(el.dataset.relopen)],
-  /* SERIES：カードをたたむ・開く／AniListのつながりを出す・出さない（この端末で覚える） */
+  /* SERIES：アプリだけ／AniListのつながりも出す（切り替え）・作品の一覧をたたむ（この端末で覚える）。切り替えはたたむ行の中にあるので先に受ける */
   [
-    "[data-serfold]",
-    () => {
-      serUI.fold = !serUI.fold;
+    "[data-sertog]",
+    el => {
+      serUI.al = el.dataset.sertog === "1";
       saveSerUI();
       refreshSheet();
     },
   ],
   [
-    "[data-sertog]",
+    "[data-serfold]",
     () => {
-      serUI.al = !serUI.al;
+      serUI.fold = !serUI.fold;
       saveSerUI();
       refreshSheet();
     },
