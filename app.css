@@ -178,7 +178,8 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var
 .banner b{display:block}
 .banner button{border:1px solid var(--u-line);background:var(--u-bg);border-radius:var(--r-m);padding:6px 10px;font-size:var(--fs-m)}
 main{padding-bottom:20px}
-.slots{background:var(--u-surface);border:1px solid var(--u-line);overflow:hidden}
+/* ライブラリの行のまとまり：カードと同じ太枠＋影 */
+.slots{background:var(--u-surface);border:2px solid var(--k);border-radius:18px;box-shadow:4px 4px 0 var(--ks);overflow:hidden}
 .row{display:flex;align-items:stretch;border-top:1px solid var(--u-line)}
 .row:first-child{border-top:0}
 .slot{display:grid;flex:1;min-width:0;border:0;background:transparent;text-align:left;-webkit-tap-highlight-color:transparent;grid-template-columns:52px 1fr auto;gap:10px;padding:8px 10px;align-items:start}
@@ -489,7 +490,7 @@ input[type=date]::-webkit-date-and-time-value{text-align:left}
 /* ===== 3アプリ共通：部品のそろえ ===== */
 :focus-visible{outline:2px solid var(--u-accent);outline-offset:2px}
 /* 枠の角丸をそろえる */
-.slots,.banner,.fsdrop,.fsec,.spaste,.eps,.eped{border-radius:var(--r-l)}
+.banner,.fsdrop,.fsec,.spaste,.eps,.eped{border-radius:var(--r-l)}
 .field input,.field select{border-radius:var(--r-m)}
 /* ボタンの角丸をそろえる */
 .sernew button{flex:none;border:1px solid var(--u-line);background:var(--u-bg);padding:0 14px;font-weight:700;font-size:var(--fs-base);border-radius:var(--r-m)}
@@ -692,12 +693,13 @@ input[type=date]::-webkit-date-and-time-value{text-align:left}
 /* 選択肢はボタンの列のすぐ下に、上から垂れ下がる形で出す */
 .fwrap{position:relative}
 .fpop-scrim{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.18)}
-.fsdrop.fpop{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:51;margin:0;border:1px solid var(--u-line);border-radius:var(--r-l);max-height:62vh;overflow:auto;overscroll-behavior:contain;padding:12px 14px 14px;box-shadow:0 12px 32px rgba(16,24,40,.22);transform-origin:top center;animation:fdrop .16s ease-out}
+.fsdrop.fpop{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:51;margin:0;border:2px solid var(--k);border-radius:18px;max-height:62vh;overflow:auto;overscroll-behavior:contain;padding:12px 14px 14px;box-shadow:4px 4px 0 var(--ks);transform-origin:top center;animation:fdrop .16s ease-out}
 
 .fsdrop.fpop .fgroup:last-child{display:grid}
 .fsdrop.fpop .fgroup:nth-child(2):last-child{display:block}
 .fsdrop.fpop .fgroup:nth-child(2):last-child>h5{display:none}
 .fpop-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.fpop-h .u-btn{border:2px solid var(--k);background:var(--u-surface);color:var(--u-ink);box-shadow:2px 2px 0 var(--ks)}
 .fpop-h b{font-size:var(--fs-l)}
 .fsdrop.fpop .fgroup{grid-template-columns:76px 1fr;margin-top:12px}
 .fsdrop.fpop .fgroup h5{font-size:var(--fs-m);margin-top:7px}
@@ -1117,6 +1119,8 @@ button.imt[aria-expanded="false"]+.imt,button.imt[aria-expanded="false"]+button.
 /* 上の帯：スマホは小さなロゴと今の画面の名前だけ（追加・設定は下のドック）。PCは右上に表示の切り替え */
 .hthm{margin-left:auto}
 .ich .iedit{margin-left:auto}
+/* ON AIR・YOUTUBE の見出しの横のジャンル・放送形態（投稿者）の札 */
+.ich .ich-tags{margin-left:10px;gap:4px}
 
 @media (max-width:899px){
   body{padding-bottom:calc(var(--u-navb) + var(--tbh) + 24px);--u-toast-b:calc(var(--tbh) + 22px)}
@@ -1147,7 +1151,7 @@ button.imt[aria-expanded="false"]+.imt,button.imt[aria-expanded="false"]+button.
 .fsh-scrim{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.4)}
 .fsh{position:fixed;left:0;right:0;bottom:0;z-index:61;display:flex;flex-direction:column;max-height:86vh;background:var(--u-surface);color:var(--u-ink);border-radius:var(--r-l) var(--r-l) 0 0;border-top:1px solid var(--u-line);box-shadow:0 -8px 30px rgba(0,0,0,.2);padding-bottom:env(safe-area-inset-bottom,0px);overflow:hidden}
 .dd-x{flex:none;width:34px;height:34px;border:0;border-radius:50%;background:var(--u-soft);color:var(--u-sub);display:grid;place-items:center;padding:0;cursor:pointer;font-size:var(--fs-l)}
-.fsh-x{flex:none}
+.fsh-x{flex:none;border:2px solid var(--k)!important;background:var(--u-surface)!important;color:var(--u-ink)!important;box-shadow:2px 2px 0 var(--ks)}
 .fsh-body{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:0 0 6px}
 .fsh-row{width:100%;display:flex;align-items:center;gap:10px;min-height:52px;padding:0 14px 0 18px;border:0;background:none;color:var(--u-ink);font:inherit;font-size:var(--fs-l);text-align:left;cursor:pointer}
 .fsh-row:hover,.fsh-row:focus-visible{background:var(--u-soft);outline:none}
@@ -1155,7 +1159,7 @@ button.imt[aria-expanded="false"]+.imt,button.imt[aria-expanded="false"]+button.
 .fsh-v{flex:1;min-width:0;text-align:right;color:var(--u-sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--fs-base)}
 .fsh-v.on{color:var(--u-acct);font-weight:700}
 .fsh-cv{flex:none;color:var(--u-sub);transition:transform .15s}
-.fsh-go{width:100%}
+.fsh-go{width:100%;border:2px solid var(--k);box-shadow:3px 3px 0 var(--ks)}
 /* 選択肢：スマホはシートの上に重ねる（選ぶと戻る）。PCは項目のすぐ下に開く */
 .fsh-sub{background:var(--u-surface)}
 .fsh-subb.dd-list .dd-row:first-child{border-top:0}
@@ -1277,10 +1281,13 @@ button.setrow:hover{background:var(--u-soft)}
 .ghd .gtog{flex:1;min-width:0}
 .gtog .gcnt{margin-left:auto;font-family:var(--u-f);font-size:var(--fs-s);color:var(--u-sub);font-weight:500}
 /* 並び替え：ボタンのすぐ下に小さく開く（画面の下からは出さない） */
-.fsdrop.fpop.k-sort{left:auto;right:0;width:min(340px,100%);top:calc(100% + 6px);padding:10px 12px 12px}
+/* 並び替え：札が1行に収まる幅（入りきらないスマホでは折り返す） */
+.fsdrop.fpop.k-sort{left:auto;right:0;width:max-content;max-width:100%;top:calc(100% + 6px);padding:10px 12px 12px}
 .fpop-scrim:has(+ .k-sort){background:rgba(0,0,0,.12)}
 .fsdrop.fpop.k-sort .fgroup.sstep{display:block!important;grid-template-columns:none;margin-top:10px}
 @media (max-width:899px){.fsdrop.fpop.k-sort{position:absolute;z-index:61;max-height:min(70vh,520px)}}
+/* スマホ：並び替えの札を少し小さくして、1つだけ次の行に落ちないように */
+@media (max-width:599px){.fsdrop.fpop.k-sort .sortlist button{padding:0 8px!important;font-size:var(--fs-s)!important}}
 /* シリーズの管理：1行に収める */
 .smbar{display:flex;align-items:center;gap:8px;margin:6px 0 8px}
 .smbar .sseg{flex:1;min-width:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -1296,6 +1303,10 @@ button.setrow:hover{background:var(--u-soft)}
 .slist .srow:first-child{border-top:0}
 /* === 選択ボタンを全部同じ見た目に（編集画面・絞り込み・並び替え・未入力の項目・シリーズ候補）：札のボタン（.u-chip）と同じ形 === */
 .chips button:not(.u-btn):not(.u-chip),.fsh-subb .serbox button,.mkeys button{display:inline-flex!important;align-items:center;justify-content:center;gap:4px;min-height:var(--h-chip);height:auto!important;padding:0 12px!important;border:1px solid transparent!important;background:var(--u-chip)!important;color:var(--u-ink)!important;border-radius:var(--r-full)!important;font:700 var(--fs-m)/1.2 var(--u-f)!important;max-width:100%;white-space:normal;overflow-wrap:anywhere;text-align:left;cursor:pointer;box-shadow:none!important}
+/* 絞り込み・並び替え・保存フィルタの札：太枠（選んでいるものは黄色＋影。カードやボタンと同じ形） */
+.fsdrop.fpop .chips button:not(.u-btn):not(.u-chip),.fsh .chips button:not(.u-btn):not(.u-chip),.fsh .mp-t{border:2px solid var(--k)!important;background:var(--u-surface)!important;color:var(--u-ink)!important}
+.fsdrop.fpop .chips button:not(.u-btn):not(.u-chip):is([aria-pressed="true"],[aria-checked="true"]),.fsh .chips button:not(.u-btn):not(.u-chip):is([aria-pressed="true"],[aria-checked="true"]),.fsh .mp-t.on{background:var(--pop)!important;color:var(--onpop)!important;box-shadow:2px 2px 0 var(--ks)!important}
+.fsh .dd-row.on{background:var(--pop2)}
 .chips button:not(.u-btn):not(.u-chip)[aria-pressed="true"],.chips button:not(.u-btn):not(.u-chip)[aria-checked="true"],.mkeys button[aria-pressed="true"]{border-color:color-mix(in srgb,var(--u-accent) 60%,transparent)!important;background:var(--u-accent2)!important;color:var(--u-acct)!important}
 .chips button small,.serbox button small{font-family:var(--u-num);font-size:var(--fs-xs)!important;font-weight:500;opacity:.75;margin-left:4px}
 .fsdrop.fpop.k-sort .sortlist{margin-top:0;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));display:flex!important;flex-wrap:wrap;gap:6px}
@@ -1310,7 +1321,7 @@ span.mname{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space
 @media (min-width:900px){
   html.fshopen,html.fshopen body{overflow:hidden}
   .fsh-scrim{background:rgba(0,0,0,.12)}
-  .fsh{left:auto;border-top:0;border-left:1px solid var(--u-line);top:auto;right:auto;bottom:auto;max-height:calc(100vh - 140px);height:auto;border:1px solid var(--u-line)!important;border-radius:var(--r-l);box-shadow:0 12px 32px rgba(16,24,40,.22);width:min(760px,calc(100vw - 32px))}
+  .fsh{left:auto;top:auto;right:auto;bottom:auto;max-height:calc(100vh - 140px);height:auto;border:2px solid var(--k)!important;border-radius:18px;box-shadow:4px 4px 0 var(--ks);width:min(760px,calc(100vw - 32px))}
   .fsh.in{animation:fdrop .14s ease-out}
   .fsdrop.fpop.k-sort{left:0;right:auto}
 }
@@ -1318,7 +1329,7 @@ span.mname{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space
 .mlist.slist{align-content:start;grid-auto-rows:min-content;background:var(--u-surface);-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 /* スマホも絞り込み・保存フィルタはボタンのすぐ下に出す（PCと同じ形） */
 @media (max-width:899px){
-  .fsh{left:8px;right:8px;bottom:auto;border:1px solid var(--u-line);border-radius:var(--r-l);box-shadow:0 12px 32px rgba(0,0,0,.35);padding-bottom:0}
+  .fsh{left:8px;right:8px;bottom:auto;border:2px solid var(--k);border-radius:18px;box-shadow:4px 4px 0 var(--ks);padding-bottom:0}
   .fsh.in{animation:fdrop .14s ease-out}
   .fsh-scrim{background:rgba(0,0,0,.25)}
   .fsdrop.fpop{z-index:61;max-height:70vh;overflow:auto}
@@ -1429,8 +1440,8 @@ select#arcJump{cursor:pointer;-webkit-appearance:none;appearance:none;padding-ri
   .fsh-rows{overflow:auto;border-right:1px solid var(--u-line)}
   .fsh-rows .fsh-row:first-child{border-top:0}
   .fsh-row{min-height:46px;font-size:var(--fs-base)}
-  .fsh-row.cur{background:var(--u-soft)}
-  .fsh-row.cur .fsh-cv{color:var(--u-ink)}
+  .fsh-row.cur{background:var(--pop);color:var(--onpop)}
+  .fsh-row.cur .fsh-cv{color:var(--onpop)}
   .fsh-pane{overflow:auto;overscroll-behavior:contain}
   .fsh-subh{padding-left:16px}
   .fsh-subh .fsh-back{display:none}

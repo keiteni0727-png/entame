@@ -132,7 +132,7 @@ function infoCards(it, { md, ns, mv, stv, cs, songRows }) {
     l.length ? html() : nofHas(it, nofKey) ? tkChip(lab, `<span class="nosong">なし</span>`) : tkMiss(`<small>${lab}</small>未設定`, "r:" + lab, ks);
   if (md === "stream") chips.push(listChips("配信", m.plat, () => m.plat.map(vlab).join("") + mk("r:配信", ["配信サイト"]), "plat", ["配信サイト"]));
   else {
-    if (hasSt(md)) chips.push(listChips("放送局", m.stations, () => m.stations.map(x => tkChip("放送局", esc(x))).join("") + mk("r:放送局", ["放送局"]), "st", ["放送局"]));
+    if (hasSt(md)) chips.push(listChips("放送局", m.stations, () => m.stations.map(x => `<span class="tk-chip">${esc(x)}</span>`).join("") + mk("r:放送局", ["放送局"]), "st", ["放送局"]));
     if (it.k === "d") chips.push(it.slot ? tkChip("放送枠", esc(it.slot)) : nofHas(it, "slot") ? "" : tkMiss("<small>放送枠</small>未設定", "r:放送枠", []));
     chips.push(listChips("配信", m.vods, () => m.vods.map(vlab).join("") + mk("r:配信", ["配信サイト"]), "vods", ["配信サイト"]));
   }
@@ -144,7 +144,10 @@ function infoCards(it, { md, ns, mv, stv, cs, songRows }) {
   if (ms.some(x => x.k === "公式サイト")) chips.push(tkMiss("<small>公式サイト</small>未設定", "r:公式サイト", ["公式サイト"]));
   if (ms.some(x => x.k === "配信URL" || x.k === "配信URLのずれ")) chips.push(tkMiss(`<small>配信URL</small>${it.vurl ? "確認" : "未設定"}`, "r:配信URL", ["配信URL", "配信URLのずれ"]));
   lines.push(`<div class="tk-chips">${chips.join("")}</div>`);
-  const bc = `<div class="icard ibc"><div class="ich"><span class="ilamp onair">ON AIR</span>${edB("onair", "基本情報")}</div>${lines.join("")}${notes.join("")}</div>`;
+  /* 見出しの横にジャンル・放送形態の札（押すと放送形態を編集） */
+  const mlab = mediaLabOf(it);
+  const tags = `<span class="meta dmeta ich-tags">${kindTag(it)}${mlab ? `<button type="button" class="dmt mtag m-${mlab[1]}" data-jump="fMedia" title="放送形態を変える">${mlab[0]}</button>` : ""}</span>`;
+  const bc = `<div class="icard ibc"><div class="ich"><span class="ilamp onair">ON AIR</span>${tags}${edB("onair", "基本情報")}</div>${lines.join("")}${notes.join("")}</div>`;
   /* 曲の話数の要確認（core.js の「曲の話数」と同じ判定） */
   const sgMax = Math.max(0, ...episodes(it).filter(e => !e.sp).map(e => epNum(e.n)).filter(n => n != null));
   const sgOver = x => sgMax > 0 && [x.a, x.b, ...exOf(x).flatMap(r => [r.a, r.b])].some(v => v != null && +v > sgMax);
@@ -261,8 +264,8 @@ function renderDetail(it) {
   const nv = navNeighbors(it.id),
     busy = !!(epEdit || arcEdit || slotEdit || subPaste || epOne != null);
   const navB = (d, lab, ic) => `<button type="button" class="u-btn icon sm dnav" data-dnav="${d}" aria-label="${lab}" title="${lab}${TOUCH ? "" : `（${d < 0 ? "←" : "→"}キー）`}" ${nv[d < 0 ? 0 : 1] && !busy ? "" : "disabled"}>${ic}</button>`;
-  return `<div class="dmain"><div class="dhead"><div class="hdrow dnavrow"><div class="hdrow">${navB(-1, "前の作品", CHEV(-1))}${navB(1, "次の作品", CHEV(1))}<button type="button" class="u-btn sm" id="editItem" aria-label="作品を編集">編集</button><button class="u-btn icon sm soft close" type="button" data-close aria-label="閉じる">✕</button></div></div></div>
-    <div class="dtit dhx"><div class="dhrow">${it.img ? `<button type="button" class="dtimg" data-imgview="1" aria-label="画像を大きく表示">${imgTag(it, "l", "dtimgi")}</button>` : `<button type="button" class="dtimg none" data-imgadd="1" aria-label="画像を貼り付け">${IMG_ICON}</button>`}<div class="dtc"><div class="meta dmeta">${kindTag(it)}${(l => (l ? `<button type="button" class="dmt mtag m-${l[1]}" data-jump="fMedia" title="放送形態を変える">${l[0]}</button>` : ""))(mediaLabOf(it))}${stBtn}${stMs.length ? wnMark("st") : ""}</div>${stMs.length ? wnNote("st", stMs.map(x => wnText(it, x)).join("")) : ""}<h3 class="jbr">${jbr(it.t)}<button type="button" class="tcopy" id="copyTitle" aria-label="タイトルをコピー" title="タイトルをコピー"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button></h3>
+  return `<div class="dmain"><div class="dhead"><div class="hdrow dnavrow"><div class="hdrow"><span class="meta dmeta dtop">${stBtn}${stMs.length ? wnMark("st") : ""}</span>${navB(-1, "前の作品", CHEV(-1))}${navB(1, "次の作品", CHEV(1))}<button type="button" class="u-btn sm" id="editItem" aria-label="作品を編集">編集</button><button class="u-btn icon sm soft close" type="button" data-close aria-label="閉じる">✕</button></div></div></div>
+    <div class="dtit dhx"><div class="dhrow">${it.img ? `<button type="button" class="dtimg" data-imgview="1" aria-label="画像を大きく表示">${imgTag(it, "l", "dtimgi")}</button>` : `<button type="button" class="dtimg none" data-imgadd="1" aria-label="画像を貼り付け">${IMG_ICON}</button>`}<div class="dtc">${stMs.length ? wnNote("st", stMs.map(x => wnText(it, x)).join("")) : ""}<h3 class="jbr">${jbr(it.t)}<button type="button" class="tcopy" id="copyTitle" aria-label="タイトルをコピー" title="タイトルをコピー"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button></h3>
     ${lnk ? `<div class="dtbtns">${lnk}</div>` : ""}</div></div></div>
     ${noEp ? "" : `<div class="dtabs" role="tablist"><button type="button" role="tab" data-dtab="info">番組情報</button><button type="button" role="tab" data-dtab="ep">話数${eps.length ? ` <small>${w}/${watchable(eps).length}</small>` : ""}${epMs ? `<span class="wnt" aria-label="要確認あり">!</span>` : ""}</button></div>`}
     <div class="dpane dp-info">${infoCards(it, { md, ns, mv, stv, cs, songRows })}

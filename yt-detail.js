@@ -38,7 +38,15 @@ function ytDetailHtml(x) {
     ...(miss.some(m => m.k === "再生リスト") ? [row("再生リスト", un("未設定"))] : []),
     ...(miss.some(m => m.k === "まとめ動画") ? [row("まとめ動画", un("未設定"))] : []),
   ];
-  const info = `<div class="icard ibc"><div class="ich"><span class="ilamp ytl">YOUTUBE</span><button type="button" class="u-btn sm iedit" data-jump="ycard" aria-label="基本情報を編集">編集</button></div><dl class="idl">${rows.join("")}</dl></div>`;
+  /* YOUTUBE の見出しの横の札：投稿者 → ジャンル（押すとジャンルを編集）。視聴ステータスは上の段（← → の左） */
+  const c = ytCat(x),
+    sb = ytGrp(x);
+  const gBtn = c ? `<button type="button" class="dmt lab s" data-jump="yfGenre" title="ジャンルを変える">${c}${sb ? `・${esc(sb)}` : ""}</button>` : "";
+  /* 投稿者・ジャンルの未入力：上のラベルの横に「!」 */
+  const topMiss = miss.filter(m => m.k === "投稿者" || m.k === "ジャンル");
+  const ytTags = `<span class="meta dmeta ich-tags"><span class="kind yauth">${esc(x.a || "YouTube")}</span>${gBtn}${topMiss.length ? wnMark("y:top") : ""}</span>`;
+  const ytTagNote = topMiss.length ? wnNote("y:top", topMiss.map(wnTx).join("")) : "";
+  const info = `<div class="icard ibc"><div class="ich"><span class="ilamp ytl">YOUTUBE</span>${ytTags}<button type="button" class="u-btn sm iedit" data-jump="ycard" aria-label="基本情報を編集">編集</button></div>${ytTagNote}<dl class="idl">${rows.join("")}</dl></div>`;
   const prog = `<div class="icard iprog"><div class="ich"><span class="ilamp progl">PROGRESS</span><span class="inow">${n ? `${pw} / ${n}本 見た` : "パート数を入れると進み具合を記録できます"}</span></div>${
     n
       ? `<div class="prog"><i style="width:${Math.min(100, (pw / n) * 100)}%"></i></div>
@@ -48,15 +56,9 @@ function ytDetailHtml(x) {
   const nv = ytNeighbors(x.id),
     busy = !!(yform && yform.inline);
   const navB = (d, lab) => `<button type="button" class="u-btn icon sm dnav" data-dnav="${d}" aria-label="${lab}" title="${lab}${TOUCH ? "" : `（${d < 0 ? "←" : "→"}キー）`}" ${nv[d < 0 ? 0 : 1] && !busy ? "" : "disabled"}>${CHEV(d)}</button>`;
-  /* 上段のラベル：投稿者（作品のジャンルの位置）→ ジャンル（作品の種別の位置。押すとジャンルを編集）→ 視聴ステータス */
-  const c = ytCat(x),
-    sb = ytGrp(x);
-  const gBtn = c ? `<button type="button" class="dmt lab s" data-jump="yfGenre" title="ジャンルを変える">${c}${sb ? `・${esc(sb)}` : ""}</button>` : "";
-  /* 投稿者・ジャンルの未入力：上のラベルの横に「!」 */
-  const topMiss = miss.filter(m => m.k === "投稿者" || m.k === "ジャンル");
   const lnk = [x.pl ? `<a class="u-btn dtb vod" href="${esc(x.pl)}" target="_blank" rel="noopener">${IC_PLAY}<span>YouTubeで見る</span></a>` : "", x.sm ? `<a class="u-btn dtb" href="${esc(x.sm)}" target="_blank" rel="noopener"><span>まとめ動画</span>${IC_EXT}</a>` : ""].join("");
-  return `<div class="dhead ydhead"><div class="hdrow dnavrow"><div class="hdrow">${navB(-1, "前の作品")}${navB(1, "次の作品")}<button type="button" class="u-btn sm" id="ytEdit" aria-label="再生リストを編集">編集</button><button class="u-btn icon sm soft close" type="button" data-close aria-label="閉じる">✕</button></div></div></div>
-    <div class="dtit dhx yhx">${ytHeroHtml(x)}<div class="dtc"><div class="meta dmeta"><span class="kind yauth">${esc(x.a || "YouTube")}</span>${gBtn}${stBtn}${topMiss.length ? wnMark("y:top") : ""}</div>${topMiss.length ? wnNote("y:top", topMiss.map(wnTx).join("")) : ""}<h3 class="jbr">${jbr(x.t)}<button type="button" class="tcopy" id="ytCopy" aria-label="タイトルをコピー" title="タイトルをコピー"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button></h3>${lnk ? `<div class="dtbtns">${lnk}</div>` : ""}</div></div>
+  return `<div class="dhead ydhead"><div class="hdrow dnavrow"><div class="hdrow"><span class="meta dmeta dtop">${stBtn}</span>${navB(-1, "前の作品")}${navB(1, "次の作品")}<button type="button" class="u-btn sm" id="ytEdit" aria-label="再生リストを編集">編集</button><button class="u-btn icon sm soft close" type="button" data-close aria-label="閉じる">✕</button></div></div></div>
+    <div class="dtit dhx yhx">${ytHeroHtml(x)}<div class="dtc"><h3 class="jbr">${jbr(x.t)}<button type="button" class="tcopy" id="ytCopy" aria-label="タイトルをコピー" title="タイトルをコピー"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button></h3>${lnk ? `<div class="dtbtns">${lnk}</div>` : ""}</div></div>
     <div class="ydbody">${info}${prog}
     <div class="links">${ytImgAddChip(x)}<button type="button" class="u-btn sm txt danger delsm" id="ytDel">削除</button></div></div>`;
 }
