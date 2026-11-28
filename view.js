@@ -607,11 +607,13 @@ function setMain(html) {
       return;
     }
   }
-  const m = /^\s*<div class="ftools">[\s\S]*?<\/div>/.exec(html);
+  /* 上の道具の行（検索窓）は残して、下の一覧（#results）だけ入れかえる（検索中に入力欄が作り直されて、続けて打てなくなるのを防ぐ）。
+     道具の行の前にある大きな文字のタブ（.gtabs）も道具の行と一緒に扱う */
+  const m = /^(\s*<div class="gtabs"[\s\S]*?<\/div>)?\s*<div class="ftools">[\s\S]*?<\/div>/.exec(html);
   const box = main.querySelector(":scope > .ftools");
   const res = main.querySelector(":scope > #results");
   if (m && box && res) {
-    const nid = (/id="([^"]+)"/.exec(m[0]) || [])[1];
+    const nid = (/id="([^"]+)"/.exec(m[0].slice((m[1] || "").length)) || [])[1];
     const cur = box.querySelector("input");
     if (cur && cur.id === nid) {
       res.innerHTML = html.slice(m.index + m[0].length);
