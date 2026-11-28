@@ -11,7 +11,13 @@
 <meta name="theme-color" content="#17151b" media="(prefers-color-scheme: dark)">
 <meta name="robots" content="noindex,nofollow">
 <script>try{var t=localStorage.getItem("u-theme:entame");if(t==="light"||t==="dark"){document.documentElement.setAttribute("data-theme",t);document.querySelectorAll('meta[name="theme-color"]').forEach(function(m){m.dataset.orig=m.content;m.content=t==="dark"?"#17151b":"#f7f1e8"})}var d=t==="dark"||(t!=="light"&&matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.classList.add(d?"th-d":"th-l")}catch(e){}</script>
+<!-- 起動を速く：書体・Firebase のサーバーへの接続を先に始め、Firebase の部品はアプリのファイルと並行して読み込む（版は core.js の U.FB_VER と同じにする） -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://firestore.googleapis.com">
+<link rel="modulepreload" href="https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js">
+<link rel="modulepreload" href="https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js">
+<link rel="modulepreload" href="https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500;600&family=Mochiy+Pop+One&family=Rubik:wght@600;800;900&display=swap">
 <!-- 読み込むファイルの ?v= は更新のたびに変える（ブラウザに古いファイルが残らないように） -->
 <link rel="stylesheet" href="app.css?v=20261123b">

@@ -384,6 +384,7 @@ window.UAuth = (() => {
       kind … "fb"＝Firebase / "none"＝つながらない
       db   … doc(path) と collection(path) を持つ
       uid  … 利用者のID（つながらないときは null） */
+/* FB_VER を変えるときは index.html の modulepreload の版も同じにする */
 const U = { app: Object.assign({ id: "app", fb: null, root: null }, window.U_APP || {}), FB_VER: "12.15.0" };
 /* ---------- 表示（ライト／ダーク）：auto＝端末に合わせる。アプリごと・端末ごとに覚える ----------
    開いた瞬間に白く光らないよう、各アプリの index.html の head でも同じ処理を先に行う */

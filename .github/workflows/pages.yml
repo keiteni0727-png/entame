@@ -28,6 +28,12 @@ jobs:
       - uses: actions/checkout@v4
       - name: 版の番号を付ける
         run: python3 .github/scripts/stamp.py "$(TZ=Asia/Tokyo date +%Y%m%d%H%M%S)"
+      # 公開するファイルを小さくする（説明の文・空白を除くだけ。関数や変数の名前は変えない）。sw.js は版の番号を書きかえるので除く
+      - name: ファイルを小さくする
+        run: |
+          for f in $(ls *.js | grep -v '^sw\.js$') app.css; do
+            npx --yes esbuild@0.24.0 "$f" --minify-whitespace --minify-syntax --charset=utf8 --log-level=warning --outfile="$f" --allow-overwrite
+          done
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
