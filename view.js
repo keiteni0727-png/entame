@@ -68,12 +68,6 @@ const slotOk = i => !state.slot || i.slot === state.slot;
 /* ジャンル：a=アニメ d=ドラマ f=映画（ドラマと関係ない実写映画） r=バラエティ（恋愛リアリティなど、アニメでもドラマでもない配信番組） */
 const KIND_LAB = { a: "アニメ", d: "ドラマ", f: "映画", r: "バラエティ" };
 const kindTag = i => `<span class="kind ${i.k}">${KIND_LAB[i.k] || "ドラマ"}</span>`;
-/* 番組表の時刻の下に出す放送局（配信なら配信サイト） */
-function stationTxt(i) {
-  const m = mediaOf(i);
-  const l = m.media === "stream" ? m.plat : hasSt(m.media) ? m.stations : [];
-  return l.join("・");
-}
 /* 放送局・配信サイトのラベル。tag=true：作品詳細用。種別（TV・TV SP・映画・OVA・配信）を一覧と同じタグで先頭に出す */
 function mediaLabels(i, tag) {
   const m = mediaOf(i);
@@ -322,30 +316,33 @@ function weekCard(i, dayKey, isNext, onAir) {
     wn = watchable(eps).length;
   const e = weekEp(i, dayKey);
   const m = mediaOf(i);
-  const st = i.dow < 0 ? "" : stationTxt(i);
   const fin = dayKey && isFinOn(i, dayKey);
+  /* 番組表ではシリーズ・放送局は出さない。配信サイトの札だけ下の段に */
+  const sites = [...new Set([...(m.media === "stream" ? m.plat : []), ...m.vods])].map(vlab).join("");
   const time = i.dow < 0 ? (m.media === "sp" && i.time ? esc(i.time) : ONE_LAB[m.media] || "配信") : esc(i.time || "--:--");
   /* 右上の斜めのシール：放送中・次の放送・その日の話を見た */
   const seal = onAir ? `<span class="wc-seal live">ON AIR</span>` : isNext ? `<span class="wc-seal nx">NEXT</span>` : e && e.w ? `<span class="wc-seal seen">見た</span>` : "";
-  /* 視聴ボタン：未視聴があれば「○話を見た」 */
+  /* 視聴ボタン：未視聴があれば「✓ ○話を見た」 */
+  const CK = `<svg class="ck" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   const tick = back[0]
-    ? `<button type="button" class="u-btn pri wc-tick" data-tick="${i.id}" aria-label="${esc(i.t)} ${esc(epVal(back[0].n) ? epVal(back[0].n) + "話" : back[0].n)}を視聴済にする">${esc(epVal(back[0].n) ? epVal(back[0].n) + "話" : back[0].n)}を見た</button>`
+    ? `<button type="button" class="u-btn pri wc-tick" data-tick="${i.id}" aria-label="${esc(i.t)} ${esc(epVal(back[0].n) ? epVal(back[0].n) + "話" : back[0].n)}を視聴済にする">${CK}${esc(epVal(back[0].n) ? epVal(back[0].n) + "話" : back[0].n)}を見た</button>`
     : spUnseen(i)
-      ? `<button type="button" class="u-btn pri wc-tick" data-spdone="${i.id}" aria-label="${esc(i.t)}を視聴済にする">見た</button>`
+      ? `<button type="button" class="u-btn pri wc-tick" data-spdone="${i.id}" aria-label="${esc(i.t)}を視聴済にする">${CK}見た</button>`
       : "";
-  /* 線のタイムライン：時刻・線と点・縦長の画像（ポスター）・情報（PC・スマホとも画像の右に、画像の高さに収める） */
+  /* 線のタイムライン：時刻・線と点・縦長の画像（ポスター。左下にジャンルの札）・情報（PC・スマホとも画像の右に、画像の高さに収める）。
+     情報は上から タイトル → 進み具合のバー（横いっぱい）→「7/13話」と次の話 → 下の段に配信サイト・最終回の札と「見た」ボタン */
   const img = posterTag(i, "s", "wc-imgi") || `<span class="wc-noimg">${IMG_ICON}</span>`;
   return `<div class="wcard v-tl${onAir ? " live" : isNext ? " nx" : ""}">${seal}
     <span class="wc-time">${time}</span>
     <span class="wc-line" aria-hidden="true"><i></i></span>
-    <button type="button" class="wc-img" data-id="${i.id}" tabindex="-1" aria-hidden="true">${img}</button>
+    <button type="button" class="wc-img" data-id="${i.id}" tabindex="-1" aria-hidden="true">${img}<span class="wc-kind">${kindTag(i)}</span></button>
     <div class="wc-body">
       <button type="button" class="wc-main" data-id="${i.id}">
-        <span class="wc-tags">${kindTag(i)}${fin ? FIN : ""}${libLabels(i)}${st ? `<span class="wc-st">${esc(st)}</span>` : ""}</span>
         <span class="wc-ttl jbr">${jbr(i.t)}</span>
-        ${weekEpLine(i, e, onAir)}
+        ${eps.length ? `<span class="wc-bar"><i style="width:${Math.round((w / (wn || 1)) * 100)}%"></i></span>` : ""}
+        <span class="wc-sub">${eps.length ? `<span class="wc-cnt">${w}/${wn}話</span>` : ""}${weekEpLine(i, e, onAir)}</span>
       </button>
-      <div class="wc-foot2">${eps.length ? `<span class="wc-prog"><span class="wc-bar"><i style="width:${Math.round((w / (wn || 1)) * 100)}%"></i></span><span class="wc-cnt">${w}/${wn}話</span></span>` : ""}${tick}</div>
+      <div class="wc-foot2"><span class="wc-tags">${fin ? FIN : ""}${sites}</span>${tick}</div>
     </div>
   </div>`;
 }

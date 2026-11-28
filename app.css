@@ -732,17 +732,11 @@ input[type=date]::-webkit-date-and-time-value{text-align:left}
 .wc-main{display:grid;gap:7px;border:0;background:none;text-align:left;padding:14px 16px 12px;font:inherit;color:var(--u-ink);min-width:0;flex:1;align-content:start}
 
 .wc-time{font-family:var(--u-num);font-size:var(--fs-2xl);font-weight:700;letter-spacing:-.01em;line-height:1}
-.wc-st{font-size:var(--fs-base);font-weight:700;color:var(--u-sub)}
 
 .wc-ttl{font-family:var(--u-f);font-size:var(--fs-xl);font-weight:700;line-height:1.35;overflow-wrap:anywhere}
 .wc-ep{font-size:var(--fs-l);color:var(--u-sub);overflow-wrap:anywhere}
 .wc-ep b{color:var(--u-ink);font-family:var(--u-num)}
 .wc-ep em{font-style:normal;font-size:var(--fs-s);font-weight:700;color:var(--u-sub);border:1px solid var(--u-line);border-radius:var(--r-s);padding:1px 6px;margin-right:7px;vertical-align:1px}
-.wc-prog{display:flex;align-items:center;gap:10px;margin-top:2px;flex-wrap:wrap}
-.wc-bar{flex:1;min-width:100px;max-width:240px;height:8px;border-radius:var(--r-s);background:var(--u-chip);overflow:hidden}
-.wc-bar i{display:block;height:100%;background:var(--u-ok)}
-.wc-cnt{font-family:var(--u-num);font-size:var(--fs-base);color:var(--u-sub);font-weight:600}
-.wc-tick .ck{display:grid;place-items:center;width:22px;height:22px;border-radius:var(--r-s);border:2px solid var(--u-ok);color:var(--u-ok);font-size:var(--fs-m);line-height:1}
 
 .wtabs{display:flex;border-radius:var(--r-l);margin-top:16px;background:none;padding:0;gap:5px}
 .wtabs button{flex:1;display:grid;justify-items:center;gap:1px;padding:7px 4px;position:relative;font:inherit;line-height:1.2;background:var(--u-surface);border:2px solid var(--k);border-radius:14px;color:var(--u-ink)}
@@ -756,7 +750,6 @@ input[type=date]::-webkit-date-and-time-value{text-align:left}
   .wday{margin-top:12px}
   .wc-time{font-size:var(--fs-2xl)}
   .wc-ttl{font-size:var(--fs-xl)}
-  .wc-bar{max-width:none}
   .wcard .pconly{display:none}
   .wcard .lab.s.pconly{display:inline-block}
   .frow .fb .chev{display:none}
@@ -1040,15 +1033,22 @@ button.imt[aria-expanded="false"]+.imt,button.imt[aria-expanded="false"]+button.
 .wcard .wc-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;padding-bottom:16px}
 .wcard .wc-main{display:flex;flex-direction:column;gap:6px;padding:0;border:0;background:none;text-align:left;font:inherit;color:var(--u-ink);min-width:0}
 .wc-tags{display:flex;flex-wrap:wrap;gap:4px 5px;align-items:center;min-width:0}
-.wc-tags .wc-st{font-size:var(--fs-s);font-weight:700;color:var(--u-sub)}
 .wcard .wc-ttl{font-size:var(--fs-l);font-weight:700;line-height:1.35}
 .wcard .wc-ep{font-size:var(--fs-base);color:var(--u-ink);line-height:1.45}
 .wcard .wc-ep em{border:0;margin:0;padding:0;font-size:inherit;vertical-align:baseline;font-style:normal;font-weight:700;color:var(--u-sub)}
 .wcard .wc-ep em.p-未視聴{color:var(--u-live)}
 .wcard .wc-ep em.p-次回{color:var(--u-acct)}
 .wcard .wc-ep em.p-放送中{color:var(--u-live)}
-.wcard .wc-prog{display:flex;align-items:center;gap:10px}
-.wcard .wc-bar{flex:1;max-width:180px;min-width:60px;border-radius:var(--r-s);overflow:hidden;border:1.5px solid var(--k2);height:8px;background:var(--u-bg)}
+/* 進み具合のバーは横いっぱい。その下に「7/13話」と次の話を1行で */
+.wcard .wc-bar{display:block;width:100%;box-sizing:border-box;border-radius:var(--r-s);overflow:hidden;border:1.5px solid var(--k2);height:8px;background:var(--u-bg);margin:2px 0}
+/* 右上のシール（ON AIR・NEXT・見た）がタイトルに重ならないように */
+.wcard:has(>.wc-seal) .wc-ttl{padding-right:46px}
+.wc-sub{display:flex;align-items:baseline;gap:8px;min-width:0}
+.wc-sub .wc-cnt{flex:none;white-space:nowrap}
+.wc-sub .wc-ep{min-width:0}
+/* 画像の左下のジャンルの札（グリッドの札と同じ位置） */
+.wc-img .wc-kind{position:absolute;left:6px;bottom:6px;z-index:1;display:flex}
+.wc-img .wc-kind .kind{border:1.5px solid var(--k2)}
 .wcard .wc-bar i{display:block;height:100%;background:var(--u-accent)}
 .wcard .wc-cnt{font-size:var(--fs-s);font-weight:600;color:var(--u-sub);font-family:inherit}
 .wc-tick{flex:1;align-self:flex-start}
@@ -1710,9 +1710,10 @@ select.sg-t{height:var(--h-in);width:auto;max-width:120px;cursor:pointer;-webkit
 .v-tl .wc-ttl{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-family:var(--fd);font-weight:400;font-size:15px;line-height:1.35}
 .v-tl .wc-ep{font-size:var(--fs-m);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .wc-foot2{display:flex;align-items:center;gap:10px;min-height:32px}
-.wc-foot2 .wc-prog{flex:1;min-width:0}
-.wc-foot2 .wc-bar{max-width:200px}
-.wcard.v-tl .wc-tick.u-btn{flex:none;margin-left:auto;height:32px;padding:0 14px;font-size:var(--fs-s);border:2px solid var(--k);background:var(--pop);color:var(--onpop);font-weight:900;border-radius:18px;box-shadow:2px 2px 0 var(--ks)}
+.wc-foot2 .wc-tags{flex:1;min-width:0}
+/* 「✓ ○話を見た」：ほかの小さいボタンと同じ高さ */
+.wcard.v-tl .wc-tick.u-btn{flex:none;margin-left:auto;display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 11px 0 9px;font-size:var(--fs-s);border:2px solid var(--k);background:var(--pop);color:var(--onpop);font-weight:800;border-radius:var(--r-full);box-shadow:2px 2px 0 var(--ks)}
+.wc-tick .ck{width:14px;height:14px;flex:none}
 .wline .v-tl:first-of-type .wc-line::before{top:14px}
 .wline{display:flex;flex-direction:column;margin-top:4px}
 @media (min-width:900px){
@@ -1786,7 +1787,6 @@ html[data-gsz="s"] .pgrid{--gc:3}
 @media (min-width:900px){.row.thr.yrow .slot{grid-template-columns:62px 80px minmax(0,1fr) auto!important}.row.thr.yrow .thb{width:80px}}
 .ygrid .pimg{aspect-ratio:16/9}
 .v-tl .wc-tags>*{flex:none}
-.v-tl .wc-tags .wc-st{white-space:nowrap}
 /* スマホ：ライブラリ・YouTubeの一覧の行には画像を出さない（画像の前の見え方。PCは出す） */
 @media (max-width:599px){.row.thr .thb{display:none}.row.thr .slot,.row.thr.yrow .slot{grid-template-columns:48px minmax(0,1fr) auto!important;align-items:start}}
 /* 作品の詳細：縦の画像（見出しのポスター。押すと拡大） */
@@ -2000,6 +2000,14 @@ html[data-gsz="s"] .pgrid{--gc:3}
 .dhx .dtb.vod{background:var(--kbg);color:#fff;box-shadow:3px 3px 0 var(--u-accent)}
 .dhx .dtb.vod .iic.ply circle{fill:#fff}
 .dhx .dtb.vod .iic.ply path{fill:var(--kbg)}
+/* 配信サイトの色のボタン（Netflix は赤など）。影はほかのボタンと同じ黒 */
+.dhx .dtb.vod.vc{background:var(--vc);color:var(--vt);border-color:var(--k);box-shadow:3px 3px 0 var(--ks)}
+.dhx .dtb.vod.vc .iic.ply circle{fill:var(--vt)}
+.dhx .dtb.vod.vc .iic.ply path{fill:var(--vc)}
+/* 上の段の視聴ステータス：横のボタンと高さ・位置をそろえる。要確認の「!」は札の右上に小さく重ねる（画像に被らないように） */
+.dhead .dtop{position:relative;margin:0}
+.dhead .dtop .pill.dst{height:28px}
+.dhead .dtop .wnm{position:absolute;top:-7px;right:-7px;margin:0;z-index:2;box-shadow:0 0 0 2px var(--u-bg)}
 /* 上の段：前後・編集・✕だけ（右寄せ） */
 .dnavrow{justify-content:flex-end}
 /* --- 詳細の小さいボタン（前後・編集・✕・カードの編集・話数の編集と貼り付け）：ステッカーの形（太枠＋小さなずらした影） --- */
@@ -2188,6 +2196,3 @@ html[data-gsz="s"] .pgrid{--gc:3}
   html.nlist .v-tl .wc-ttl{font-size:15px}
   html.nlist .v-tl .wc-tags{flex-wrap:wrap}
 }
-/* 一覧が狭いときの番組表：進み具合の「5/12話」を折り返さない */
-html.nlist .wc-foot2 .wc-cnt{white-space:nowrap}
-html.nlist .wc-foot2 .wc-bar{min-width:40px}

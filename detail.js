@@ -260,7 +260,9 @@ function renderDetail(it) {
   const stMs = upcoming(it) ? [] : missingOf(it).filter(x => x.k === "ステータス" || x.k === "ステータスのずれ");
   const epMs = missingOf(it).some(x => ["サブタイトル", "話数の表記", "話数の抜け", "話数の重複", "日付の確認", "未チェックの話"].includes(x.k));
   /* スマホ：ポスターの右（タイトルの下）に配信・公式サイトのボタン（PCは左の列） */
-  const lnk = [it.vurl ? `<a class="u-btn dtb vod" href="${esc(it.vurl)}" target="_blank" rel="noopener">${IC_PLAY}<span>${esc(vodName(it))}で見る</span></a>` : "", it.url ? `<a class="u-btn dtb" href="${esc(it.url)}" target="_blank" rel="noopener"><span>公式サイト</span>${IC_EXT}</a>` : ""].join("");
+  /* 配信のボタンは配信サイトの色（URLからサイトが分かればそのサイト、分からなければ配信サイトが1つのときはその色） */
+  const vsite = Object.keys(VOD_COLOR).find(k => normVod(k) === vurlSite(it.vurl)) || vodName(it);
+  const lnk = [it.vurl ? `<a class="u-btn dtb vod${VOD_COLOR[vsite] ? " vc" : ""}"${vcStyle(vsite)} href="${esc(it.vurl)}" target="_blank" rel="noopener">${IC_PLAY}<span>${esc(vodName(it))}で見る</span></a>` : "", it.url ? `<a class="u-btn dtb" href="${esc(it.url)}" target="_blank" rel="noopener"><span>公式サイト</span>${IC_EXT}</a>` : ""].join("");
   const nv = navNeighbors(it.id),
     busy = !!(epEdit || arcEdit || slotEdit || subPaste || epOne != null);
   const navB = (d, lab, ic) => `<button type="button" class="u-btn icon sm dnav" data-dnav="${d}" aria-label="${lab}" title="${lab}${TOUCH ? "" : `（${d < 0 ? "←" : "→"}キー）`}" ${nv[d < 0 ? 0 : 1] && !busy ? "" : "disabled"}>${ic}</button>`;
