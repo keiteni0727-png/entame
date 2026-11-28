@@ -26,6 +26,8 @@ const SHELL = [
   "manifest.json",
   "icon-180.png",
   "icon-192.png",
+  "logos/abema.png", "logos/asahi.png", "logos/danime.png", "logos/disney.png", "logos/fuji.png", "logos/lemino.png", "logos/mx.png", "logos/netflix.png",
+  "logos/nhk.png", "logos/ntv.png", "logos/prime.png", "logos/tbs.png", "logos/tver.png", "logos/tvtokyo.png", "logos/unext.png",
 ];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).catch(() => {}).then(() => self.skipWaiting())); });
 self.addEventListener("activate", e => {

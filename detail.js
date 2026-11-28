@@ -132,7 +132,7 @@ function infoCards(it, { md, ns, mv, stv, cs, songRows }) {
     l.length ? html() : nofHas(it, nofKey) ? tkChip(lab, `<span class="nosong">なし</span>`) : tkMiss(`<small>${lab}</small>未設定`, "r:" + lab, ks);
   if (md === "stream") chips.push(listChips("配信", m.plat, () => m.plat.map(vlab).join("") + mk("r:配信", ["配信サイト"]), "plat", ["配信サイト"]));
   else {
-    if (hasSt(md)) chips.push(listChips("放送局", m.stations, () => m.stations.map(x => `<span class="tk-chip">${esc(x)}</span>`).join("") + mk("r:放送局", ["放送局"]), "st", ["放送局"]));
+    if (hasSt(md)) chips.push(listChips("放送局", m.stations, () => m.stations.map(x => `<span class="tk-chip">${logoImg(x)}${esc(x)}</span>`).join("") + mk("r:放送局", ["放送局"]), "st", ["放送局"]));
     if (it.k === "d") chips.push(it.slot ? tkChip("放送枠", esc(it.slot)) : nofHas(it, "slot") ? "" : tkMiss("<small>放送枠</small>未設定", "r:放送枠", []));
     chips.push(listChips("配信", m.vods, () => m.vods.map(vlab).join("") + mk("r:配信", ["配信サイト"]), "vods", ["配信サイト"]));
   }

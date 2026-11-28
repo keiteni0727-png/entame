@@ -1151,7 +1151,10 @@ const vcStyle = v => {
   const c = VOD_COLOR[v];
   return c ? ` style="--vc:${c[0]};--vt:${c[1]}"` : "";
 };
-const vlab = v => `<span class="lab v${VOD_COLOR[v] ? " vc" : ""}"${vcStyle(v)}>${esc(v)}</span>`;
+/* 放送局・配信サイトのアイコン（logos/。各サイトのアイコン。TOKYO MX はマスコット）。設定で足した名前などアイコンのないものは文字だけ */
+const LOGO = { Netflix: "netflix", "Disney＋": "disney", ABEMA: "abema", "U-NEXT": "unext", "Prime Video": "prime", Lemino: "lemino", dアニメストア: "danime", TVer: "tver", フジテレビ: "fuji", 日本テレビ: "ntv", テレビ朝日: "asahi", TBS: "tbs", テレビ東京: "tvtokyo", "TOKYO MX": "mx", NHK: "nhk" };
+const logoImg = n => (LOGO[n] ? `<img class="lgi" src="logos/${LOGO[n]}.png" alt="" loading="lazy">` : "");
+const vlab = v => `<span class="lab v${VOD_COLOR[v] ? " vc" : ""}${LOGO[v] ? " hl" : ""}"${vcStyle(v)}>${logoImg(v)}${esc(v)}</span>`;
 const MEDIA = [
   ["tv", "TV"],
   ["sp", "TV SP"],
