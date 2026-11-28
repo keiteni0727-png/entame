@@ -229,9 +229,21 @@ function syncDhh() {
    （全文はコピーのボタンで取れる）。作品の詳細・YouTube の詳細で共通 */
 const TITLE_MIN2 = 15,
   TITLE_MIN3 = 13;
+let fitMemo = null; // 前に合わせた結果 { key, fs, cls }（同じタイトル・同じ幅なら測り直さない）
 function fitTitle() {
   const h = $("#layer .sheet .dhx h3");
   if (!h || !h.offsetParent) return;
+  const key = `${h.textContent}|${innerWidth}|${document.documentElement.style.getPropertyValue("--pw")}|${document.fonts ? document.fonts.status : ""}`;
+  if (fitMemo && fitMemo.key === key) {
+    h.style.fontSize = fitMemo.fs;
+    h.classList.remove("clamp3", "jbrx");
+    if (fitMemo.cls) h.classList.add(...fitMemo.cls.split(" "));
+    return;
+  }
+  fitTitleMeasure(h);
+  fitMemo = { key, fs: h.style.fontSize, cls: ["clamp3", "jbrx"].filter(c => h.classList.contains(c)).join(" ") };
+}
+function fitTitleMeasure(h) {
   h.style.fontSize = "";
   h.classList.remove("clamp3", "jbrx");
   const lines = () => Math.round(h.getBoundingClientRect().height / (parseFloat(getComputedStyle(h).lineHeight) || 1));

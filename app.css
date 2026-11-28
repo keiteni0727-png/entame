@@ -178,6 +178,8 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var
 .banner b{display:block}
 .banner button{border:1px solid var(--u-line);background:var(--u-bg);border-radius:var(--r-m);padding:6px 10px;font-size:var(--fs-m)}
 main{padding-bottom:20px}
+/* 一覧の行：画面の外にある行は、並べる計算・描く処理を後回しにする（作品が多いと描き直しが重くなるため）。高さはだいたいの値 */
+.slots>.row{content-visibility:auto;contain-intrinsic-size:auto 76px}
 /* ライブラリの行のまとまり：カードと同じ太枠＋影 */
 .slots{background:var(--u-surface);border:2px solid var(--k);border-radius:18px;box-shadow:4px 4px 0 var(--ks);overflow:hidden}
 .row{display:flex;align-items:stretch;border-top:1px solid var(--u-line)}
@@ -1739,7 +1741,8 @@ select.sg-t{height:var(--h-in);width:auto;max-width:120px;cursor:pointer;-webkit
 .count .vtog ~ .gbulk{margin-left:12px!important}
 @media (max-width:899px){.count .vtog ~ .gbulk{flex-basis:auto!important}}
 /* グリッド：列の数は --gc（大きさは「ふつう」「小さめ」の2つ × スマホ／iPad縦／PC。YouTubeは横長なので別）。ポスターは太枠＋影で1枚ずつ少し傾け、左上に斜めのステータスのシール */
-.pgrid{--gc:2;display:grid;grid-template-columns:repeat(var(--gc),minmax(0,1fr));gap:24px 18px;padding:6px 4px 0}
+/* 画面の外にあるまとまりは並べる計算・描く処理を後回しにする。シール・傾き・影がはみ出して切れないよう、内側に余白をとって外側を同じだけ戻す（見た目の位置は前と同じ） */
+.pgrid{--gc:2;display:grid;grid-template-columns:repeat(var(--gc),minmax(0,1fr));gap:24px 18px;padding:10px 10px 12px;margin:-4px -6px -12px;content-visibility:auto;contain-intrinsic-size:auto 900px}
 html[data-gsz="s"] .pgrid{--gc:3}
 @media (min-width:600px) and (max-width:899px){
   .pgrid{--gc:4}
@@ -1781,7 +1784,7 @@ html[data-gsz="s"] .pgrid{--gc:3}
 .pcell.sel .pimg{box-shadow:4px 4px 0 var(--u-accent);outline:3px solid var(--u-accent);outline-offset:3px}
 /* 選んでいる行は行ぜんたいを囲む（YouTube の行の右の「再生」も含める） */
 .row:has(>.slot.sel){outline:3px solid var(--u-accent);outline-offset:-3px}
-.cgroup .pgrid{margin-top:4px}
+.cgroup .pgrid{margin-top:-4px}
 /* YouTube：一覧のサムネは横長、グリッドも横長 */
 .row.thr.yrow .slot{grid-template-columns:48px 64px minmax(0,1fr) auto!important}
 .row.thr.yrow .thb{width:64px;aspect-ratio:16/9}

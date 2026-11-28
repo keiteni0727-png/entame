@@ -1625,6 +1625,35 @@ function purgeTrash(col) {
   });
 }
 /* 保存先につないで、作品・話数と視聴チェック・マスタ・YouTube を読み込む（ほかの端末で変えた分も自動で反映） */
+/* 保存先からデータが届いたときの描き直しは、次の描画の直前に1回にまとめる（届くたびに全体を描き直して重くならないように） */
+let rsFrame = 0,
+  rsSheet = false,
+  rsSet = false,
+  rsYt = false;
+function renderSoon(o = {}) {
+  rsSheet = rsSheet || !!o.sheet;
+  rsSet = rsSet || !!o.set;
+  rsYt = rsYt || !!o.yt;
+  if (rsFrame) return;
+  rsFrame = requestAnimationFrame(() => {
+    rsFrame = 0;
+    const [sh, se, yt] = [rsSheet, rsSet, rsYt];
+    rsSheet = rsSet = rsYt = false;
+    render();
+    if (sh && openId && !epEdit) refreshSheet();
+    if (se) refreshSettings();
+    if (yt && ytOpen) ytRefresh();
+  });
+}
+/* 中身が同じか（届いたデータが今のデータと同じなら、組み立て直し・描き直しをしない。自分の保存が返ってきたときなど） */
+function sameData(a, b) {
+  if (a === b) return true;
+  if (!a || !b || typeof a !== "object" || typeof b !== "object" || Array.isArray(a) !== Array.isArray(b)) return false;
+  const ka = Object.keys(a),
+    kb = Object.keys(b);
+  if (ka.length !== kb.length) return false;
+  return ka.every(k => Object.prototype.hasOwnProperty.call(b, k) && sameData(a[k], b[k]));
+}
 async function initStore() {
   const conn = await U.store();
   if (!conn.db) {
@@ -1641,8 +1670,7 @@ async function initStore() {
     calcLastAt();
     rebuild();
     fillEpTimesAll();
-    render();
-    if (openId && !epEdit) refreshSheet();
+    renderSoon({ sheet: 1 });
   };
   /* 読み込みが止まったときは U.sync が自動でつなぎ直す。ここでは「同期中」に戻すだけ */
   const onErr = k => () => {
@@ -1670,13 +1698,16 @@ async function initStore() {
   db.collection("titles").onSnapshot(
     s => {
       syncMark("titles", s);
-      over = docsOf(s);
+      const nx = docsOf(s);
+      /* 同じ中身（自分の保存が返ってきた・保存済みの印が変わっただけ）なら、組み立て直し・描き直しはしない */
+      const same = got.titles && sameData(over, nx);
+      if (!same) over = nx;
       if (s.fromCache === false) {
         purgeTrash("titles");
         cleanWideImages();
       }
       got.titles = true;
-      done();
+      if (!same) done();
     },
     onErr("titles"),
     { meta: true },
@@ -1684,9 +1715,11 @@ async function initStore() {
   db.collection("progress").onSnapshot(
     s => {
       syncMark("progress", s);
-      prog = docsOf(s);
+      const nx = docsOf(s);
+      const same = got.progress && sameData(prog, nx);
+      if (!same) prog = nx;
       got.progress = true;
-      done();
+      if (!same) done();
       if (s.fromCache === false) migrateProg();
     },
     onErr("progress"),
@@ -1697,16 +1730,14 @@ async function initStore() {
     master = d ? d.data() : {};
     got.master = true;
     if (got.titles) fixOldData();
-    render();
-    refreshSettings();
+    renderSoon({ set: 1 });
   }, onErr());
   db.collection("yt").onSnapshot(s => {
     ytOver = docsOf(s);
     if (s.fromCache === false) purgeTrash("yt");
     calcLastAt();
     ytRebuild();
-    render();
-    if (ytOpen) ytRefresh();
+    renderSoon({ yt: 1 });
   }, onErr());
 }
 /* ---------- 話数（放送日時は「分」で持つ。日本時間の深夜25時台は前日扱い） ---------- */

@@ -543,8 +543,18 @@ async function alRefresh(force) {
   if ($(".alsheet")) alOpenNotes();
 }
 /* お知らせの中身：[{ m, base: 登録済みの作品, why }] */
+/* 計算した結果を覚えておき、お知らせ・アニメのタイトルとAniListの番号・表示しない設定が変わったときだけ計算し直す
+   （番組表を描き直すたびに数百件の新作と全作品のタイトルを比べ直して重くなっていたため） */
+let alNotesMemo = null;
 function alNotes() {
   if (!alFeed) return [];
+  const key = [alFeed, items.filter(i => i.k === "a").map(i => `${i.id}\t${i.al || ""}\t${i.t}`).join("\n"), (master.alHide || []).join(",")];
+  if (alNotesMemo && alNotesMemo.key.every((v, i) => v === key[i])) return alNotesMemo.out;
+  const out = alNotesCalc();
+  alNotesMemo = { key, out };
+  return out;
+}
+function alNotesCalc() {
   const hide = new Set(master.alHide || []);
   const anime = items.filter(i => i.k === "a");
   const have = new Set(anime.map(i => i.al).filter(Boolean));
