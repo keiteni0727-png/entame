@@ -1183,6 +1183,44 @@ const ls = U.ls;
 U.noSheet = true;
 const esc = U.esc;
 const $ = s => document.querySelector(s);
+/* タイトルを言葉の切れ目でだけ折り返す（「葬送のテス／ト」のように言葉の途中で切らない）。
+   エスケープした文字に、折り返してよい場所の印 <wbr> を入れて返す。使う側の CSS は word-break:keep-all（.jbr）。
+   区切りは日本語の単語の区切り（Intl.Segmenter）を、カタカナの続き・ひらがな（助詞など）・漢字の続き・ひらがなの後の漢字1文字（「だった件」）・「第2期」・かっこでまとめ直したもの */
+const JBR_SEG = typeof Intl === "object" && Intl.Segmenter ? new Intl.Segmenter("ja", { granularity: "word" }) : null;
+const jbrCache = new Map();
+function jbr(t) {
+  t = String(t ?? "");
+  if (!JBR_SEG || t.length < 6) return esc(t);
+  if (jbrCache.has(t)) return jbrCache.get(t);
+  const KATA = /[\u30a0-\u30ffー]/,
+    HIRA = /^[\u3040-\u309f]+$/,
+    KAN = /[\u4e00-\u9fff々]/,
+    OPEN = /[【「『（(〈《［\[〔]$/,
+    CLOSE = /^[】」』）)〉》］\]〕、。，．！？!?〜～ー・…:：]/,
+    UNIT = /^[期話章部弾作編幕回巻]$/;
+  const out = [];
+  for (const { segment: b } of JBR_SEG.segment(t)) {
+    const a = out[out.length - 1];
+    const join =
+      a != null &&
+      !/\s$/.test(a) &&
+      !/^\s/.test(b) &&
+      ((KATA.test(a.slice(-1)) && KATA.test(b[0])) ||
+        HIRA.test(b) ||
+        (b.length === 1 && KAN.test(b) && /[\u3040-\u309f]$/.test(a)) ||
+        (KAN.test(a.slice(-1)) && KAN.test(b[0]) && !/[0-9０-９]/.test(a)) ||
+        /第$/.test(a) ||
+        (/[0-9０-９]$/.test(a) && (/^[0-9０-９]/.test(b) || UNIT.test(b))) ||
+        OPEN.test(a) ||
+        CLOSE.test(b));
+    if (join) out[out.length - 1] = a + b;
+    else out.push(b);
+  }
+  const html = out.map(esc).join("<wbr>");
+  if (jbrCache.size > 2000) jbrCache.clear();
+  jbrCache.set(t, html);
+  return html;
+}
 /* クリックの割り当て表を上から順に試す。表は [目印のセレクタ, 処理(押した要素, 作品など, イベント)] の並び。
    セレクタが null の行は毎回試す。処理が false を返したら「ここでは扱わない」として次の行へ。どれかが扱ったら true */
 function runActions(table, e, ctx) {

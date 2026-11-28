@@ -388,8 +388,8 @@ function openForm(it, target, el) {
   if (it && ONLY_A[target]) return openInlineForm(target, el);
   form.fromDetail = !!it && openId === it.id; // 詳細から開いたか（戻るときに前・次の並びを引き継ぐ）
   openId = null;
-  $("#layer").innerHTML =
-    `<div class="scrim" data-close></div><div class="sheet form" role="dialog" aria-modal="true" aria-label="${form.id ? "作品を編集" : "作品を追加"}"><div class="wrap" id="formIn">${formHtml()}</div></div>`;
+  const html = `<div class="scrim" data-close></div><div class="sheet form" role="dialog" aria-modal="true" aria-label="${form.id ? "作品を編集" : "作品を追加"}"><div class="wrap" id="formIn">${formHtml()}</div></div>`;
+  form.fromDetail ? openOverDetail(html) : ($("#layer").innerHTML = html);
   readForm();
   form.init = JSON.stringify({ ...form, init: 0 });
   if (!TOUCH) $("#f-t").focus({ preventScroll: true });
@@ -589,7 +589,7 @@ async function submitForm() {
 const TOUCH = U.TOUCH;
 const lockScroll = U.lock;
 /* 後ろの画面を止めるのは、真ん中に出す画面のときだけ（PCの右のパネルで開いた詳細は、一覧もそのまま動かせる） */
-new MutationObserver(() => lockScroll(!!$("#layer").firstElementChild && !(IS_PC() && $("#layer .sheet.dpanel")))).observe($("#layer"), { childList: true });
+new MutationObserver(() => lockScroll(!!$("#layer").firstElementChild && !(IS_PC() && $("#layer .sheet.dpanel:not(.dbg)")))).observe($("#layer"), { childList: true });
 /* 作品の追加・編集画面：入力中の内容を読み取ってから変えて、描き直す */
 let sgExK = -1; // 飛び飛びの話を足した曲（足したあとその入力欄へ移るため）
 const formEdit = (fn, after) => el => {

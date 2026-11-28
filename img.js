@@ -354,11 +354,12 @@ const gridTag = (it, attr) => {
   return l ? `<span class="ptag mtag m-${l[1]}">${l[0]}</span>` : "";
 };
 const gridCell = (it, attr = "data-id", ik = it) =>
-  `<button type="button" class="pcell${it.s === "視聴済み" ? " done" : ""}" ${attr}="${esc(it.id)}">${gridSeal(it, attr)}<span class="pimg">${posterTag(ik, "s", "pimgi") || `<span class="wc-noimg">${IMG_ICON}</span>`}${gridTag(it, attr)}</span><span class="pttl">${esc(it.t || "（タイトルなし）")}</span>${gridProg(it, attr)}</button>`;
+  `<button type="button" class="pcell${it.s === "視聴済み" ? " done" : ""}" ${attr}="${esc(it.id)}">${gridSeal(it, attr)}<span class="pimg">${posterTag(ik, "s", "pimgi") || `<span class="wc-noimg">${IMG_ICON}</span>`}${gridTag(it, attr)}</span><span class="pttl jbr">${jbr(it.t || "（タイトルなし）")}</span>${gridProg(it, attr)}</button>`;
 /* 詳細で開いている作品を一覧で目立たせる（PCの右のパネルで開いている間） */
 function markSel() {
   document.querySelectorAll("#main .sel").forEach(el => el.classList.remove("sel"));
-  const id = openId || ytOpen;
+  /* 編集画面を詳細の上に重ねている間も、編集中の作品を目立たせたまま */
+  const id = openId || ytOpen || (form && !form.inline && form.id) || (typeof yform !== "undefined" && yform && !yform.inline && yform.id);
   if (!id || !$("#layer .sheet.dpanel")) return;
   document.querySelectorAll(`#main [data-id="${CSS.escape(id)}"], #main [data-yt="${CSS.escape(id)}"]`).forEach(el => el.classList.add("sel"));
 }

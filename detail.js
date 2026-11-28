@@ -1,5 +1,6 @@
 /* ===================== 作品の詳細：基本情報のカード・前後の作品への移動・ステータス・保存 =====================
    話数（視聴チェック・話数の編集・〇〇編）は episodes.js、各話リストの貼り付けは epaste.js */
+let dTabBack = ""; // 編集画面から詳細に戻るときに開くタブ（close で控える）
 let openId = null, // 開いている作品
   epEdit = null; // 話数の編集中の下書き
 let stMenu = false; // 視聴ステータスの選択肢を開いているか
@@ -261,7 +262,7 @@ function renderDetail(it) {
     busy = !!(epEdit || arcEdit || slotEdit || subPaste || epOne != null);
   const navB = (d, lab, ic) => `<button type="button" class="u-btn icon sm dnav" data-dnav="${d}" aria-label="${lab}" title="${lab}${TOUCH ? "" : `（${d < 0 ? "←" : "→"}キー）`}" ${nv[d < 0 ? 0 : 1] && !busy ? "" : "disabled"}>${ic}</button>`;
   return `<div class="dmain"><div class="dhead"><div class="hdrow dnavrow"><div class="hdrow">${navB(-1, "前の作品", CHEV(-1))}${navB(1, "次の作品", CHEV(1))}<button type="button" class="u-btn sm" id="editItem" aria-label="作品を編集">編集</button><button class="u-btn icon sm soft close" type="button" data-close aria-label="閉じる">✕</button></div></div></div>
-    <div class="dtit dhx"><div class="dhrow">${it.img ? `<button type="button" class="dtimg" data-imgview="1" aria-label="画像を大きく表示">${imgTag(it, "l", "dtimgi")}</button>` : `<button type="button" class="dtimg none" data-imgadd="1" aria-label="画像を貼り付け">${IMG_ICON}</button>`}<div class="dtc"><div class="meta dmeta">${kindTag(it)}${(l => (l ? `<button type="button" class="dmt mtag m-${l[1]}" data-jump="fMedia" title="放送形態を変える">${l[0]}</button>` : ""))(mediaLabOf(it))}${stBtn}${stMs.length ? wnMark("st") : ""}</div>${stMs.length ? wnNote("st", stMs.map(x => wnText(it, x)).join("")) : ""}<h3>${esc(it.t)}<button type="button" class="tcopy" id="copyTitle" aria-label="タイトルをコピー" title="タイトルをコピー"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button></h3>
+    <div class="dtit dhx"><div class="dhrow">${it.img ? `<button type="button" class="dtimg" data-imgview="1" aria-label="画像を大きく表示">${imgTag(it, "l", "dtimgi")}</button>` : `<button type="button" class="dtimg none" data-imgadd="1" aria-label="画像を貼り付け">${IMG_ICON}</button>`}<div class="dtc"><div class="meta dmeta">${kindTag(it)}${(l => (l ? `<button type="button" class="dmt mtag m-${l[1]}" data-jump="fMedia" title="放送形態を変える">${l[0]}</button>` : ""))(mediaLabOf(it))}${stBtn}${stMs.length ? wnMark("st") : ""}</div>${stMs.length ? wnNote("st", stMs.map(x => wnText(it, x)).join("")) : ""}<h3 class="jbr">${jbr(it.t)}<button type="button" class="tcopy" id="copyTitle" aria-label="タイトルをコピー" title="タイトルをコピー"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button></h3>
     ${lnk ? `<div class="dtbtns">${lnk}</div>` : ""}</div></div></div>
     ${noEp ? "" : `<div class="dtabs" role="tablist"><button type="button" role="tab" data-dtab="info">番組情報</button><button type="button" role="tab" data-dtab="ep">話数${eps.length ? ` <small>${w}/${watchable(eps).length}</small>` : ""}${epMs ? `<span class="wnt" aria-label="要確認あり">!</span>` : ""}</button></div>`}
     <div class="dpane dp-info">${infoCards(it, { md, ns, mv, stv, cs, songRows })}
@@ -336,12 +337,26 @@ function openDetail(id, dir, keepNav) {
   $("#layer").innerHTML =
     `<div class="scrim" data-close></div><div class="dp-grip" title="ドラッグで幅を変える（ダブルクリックで元の幅）" aria-hidden="true"></div><div class="sheet dpanel" role="dialog" aria-modal="true" aria-label="${esc(it.t)}"><div class="wrap" id="sheetIn">${renderDetail(it)}</div></div>`;
   syncDhh();
-  setDTab("info");
+  setDTab(dTabBack || "info");
+  dTabBack = "";
   markSel();
   /* スクロールしたら上の段に地の色を付ける（スクロール前は透明で、ポスターが上の段の横まで上がる） */
   const sh2 = $("#layer .sheet");
   sh2.addEventListener("scroll", () => sh2.classList.toggle("scrolled", sh2.scrollTop > 4), { passive: true });
   if (!TOUCH) $(".sheet .close").focus({ preventScroll: true });
+}
+/* 編集画面を出す。PCで右の詳細を開いているときは、詳細を押せない状態（.dbg）で後ろに残して、その上に重ねる（閉じると詳細に戻る） */
+function openOverDetail(html) {
+  const sh = IS_PC() && $("#layer .sheet.dpanel");
+  if (!sh) {
+    $("#layer").innerHTML = html;
+    return;
+  }
+  sh.inert = true;
+  sh.classList.add("dbg");
+  $("#layer").replaceChildren(sh);
+  sh.insertAdjacentHTML("afterend", html);
+  markSel();
 }
 /* 詳細を「基本情報／話数」タブで切り替え（PC・スマホ共通）（タブの状態はシート自体のクラスで持つ） */
 function setDTab(t) {

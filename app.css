@@ -172,6 +172,8 @@ button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{ou
 .wrap{max-width:860px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--u-surface);border-bottom:1px solid var(--u-line)}
 [hidden]{display:none!important}
+/* タイトル：<wbr> の場所（言葉の切れ目）でだけ折り返す。入りきらない長い言葉は途中でも折り返す（core.js の jbr） */
+.jbr{word-break:keep-all;overflow-wrap:anywhere}
 .banner{margin-top:12px;background:var(--u-surface);border:1px solid var(--u-line);border-left:4px solid var(--u-accent);padding:10px 12px;font-size:var(--fs-m);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .banner b{display:block}
 .banner button{border:1px solid var(--u-line);background:var(--u-bg);border-radius:var(--r-m);padding:6px 10px;font-size:var(--fs-m)}
@@ -2038,7 +2040,10 @@ html[data-gsz="s"] .pgrid{--gc:3}
 @media (min-width:900px){
   #layer .sheet.dpanel{top:0;bottom:0;left:auto;right:0;width:var(--pw);max-width:none;max-height:none;transform:none;border-radius:0;border-left:3px solid var(--k);box-shadow:none}
   #layer .sheet.dpanel .wrap{flex:1 1 auto;width:100%;min-width:0;max-width:none;padding-left:16px;padding-right:16px}
-  #layer:has(.sheet.dpanel) .scrim{display:none}
+  #layer:has(.sheet.dpanel:not(.dbg)) .scrim{display:none}
+  /* 編集画面を詳細の上に重ねるとき：後ろの詳細（.dbg）は押せない。編集画面の暗い幕と編集画面はその上 */
+  #layer .dbg~.scrim{z-index:22}
+  #layer .dbg~.sheet{z-index:23}
   body:has(#layer .sheet.dpanel){padding-right:calc(var(--pw) * var(--z))}
 }
 /* --- YouTubeの詳細の見出し：上に少し傾けた横長の画像（太枠＋影）、その下にラベル・タイトル・YouTubeで見る／まとめ動画 --- */

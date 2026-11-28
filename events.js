@@ -135,14 +135,16 @@ const COMMON_ACTIONS = [
   /* 閉じる：詳細から開いた「作品を編集」「再生リストを編集」は、閉じたら詳細に戻る */
   [
     "[data-close]",
-    () => {
-      const back = form && !form.inline && form.fromDetail && form.id ? ["t", form.id] : yform && !yform.inline && yform.fromDetail && yform.id ? ["y", yform.id] : null;
-      close();
-      if (back) back[0] === "t" ? openDetail(back[1], 0, true) : ytOpenDetail(back[1]);
-    },
+    () => closeBack(),
   ],
   ["#sbAdd,#bnAdd", () => (state.mode === "yt" ? ytOpenForm(null) : openForm(null))],
 ];
+/* 閉じる（✕・キャンセル・外・Esc）。詳細から開いた編集画面は、閉じたら詳細に戻る */
+function closeBack() {
+  const back = form && !form.inline && form.fromDetail && form.id ? ["t", form.id] : yform && !yform.inline && yform.fromDetail && yform.id ? ["y", yform.id] : null;
+  close();
+  if (back) back[0] === "t" ? openDetail(back[1], 0, true) : ytOpenDetail(back[1]);
+}
 /* スワイプ（共通部品 u-swipe.js）：スマホの番組表で、曜日の見出しと作品カード（.wday）だけを指に合わせて横に動かし、離すと隣の曜日へ。曜日タブなどは動かさない */
 const segBtns = () => [...document.querySelectorAll("#main .wtabs [data-tb]")];
 const segIdx = () => segBtns().findIndex(b => b.getAttribute("aria-selected") === "true");
@@ -537,7 +539,7 @@ const KEY_ACTIONS = [
   [".e1 input", enterEsc(() => $("#e1Save")?.click(), () => $("#e1Cancel")?.click())],
   [null, (t, e) => (e.key === "Escape" && form && form.inline ? closeInlineForm() : false)],
   [null, (t, e) => (e.key === "Escape" && yform && yform.inline ? ytCloseInline() || true : false)],
-  [null, (t, e) => (e.key === "Escape" ? close() : false)],
+  [null, (t, e) => (e.key === "Escape" ? closeBack() : false)],
   ["#seriesQ", enterClick("#serSug [data-seradd]")],
 ];
 document.addEventListener("keydown", e => runInputs(KEY_ACTIONS, e));

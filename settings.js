@@ -383,6 +383,8 @@ function propagate(key, from, to) {
   return ch.length;
 }
 function close() {
+  /* 詳細の上に重ねた編集画面を閉じるとき：詳細に戻ったら同じタブ（話数など）を開く */
+  dTabBack = $("#layer .sheet.dbg.t-ep") ? "ep" : "";
   closeDD();
   lockScroll(false);
   ytOpen = null;

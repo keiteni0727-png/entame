@@ -162,7 +162,7 @@ function contCours(i) {
 function slotRow(i) {
   return `<div class="row${i.s === "視聴済み" ? " done" : ""} lst thr ls-${esc(i.s || "none")}"><button class="slot" type="button" data-id="${i.id}">
     <span class="time">${i.from ? `${+i.from.slice(5, 7)}/${+i.from.slice(8, 10)}` : "—"}${mediaTag(i)}${curKind() === "all" || (state.xser && state.series.length) ? kindTag(i) : ""}</span>${thumbHtml(i)}
-    <span class="ttl"><strong>${esc(i.t)}</strong><span class="meta"><span class="pmob">${stPill(i)}</span>${libLabels(i)}${missBadge(i)}</span></span>
+    <span class="ttl"><strong class="jbr">${jbr(i.t)}</strong><span class="meta"><span class="pmob">${stPill(i)}</span>${libLabels(i)}${missBadge(i)}</span></span>
     <span class="pwide">${stPill(i)}</span></button></div>`;
 }
 /* 放送の長さ（分）：アニメ30分・ドラマ60分。ON AIR の表示と、番組表で翌週へ移すときに使う */
@@ -342,7 +342,7 @@ function weekCard(i, dayKey, isNext, onAir) {
     <div class="wc-body">
       <button type="button" class="wc-main" data-id="${i.id}">
         <span class="wc-tags">${kindTag(i)}${fin ? FIN : ""}${libLabels(i)}${st ? `<span class="wc-st">${esc(st)}</span>` : ""}</span>
-        <span class="wc-ttl">${esc(i.t)}</span>
+        <span class="wc-ttl jbr">${jbr(i.t)}</span>
         ${weekEpLine(i, e, onAir)}
       </button>
       <div class="wc-foot2">${eps.length ? `<span class="wc-prog"><span class="wc-bar"><i style="width:${Math.round((w / (wn || 1)) * 100)}%"></i></span><span class="wc-cnt">${w}/${wn}話</span></span>` : ""}${tick}</div>

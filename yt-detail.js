@@ -56,7 +56,7 @@ function ytDetailHtml(x) {
   const topMiss = miss.filter(m => m.k === "投稿者" || m.k === "ジャンル");
   const lnk = [x.pl ? `<a class="u-btn dtb vod" href="${esc(x.pl)}" target="_blank" rel="noopener">${IC_PLAY}<span>YouTubeで見る</span></a>` : "", x.sm ? `<a class="u-btn dtb" href="${esc(x.sm)}" target="_blank" rel="noopener"><span>まとめ動画</span>${IC_EXT}</a>` : ""].join("");
   return `<div class="dhead ydhead"><div class="hdrow dnavrow"><div class="hdrow">${navB(-1, "前の作品")}${navB(1, "次の作品")}<button type="button" class="u-btn sm" id="ytEdit" aria-label="再生リストを編集">編集</button><button class="u-btn icon sm soft close" type="button" data-close aria-label="閉じる">✕</button></div></div></div>
-    <div class="dtit dhx yhx">${ytHeroHtml(x)}<div class="dtc"><div class="meta dmeta"><span class="kind yauth">${esc(x.a || "YouTube")}</span>${gBtn}${stBtn}${topMiss.length ? wnMark("y:top") : ""}</div>${topMiss.length ? wnNote("y:top", topMiss.map(wnTx).join("")) : ""}<h3>${esc(x.t)}<button type="button" class="tcopy" id="ytCopy" aria-label="タイトルをコピー" title="タイトルをコピー"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button></h3>${lnk ? `<div class="dtbtns">${lnk}</div>` : ""}</div></div>
+    <div class="dtit dhx yhx">${ytHeroHtml(x)}<div class="dtc"><div class="meta dmeta"><span class="kind yauth">${esc(x.a || "YouTube")}</span>${gBtn}${stBtn}${topMiss.length ? wnMark("y:top") : ""}</div>${topMiss.length ? wnNote("y:top", topMiss.map(wnTx).join("")) : ""}<h3 class="jbr">${jbr(x.t)}<button type="button" class="tcopy" id="ytCopy" aria-label="タイトルをコピー" title="タイトルをコピー"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button></h3>${lnk ? `<div class="dtbtns">${lnk}</div>` : ""}</div></div>
     <div class="ydbody">${info}${prog}
     <div class="links">${ytImgAddChip(x)}<button type="button" class="u-btn sm txt danger delsm" id="ytDel">削除</button></div></div>`;
 }
@@ -241,8 +241,8 @@ function ytOpenForm(x, target) {
   ytOpen = null;
   openId = null;
   form = null;
-  $("#layer").innerHTML =
-    `<div class="scrim" data-close></div><div class="sheet form" role="dialog" aria-modal="true" aria-label="YouTubeを${yform.id ? "編集" : "追加"}"><div class="wrap" id="ytFormIn">${ytFormHtml()}</div></div>`;
+  const html = `<div class="scrim" data-close></div><div class="sheet form" role="dialog" aria-modal="true" aria-label="YouTubeを${yform.id ? "編集" : "追加"}"><div class="wrap" id="ytFormIn">${ytFormHtml()}</div></div>`;
+  yform.fromDetail ? openOverDetail(html) : ($("#layer").innerHTML = html);
   if (target && document.getElementById(target)) {
     const el = document.getElementById(target);
     el.scrollIntoView({ block: "center" });
