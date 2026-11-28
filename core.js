@@ -2107,18 +2107,28 @@ function missCtx(i) {
     ta: sl.filter(x => (x.s || "").trim()).map(x => ({ st: songTA(x).st.trim(), ar: songTA(x).ar.trim() })),
   };
 }
-/* 作品の要確認の項目：[{k, j, n, ns}]。all＝絞り込み用（絞り込みだけの項目も入れる） */
+/* 作品の要確認の項目：[{k, j, n, ns}]。all＝絞り込み用（絞り込みだけの項目も入れる）。
+   結果は作品ごとに覚えておき、作品データ（組み立て直すと別のもの）・話数のデータ・日付が変わったときだけ判定し直す
+   （一覧を描くたびに全作品を判定し直して重くなっていたため）。返したリストは書きかえないこと */
+const missMemo = new WeakMap();
 function missingOf(i, all) {
   if (upcoming(i)) return [];
-  const c = missCtx(i),
-    nf = i.noF || [];
-  const out = [];
-  MISS_CHECKS.forEach(x => {
-    if ((x.n && nf.includes(x.n)) || (x.fo && !all)) return;
-    const r = x.test(c);
-    if (r) out.push({ k: typeof r === "string" ? r : x.k, j: x.j || "", n: x.n || "", ...(x.ns ? { ns: 1 } : {}) });
-  });
-  return out;
+  const p = prog[i.id],
+    d = todayStr();
+  let m = missMemo.get(i);
+  if (!m || m.p !== p || m.d !== d) {
+    const c = missCtx(i),
+      nf = i.noF || [];
+    const full = [];
+    MISS_CHECKS.forEach(x => {
+      if (x.n && nf.includes(x.n)) return;
+      const r = x.test(c);
+      if (r) full.push({ k: typeof r === "string" ? r : x.k, j: x.j || "", n: x.n || "", ...(x.ns ? { ns: 1 } : {}), ...(x.fo ? { fo: 1 } : {}) });
+    });
+    m = { p, d, full, base: full.filter(x => !x.fo) };
+    missMemo.set(i, m);
+  }
+  return all ? m.full : m.base;
 }
 /* 「なし」にできる項目（noF に入れる）。ステータス・話数・開始日は必ずあるはずなので「なし」にしない */
 const NOF_LAB = { time: "時間", st: "放送局", plat: "配信サイト", vods: "配信サイト", cours: "放送クール", url: "公式サイト", vurl: "配信URL" };

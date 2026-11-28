@@ -30,17 +30,36 @@ function imgRemember(k, url) {
     }
   }
 }
-const dataToBlobUrl = d => {
+const dataToBlob = d => {
   const i = d.indexOf(","),
     h = d.slice(0, i),
     b = d.slice(i + 1);
   const type = (/data:([^;,]+)/.exec(h) || [])[1] || "image/jpeg";
-  if (!/;base64/.test(h)) return URL.createObjectURL(new Blob([decodeURIComponent(b)], { type }));
+  if (!/;base64/.test(h)) return new Blob([decodeURIComponent(b)], { type });
   const bin = atob(b);
   const a = new Uint8Array(bin.length);
   for (let k = 0; k < bin.length; k++) a[k] = bin.charCodeAt(k);
-  return URL.createObjectURL(new Blob([a], { type }));
+  return new Blob([a], { type });
 };
+/* 読んだ画像は端末にも控える（Cache Storage）。次に開いたときは保存先から取り直さない。
+   キーは 大きさ・作品ID・版（画像を変えると版が変わるので別のキー）。使えない環境では何もしない */
+const IMG_CACHE = "img-entame-v1"; // sw.js が消す「entame-」で始まる名前にしない
+const imgCk = (sz, id, v) => new URL(`__img/${sz}/${encodeURIComponent(id)}/${encodeURIComponent(String(v))}`, location.href).href;
+const imgDisk = () => (typeof caches !== "undefined" ? caches.open(IMG_CACHE) : Promise.reject());
+const imgDiskGet = (sz, id, v) =>
+  imgDisk()
+    .then(c => c.match(imgCk(sz, id, v)))
+    .then(r => (r ? r.blob() : null))
+    .catch(() => null);
+const imgDiskPut = (sz, id, v, blob) =>
+  imgDisk()
+    .then(c => c.put(imgCk(sz, id, v), new Response(blob, { headers: { "Content-Type": blob.type || "image/jpeg" } })))
+    .catch(() => {});
+/* その作品の控えをすべて消す（画像を変えた・外したとき） */
+const imgDiskDel = id =>
+  imgDisk()
+    .then(c => c.keys().then(ks => Promise.all(ks.filter(r => r.url.includes(`/__img/`) && r.url.includes(`/${encodeURIComponent(id)}/`)).map(r => c.delete(r)))))
+    .catch(() => {});
 
 /* 画像のタグ。控えにあればすぐ表示、なければ空のまま置いて、画面に出たときに読む */
 function imgTag(it, sz, cls) {
@@ -70,11 +89,24 @@ function imgPump() {
   while (imgRunning < 6 && imgQueue.length && db) {
     const j = imgQueue.shift();
     imgRunning++;
-    db.doc(`${j.sz === "l" ? "imgl" : "imgs"}/${j.id}`)
-      .get()
-      .then(s => {
-        const d = s.exists && s.data();
-        const url = d && d.d ? dataToBlobUrl(d.d) : "";
+    /* 端末の控えにあればそれ。なければ保存先から取って、控えにも入れる */
+    imgDiskGet(j.sz, j.id, j.v)
+      .then(
+        b =>
+          b ||
+          db
+            .doc(`${j.sz === "l" ? "imgl" : "imgs"}/${j.id}`)
+            .get()
+            .then(s => {
+              const d = s.exists && s.data();
+              if (!d || !d.d) return null;
+              const blob = dataToBlob(d.d);
+              imgDiskPut(j.sz, j.id, j.v, blob);
+              return blob;
+            }),
+      )
+      .then(b => {
+        const url = b ? URL.createObjectURL(b) : "";
         if (url) imgRemember(j.k, url);
         j.res(url);
       })
@@ -215,9 +247,12 @@ async function setImage(id, file) {
     URL.revokeObjectURL(url);
     const doc = id;
     const v = Date.now();
-    /* 先に控えへ入れて、保存の完了を待たずに表示する */
-    imgRemember(imgKey("s", doc, v), dataToBlobUrl(small));
-    imgRemember(imgKey("l", doc, v), dataToBlobUrl(large));
+    /* 先に控えへ入れて、保存の完了を待たずに表示する（端末の控えは前の画像を消してから入れる） */
+    const sb = dataToBlob(small),
+      lb = dataToBlob(large);
+    imgRemember(imgKey("s", doc, v), URL.createObjectURL(sb));
+    imgRemember(imgKey("l", doc, v), URL.createObjectURL(lb));
+    imgDiskDel(doc).then(() => (imgDiskPut("s", doc, v, sb), imgDiskPut("l", doc, v, lb)));
     await Promise.all([db.doc(`imgs/${doc}`).set({ d: small, v }), db.doc(`imgl/${doc}`).set({ d: large, v })]);
     await imgSave(id, v, "画像を保存しました");
   } catch (e) {
@@ -230,11 +265,13 @@ function removeImage(id) {
   const it = imgObj(id);
   if (!it || !it.img) return;
   imgSave(id, null, "画像を外しました");
+  imgDiskDel(id);
   db.doc(`imgs/${id}`).delete().catch(fail);
   db.doc(`imgl/${id}`).delete().catch(fail);
 }
 /* ゴミ箱から完全に消すときに、画像も消す */
 function removeImageDocs(id) {
+  imgDiskDel(id);
   if (!db) return;
   db.doc(`imgs/${id}`).delete().catch(() => {});
   db.doc(`imgl/${id}`).delete().catch(() => {});
