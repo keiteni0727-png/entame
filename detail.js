@@ -347,7 +347,14 @@ function noTabInfo() {
 function refreshEditor() {
   const it = items.find(x => x.id === openId);
   const a = $("#epArea");
-  if (it && a && epEdit && !subPaste && !arcEdit && !slotEdit) a.innerHTML = epEditorHtml(it);
+  if (!(it && a && epEdit && !subPaste && !arcEdit && !slotEdit)) return;
+  /* 作り直しの前後でスクロール位置を保つ（iOS Safariで一番上に飛ぶ対策） */
+  const ss = [];
+  for (let e = a.parentElement; e; e = e.parentElement) if (e.scrollTop) ss.push([e, e.scrollTop]);
+  a.innerHTML = epEditorHtml(it);
+  const back = () => ss.forEach(([e, v]) => { e.scrollTop = v; });
+  back();
+  requestAnimationFrame(back);
 }
 function openDetail(id, dir, keepNav) {
   const it = items.find(x => x.id === id);
