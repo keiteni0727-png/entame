@@ -1665,12 +1665,15 @@ async function initStore() {
   const done = () => {
     if (got.titles && got.master) fixOldData();
     if (!got.titles || !got.progress) return;
+    const first = !loaded;
     loaded = true;
     dropAutoSp();
     calcLastAt();
     rebuild();
     fillEpTimesAll();
-    renderSoon({ sheet: 1 });
+    /* 起動して最初に描くときは待たずにすぐ描く（まとめて描くのを待つと、起動中の忙しいブラウザでは画面が出るのが遅れるため） */
+    if (first) render();
+    else renderSoon({ sheet: 1 });
   };
   /* 読み込みが止まったときは U.sync が自動でつなぎ直す。ここでは「同期中」に戻すだけ */
   const onErr = k => () => {
