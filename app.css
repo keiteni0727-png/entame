@@ -282,7 +282,8 @@ dd{margin:0;min-width:0;overflow-wrap:anywhere}
 /* 一覧の行を詰めて表示 */
 .time .kind{font-size:var(--fs-xs);padding:1px 4px}
 .lab{font-size:var(--fs-xs);line-height:1.5;padding:0 6px;border-radius:var(--r-s);border:1px solid var(--u-line);color:var(--u-sub);white-space:nowrap}
-.lab.v{border-color:transparent;background:var(--u-chip);color:var(--u-ink)}
+/* 配信サイト：枠なしでアイコン＋名前 */
+.lab.v{border-color:transparent;background:none;color:var(--u-ink);font-weight:700;padding:0}
 .tick span{display:grid;place-items:center;border-radius:50%;border:2px solid var(--u-accent);color:var(--u-acct);font-weight:700;width:26px;height:26px;font-size:var(--fs-m)}
 .sheet .meta{margin:0 0 4px}
 .hdrow{display:flex;justify-content:space-between;align-items:center;gap:8px}
@@ -322,10 +323,9 @@ dd{margin:0;min-width:0;overflow-wrap:anywhere}
 .mtag.m-stream{color:#b4532a;background:#fbe8de}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .mtag.m-tv{color:#9fb8da;background:#1f2a3a}:root:not([data-theme="light"]) .mtag.m-movie{color:#d4a9ec;background:#2f2238}:root:not([data-theme="light"]) .mtag.m-ova{color:#86d6c8;background:#163430}:root:not([data-theme="light"]) .mtag.m-stream{color:#f0a37f;background:#3a2318}}
 :root[data-theme="dark"] .mtag.m-tv{color:#9fb8da;background:#1f2a3a}:root[data-theme="dark"] .mtag.m-movie{color:#d4a9ec;background:#2f2238}:root[data-theme="dark"] .mtag.m-ova{color:#86d6c8;background:#163430}:root[data-theme="dark"] .mtag.m-stream{color:#f0a37f;background:#3a2318}
-.lab.v.vc{background:var(--vc);border-color:var(--vc);color:var(--vt);font-weight:700}
-/* 放送局・配信サイトのアイコン（白い地の小さな角丸。色の札の上でも見えるように） */
-.lgi{flex:none;width:1.25em;height:1.25em;border-radius:3px;background:#fff;object-fit:contain;vertical-align:-.25em}
-.lab.hl{display:inline-flex;align-items:center;gap:4px;padding-left:3px}
+/* 放送局・配信サイトのアイコン（白い地の小さな角丸） */
+.lgi{flex:none;width:1.25em;height:1.25em;border-radius:3px;background:#fff;object-fit:contain;vertical-align:-.25em;box-shadow:0 0 0 1px var(--u-line)}
+.lab.hl{display:inline-flex;align-items:center;gap:4px}
 .lab.hl .lgi{width:1.3em;height:1.3em}
 .chips button.vc::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--vc);margin-right:5px;vertical-align:1px;box-shadow:0 0 0 1px var(--u-line)}
 .chips button.vc[aria-pressed="true"],.field .chips button.vc[aria-pressed="true"]{background:var(--vc);border-color:var(--vc);color:var(--vt)}
@@ -1884,10 +1884,7 @@ html[data-gsz="s"] .pgrid{--gc:3}
 /* シリーズ未登録のとき：狭い画面では「編集」を次の行へ（カードからはみ出さない） */
 .iser .ich:not(:has(.sern)){flex-wrap:wrap}
 .serbtn{flex:none;border:1px solid var(--u-accent);background:none;color:var(--u-acct);border-radius:var(--r-s);padding:2px 8px;font:inherit;font-size:var(--fs-s);font-weight:700;white-space:nowrap;cursor:pointer}
-.serbtn.pri{background:var(--u-accent);color:var(--u-on);padding:4px 11px;font-size:var(--fs-s)}
 .sertag{flex:none;font-size:var(--fs-xs);font-weight:700;padding:2px 7px;border-radius:var(--r-s);background:var(--u-chip);color:var(--u-sub);white-space:nowrap}
-.sertag.ok{background:var(--u-ok2);color:var(--u-ok)}
-.sertag.w{background:var(--u-warn2);color:var(--u-warn)}
 .sertag.cur{background:var(--u-accent2);color:var(--u-acct)}
 .sersub{display:flex;align-items:center;gap:6px;width:100%;font:inherit;font-size:var(--fs-xs);font-weight:700;color:var(--u-sub);margin:8px 0 2px;padding:8px 0 0;border:0;border-top:1px solid var(--u-line);background:none;text-align:left;cursor:pointer}
 .sersub small{font-size:var(--fs-xs);font-weight:600}
@@ -1897,19 +1894,20 @@ html[data-gsz="s"] .pgrid{--gc:3}
 .sertl::before{content:"";position:absolute;left:6px;top:10px;bottom:10px;width:2px;background:var(--u-line)}
 .serit{position:relative;display:flex;flex-wrap:nowrap;align-items:center;gap:6px 10px;padding:6px 0}
 .serit::before{content:"";position:absolute;left:-19px;top:19px;width:10px;height:10px;border-radius:var(--r-full);background:var(--u-surface);border:2px solid var(--u-sub)}
+/* 押せる行（アプリの作品＝その詳細へ、AniList の未登録＝新規登録へ） */
+.serit[role="button"]{cursor:pointer;border-radius:10px;margin:0 -6px;padding-left:6px;padding-right:6px}
+.serit[role="button"]::before{left:-13px}
+@media (hover:hover){.serit[role="button"]:hover{background:var(--u-soft)}}
+.serit.al .sertx b{color:var(--u-sub)}
 .serit.has::before{background:var(--u-ok);border-color:var(--u-ok)}
 .serit.cur::before{background:var(--u-accent);border-color:var(--u-accent)}
 .serim{flex:none;width:28px;height:40px;border-radius:4px;overflow:hidden;background:var(--u-chip)}
 .serim img{display:block;width:100%;height:100%;object-fit:cover}
 .sertx{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:1px}
-.sertx b,.sertt{font-size:var(--fs-m);font-weight:700;line-height:1.35;overflow-wrap:anywhere}
-.sertt{border:0;background:none;padding:0;color:inherit;font-family:inherit;text-align:left;cursor:pointer}
-@media (hover:hover){.sertt:hover{text-decoration:underline}}
+.sertx b{font-size:var(--fs-m);font-weight:700;line-height:1.35;overflow-wrap:anywhere}
 .sertx small{font-size:var(--fs-xs);color:var(--u-sub)}
 .serr{flex:none;display:flex;flex-direction:column;flex-wrap:nowrap;align-items:flex-end;gap:4px;max-width:48%}
 .serr .sertag,.serr .serbtn{white-space:normal;text-align:right}
-.sergl{font-size:var(--fs-xs);font-weight:700;color:var(--u-sub);margin:8px 0 0}
-.sergl.sub{font-size:var(--fs-s);color:var(--u-ink);margin:10px 0 2px}
 .edt-t{display:flex;align-items:center;gap:8px;padding:2px 0}
 .edt-tx{flex:1;min-width:0}
 .edt-tx b{font-size:var(--fs-m)}
@@ -2121,10 +2119,12 @@ html[data-gsz="s"] .pgrid{--gc:3}
 .tk-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:var(--u-accent)}
 .tk-bar b{position:absolute;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;box-sizing:border-box;border-radius:50%;background:var(--pop);border:2px solid var(--k)}
 .tk-stat{display:inline-flex;align-items:center;gap:6px;margin-left:auto;align-self:center}
-.tk-st{font-size:var(--fs-xs);font-weight:900;line-height:1.4;padding:1px 8px;border-radius:999px;border:1.5px solid var(--k);white-space:nowrap}
-.tk-st.on{background:var(--u-accent);color:#fff}
-.tk-st.end{background:var(--u-chip);color:var(--u-sub);border-color:var(--k2)}
-.tk-st.pre{background:var(--pop);color:var(--onpop)}
+/* 放送中・放送終了・あと○日：枠なしの色付きの点＋文字 */
+.tk-st{display:inline-flex;align-items:center;gap:4px;font-size:var(--fs-s);font-weight:900;line-height:1.4;white-space:nowrap}
+.tk-st::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.tk-st.on{color:var(--u-live)}
+.tk-st.end{color:var(--u-sub)}
+.tk-st.pre{color:var(--u-acct)}
 .tk-cnt{font-size:var(--fs-xs);font-weight:800;color:var(--u-sub);white-space:nowrap}
 .tk-cnt b{font-family:var(--fn);font-weight:900;font-size:var(--fs-m);color:var(--u-accent)}
 .tk-per .tk-open{color:var(--u-accent)}
@@ -2133,10 +2133,12 @@ html[data-gsz="s"] .pgrid{--gc:3}
 .tk-chips{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:9px}
 .tk-chips:empty{display:none}
 .tk-chip{display:inline-flex;align-items:center;gap:5px;min-height:26px;box-sizing:border-box;padding:0 10px;border:1.5px solid var(--k2);border-radius:999px;background:var(--u-surface);color:var(--u-ink);font:inherit;font-size:var(--fs-s);font-weight:900;white-space:nowrap}
+/* 放送局：枠なしでアイコン＋名前（配信サイトと同じ） */
+.tk-chip.st{border:0;background:none;padding:0 4px 0 0;font-weight:700}
 .tk-chip small{font-size:10px;font-weight:700;color:var(--u-sub)}
 .tk-chip.miss{border-style:dashed;background:none;color:var(--u-sub)}
 .tk-go{cursor:pointer}
-.tk-chips .lab.v{display:inline-flex;align-items:center;min-height:26px;box-sizing:border-box;padding:0 10px;border-radius:999px;font-size:var(--fs-s);font-weight:900;border:1.5px solid var(--k2);margin:0}
+.tk-chips .lab.v{display:inline-flex;align-items:center;min-height:26px;box-sizing:border-box;padding:0 4px 0 0;font-size:var(--fs-s);font-weight:700;margin:0}
 .ibc .wnm,.imusic .wnm{flex:none}
 .ibc .wnn,.imusic .wnn{margin:8px 0 0}
 /* MUSIC：種類ごとにまとめる（左の札を押すとその種類をたたむ） */

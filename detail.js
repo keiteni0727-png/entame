@@ -132,7 +132,7 @@ function infoCards(it, { md, ns, mv, stv, cs, songRows }) {
     l.length ? html() : nofHas(it, nofKey) ? tkChip(lab, `<span class="nosong">なし</span>`) : tkMiss(`<small>${lab}</small>未設定`, "r:" + lab, ks);
   if (md === "stream") chips.push(listChips("配信", m.plat, () => m.plat.map(vlab).join("") + mk("r:配信", ["配信サイト"]), "plat", ["配信サイト"]));
   else {
-    if (hasSt(md)) chips.push(listChips("放送局", m.stations, () => m.stations.map(x => `<span class="tk-chip">${logoImg(x)}${esc(x)}</span>`).join("") + mk("r:放送局", ["放送局"]), "st", ["放送局"]));
+    if (hasSt(md)) chips.push(listChips("放送局", m.stations, () => m.stations.map(x => `<span class="tk-chip st">${logoImg(x)}${esc(x)}</span>`).join("") + mk("r:放送局", ["放送局"]), "st", ["放送局"]));
     if (it.k === "d") chips.push(it.slot ? tkChip("放送枠", esc(it.slot)) : nofHas(it, "slot") ? "" : tkMiss("<small>放送枠</small>未設定", "r:放送枠", []));
     chips.push(listChips("配信", m.vods, () => m.vods.map(vlab).join("") + mk("r:配信", ["配信サイト"]), "vods", ["配信サイト"]));
   }
@@ -514,15 +514,17 @@ const DETAIL_ACTIONS = [
       else openForm(it, t);
     },
   ],
-  /* SERIES：登録済みの作品にシリーズを付ける・変える */
+  /* SERIES：AniList の未登録の作品を、この作品の詳細に出さない（元に戻せる）。行を押したときの新規登録より先に受ける */
   [
-    "[data-serset]",
-    el => {
-      const id = el.dataset.serset,
-        name = el.dataset.sername;
-      saveTitle(id, { series: name }, `「${(over[id] && over[id].t) || ""}」をシリーズ「${name}」にしました`);
+    "[data-alhide]",
+    (el, it) => {
+      const id = +el.dataset.alhide,
+        prev = it.alHide || [];
+      saveTitle(it.id, { alHide: [...new Set([...prev, id])] });
+      toastUndo(`「${el.dataset.altitle}」をこの作品の詳細に出さないようにしました`, () => saveTitle(it.id, { alHide: prev }));
     },
   ],
+  ["[data-alunhide]", (el, it) => saveTitle(it.id, { alHide: [] }, "非表示にした作品を戻しました")],
   /* SERIES：未登録の作品を AniList の情報で追加（シリーズは開いている作品と同じ） */
   [
     "[data-alreladd]",
@@ -537,11 +539,20 @@ const DETAIL_ACTIONS = [
     },
   ],
   ["[data-relopen]", el => openDetail(el.dataset.relopen)],
-  /* SERIES：AniListのつながりを開く・たたむ */
+  /* SERIES：カードをたたむ・開く／AniListのつながりを出す・出さない（この端末で覚える） */
   [
-    "[data-serrelfold]",
+    "[data-serfold]",
     () => {
-      serRelOpen = !serRelOpen;
+      serUI.fold = !serUI.fold;
+      saveSerUI();
+      refreshSheet();
+    },
+  ],
+  [
+    "[data-sertog]",
+    () => {
+      serUI.al = !serUI.al;
+      saveSerUI();
       refreshSheet();
     },
   ],

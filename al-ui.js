@@ -235,6 +235,13 @@ function onAlClick(e) {
   if (!$("#alBox") && !e.target.closest("[data-alnote],[data-alcheck],.alsheet,#alLayer")) return false;
   return runActions(AL_FORM_ACTIONS, e) || runActions(AL_NOTE_ACTIONS, e) || runActions(AL_CHK_ACTIONS, e);
 }
+/* SERIES の行（押せる div）：Enter・スペースでも押せる */
+document.addEventListener("keydown", e => {
+  if ((e.key === "Enter" || e.key === " ") && e.target.matches && e.target.matches('.serit[role="button"]')) {
+    e.preventDefault();
+    e.target.click();
+  }
+});
 document.addEventListener(
   "keydown",
   e => {
@@ -648,62 +655,80 @@ function alOwnOf(n) {
   return anime.find(i => !i.al && ns.includes(alNorm(i.t))) || null;
 }
 const alKeyOf = n => alYmd(n.startDate) || (n.seasonYear ? `${n.seasonYear}-00-00` : "9999");
-/* SERIES の「AniListのつながり」を開いているか（最初はたたむ・作品をまたいで同じ状態） */
-let serRelOpen = false;
+/* ---------- 作品の詳細の SERIES ----------
+   同じシリーズのアプリの作品を放送順に並べる。押すとその作品の詳細へ。
+   開いているときだけ「AniListのつながり」のトグルを出し、オンにすると AniList でつながっている未登録の作品を、AniList の日付で間に入れる
+   （押すと AniList の情報で新規登録の画面へ。「非表示」にした作品は、その作品の詳細には出さない＝作品データの alHide）。
+   たたむ・トグルの状態はこの端末で覚え、作品をまたいで同じ */
+const K_SERUI = "entame.ser.ui.v1";
+let serUI = Object.assign({ fold: false, al: false }, ls.get(K_SERUI) || {});
+const saveSerUI = () => ls.set(K_SERUI, serUI);
+/* 並びのキー（YYYY-MM-DD。月日が分からなければ 00、日付がなければ最後） */
+const serKeyOf = i => {
+  const f = String(i.from || "").slice(0, 10);
+  return /^\d{4}-\d{2}-\d{2}$/.test(f) ? f : yearOf(i) ? `${yearOf(i)}-00-00` : "9999";
+};
+/* 時期：TV・配信はクール（2クール以上は「2023年秋〜2024年冬」）、それ以外は年月 */
+function serWhen(i) {
+  const cs = coursOf(i).filter(c => /^\d{4}/.test(c));
+  if (cs.length) return cs.length > 1 ? `${courLabel(cs[0])}〜${courLabel(cs[cs.length - 1])}` : courLabel(cs[0]);
+  const m = /^(\d{4})-(\d{2})/.exec(i.from || "");
+  return m ? `${+m[1]}年${+m[2]}月` : "";
+}
 function seriesCardHtml(it) {
   const ser = it.series || "";
-  /* 見出しの下に、シリーズ名（Mochiy）と「作品一覧」。未登録なら点線の札と「シリーズを登録」 */
+  const fold = serUI.fold;
+  /* アプリの作品（同じシリーズ。シリーズがなければこの作品だけ） */
+  const mine = ser ? items.filter(i => i.series === ser) : [];
+  if (!mine.some(i => i.id === it.id)) mine.push(it);
+  /* 見出し・編集はほかのカードと同じ。作品の一覧は前と同じ形の行（.sersub）でたたむ */
   const head = `<div class="ich"><span class="ilamp series">SERIES</span><button type="button" class="u-btn sm iedit" data-jump="fSeries" aria-label="シリーズを編集">編集</button></div><div class="tk-ser">${
-    ser
-      ? `<b class="sern">${esc(ser)}</b><button type="button" class="tk-yb" data-series="${esc(ser)}">作品一覧 ›</button>`
-      : `<span class="tk-chip miss">シリーズ 未登録</span><button type="button" class="tk-yb" data-cardgo="fSeries">シリーズを登録</button>`
-  }</div>`;
-  let body;
-  if (!serRelOpen) body = "";
-  else if (!it.al) body = `<p class="sermsg">AniListとまだつながっていません<button type="button" class="serbtn" data-alcheck="al">AniListで確認</button></p>`;
-  else {
-    const r = alRelCache.get(it.al);
-    if (!r) alRelLoad(it.al);
-    if (!r || r === "busy") body = `<p class="sermsg">AniListから読み込み中…</p>`;
-    else if (r === "err") body = `<p class="sermsg">AniListから読み込めませんでした<button type="button" class="serbtn" data-alrelre="1">もう一度</button></p>`;
+    ser ? `<b class="sern">${esc(ser)}</b>` : `<span class="tk-chip miss">シリーズ 未登録</span><button type="button" class="tk-yb" data-cardgo="fSeries">シリーズを登録</button>`
+  }</div><button type="button" class="sersub" data-serfold="1" aria-expanded="${!fold}"><span>${ser ? "このシリーズの作品（放送順）" : "この作品"}</span><small>${mine.length}作品</small>${FOLD_IC}</button>`;
+  if (fold) return `<div class="icard iser">${head}</div>`;
+  const rows = mine.map(i => ({ key: serKeyOf(i), html: serAppRow(i, it) }));
+  /* AniList のつながり（未登録だけ。非表示にしたものは出さない） */
+  let msg = "",
+    hidN = 0,
+    alN = 0;
+  if (serUI.al) {
+    if (!it.al) msg = `<p class="sermsg">AniListとまだつながっていません<button type="button" class="serbtn" data-alcheck="al">AniListで確認</button></p>`;
     else {
-      const row = (n, cur) => {
-        const own = cur ? it : alOwnOf(n);
-        const yr = n.seasonYear || n.startDate?.year;
-        const sub = [AL_FMT[n.format] || n.format, yr ? `${yr}年` : "", cur ? "" : AL_REL_LAB[n.rel] || ""].filter(Boolean).join("・");
-        const btn = (id, name, lab) => `<button type="button" class="serbtn" data-serset="${esc(id)}" data-sername="${esc(name)}">${esc(lab)}</button>`;
-        let right;
-        if (cur) right = `<span class="sertag cur">この作品</span>`;
-        else if (!own) right = `<span class="sertag">未登録</span><button type="button" class="serbtn pri" data-alreladd="${n.id}">登録する</button>`;
-        else if (!ser) right = own.series ? `<span class="sertag ok">登録済み・シリーズ「${esc(own.series)}」</span>${btn(it.id, own.series, "この作品にも付ける")}` : `<span class="sertag">登録済み・シリーズなし</span>`;
-        else if (own.series === ser) right = `<span class="sertag ok">登録済み・シリーズ同じ</span>`;
-        else if (!own.series) right = `<span class="sertag w">登録済み・シリーズ未登録</span>${btn(own.id, ser, `「${ser}」を付ける`)}`;
-        else right = `<span class="sertag w">登録済み・別のシリーズ「${esc(own.series)}」</span>${btn(own.id, ser, `「${ser}」に変える`)}`;
-        const name = esc(cur ? it.t : alTitle(n));
-        const im = n.coverImage?.medium ? `<img src="${esc(n.coverImage.medium)}" alt="" loading="lazy" onerror="this.remove()">` : "";
-        return `<div class="serit${cur ? " cur" : own ? " has" : ""}"><span class="serim">${im}</span><span class="sertx">${own && !cur ? `<button type="button" class="sertt" data-relopen="${esc(own.id)}">${name}</button>` : `<b>${name}</b>`}<small>${esc(sub)}</small></span><span class="serr">${right}</span></div>`;
-      };
-      const main = [{ ...r.cur, _cur: 1 }, ...r.list.filter(n => AL_MAIN.has(n.rel))].sort((a, b) => (alKeyOf(a) < alKeyOf(b) ? -1 : alKeyOf(a) > alKeyOf(b) ? 1 : 0));
-      const other = r.list.filter(n => !AL_MAIN.has(n.rel) && AL_REL_LAB[n.rel]).sort((a, b) => (alKeyOf(a) < alKeyOf(b) ? -1 : 1));
-      /* 外伝などは形式ごと（映画・TV SP・OVA・配信・TV・その他）に小見出しで分ける。各グループの中は放送順 */
-      const SER_GRP = [[["MOVIE"], "映画"], [["SPECIAL"], "TV SP"], [["OVA"], "OVA"], [["ONA"], "配信"], [["TV", "TV_SHORT"], "TV"]];
-      let otherHtml = "";
-      if (other.length) {
-        const used = new Set();
-        otherHtml = `<div class="sergl">外伝・別バージョンなど</div>`;
-        for (const [fmts, lab] of SER_GRP) {
-          const g = other.filter(n => fmts.includes(n.format) && !used.has(n));
-          if (!g.length) continue;
-          g.forEach(n => used.add(n));
-          otherHtml += `<div class="sergl sub">${lab}</div>` + g.map(n => row(n, false)).join("");
-        }
-        const rest = other.filter(n => !used.has(n));
-        if (rest.length) otherHtml += `<div class="sergl sub">その他</div>` + rest.map(n => row(n, false)).join("");
+      const r = alRelCache.get(it.al);
+      if (!r) alRelLoad(it.al);
+      if (!r || r === "busy") msg = `<p class="sermsg">AniListから読み込み中…</p>`;
+      else if (r === "err") msg = `<p class="sermsg">AniListから読み込めませんでした<button type="button" class="serbtn" data-alrelre="1">もう一度</button></p>`;
+      else {
+        const hide = new Set(it.alHide || []);
+        r.list
+          .filter(n => AL_REL_LAB[n.rel] && !alOwnOf(n))
+          .forEach(n => {
+            if (hide.has(n.id)) return void hidN++;
+            alN++;
+            rows.push({ key: alKeyOf(n), html: serAlRow(n) });
+          });
+        if (!alN && !hidN) msg = `<p class="sermsg">AniListにある関連作品は、すべて登録済みです</p>`;
       }
-      body = `<div class="sertl">${main.map(n => row(n, !!n._cur)).join("")}${otherHtml}</div>`;
     }
   }
-  const rc = it.al && alRelCache.get(it.al);
-  const cnt = rc && typeof rc === "object" ? `<small>${1 + rc.list.filter(n => AL_MAIN.has(n.rel) || AL_REL_LAB[n.rel]).length}作品</small>` : "";
-  return `<div class="icard iser">${head}<button type="button" class="sersub" data-serrelfold="1" aria-expanded="${serRelOpen}"><span>AniListのつながり（放送順）</span>${cnt}${FOLD_IC}</button>${body}</div>`;
+  rows.sort((a, b) => (a.key < b.key ? -1 : a.key > b.key ? 1 : 0));
+  /* AniListのつながり：絞り込みなどと同じ、押すとオン・オフが切りかわる札。一覧の上に */
+  const tog = `<div class="chips"><button type="button" class="u-chip${serUI.al ? " on" : ""}" data-sertog="1" aria-pressed="${serUI.al}">AniListのつながり</button>${
+    serUI.al && hidN ? `<button type="button" class="serbtn" data-alunhide="1">非表示にした${hidN}件を戻す</button>` : ""
+  }</div>`;
+  return `<div class="icard iser">${head}${tog}${msg}<div class="sertl">${rows.map(x => x.html).join("")}</div></div>`;
+}
+/* アプリの作品の行（押すとその作品の詳細。開いている作品は「この作品」） */
+function serAppRow(i, it) {
+  const cur = i.id === it.id;
+  const sub = [MEDIA_LAB[mediaOf(i).media] || "", serWhen(i)].filter(Boolean).join("・");
+  const im = posterTag(i, "s", "serimi");
+  return `<div class="serit${cur ? " cur" : " has"}"${cur ? "" : ` role="button" tabindex="0" data-relopen="${esc(i.id)}"`}><span class="serim">${im}</span><span class="sertx"><b class="jbr">${jbr(i.t)}</b><small>${esc(sub)}</small></span><span class="serr">${cur ? `<span class="sertag cur">この作品</span>` : stPill(i)}</span></div>`;
+}
+/* AniList の未登録の作品の行（押すと新規登録の画面。「非表示」でこの作品の詳細には出さない） */
+function serAlRow(n) {
+  const yr = n.seasonYear || n.startDate?.year;
+  const sub = [AL_FMT[n.format] || n.format, yr ? `${yr}年` : "", AL_REL_LAB[n.rel] || ""].filter(Boolean).join("・");
+  const im = n.coverImage?.medium ? `<img src="${esc(n.coverImage.medium)}" alt="" loading="lazy" onerror="this.remove()">` : "";
+  return `<div class="serit al" role="button" tabindex="0" data-alreladd="${n.id}"><span class="serim">${im}</span><span class="sertx"><b class="jbr">${jbr(alTitle(n))}</b><small>${esc(sub)}</small></span><span class="serr"><span class="sertag">未登録</span><button type="button" class="serbtn" data-alhide="${n.id}" data-altitle="${esc(alTitle(n))}">非表示</button></span></div>`;
 }
