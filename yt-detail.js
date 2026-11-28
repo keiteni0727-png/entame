@@ -94,11 +94,13 @@ function ytOpenDetail(id, dir) {
     sh.setAttribute("aria-label", x.t);
     inn.innerHTML = ytDetailHtml(x);
     sh.scrollTop = 0;
+    syncDhh();
     markSel();
     return;
   }
   $("#layer").innerHTML =
     `<div class="scrim" data-close></div><div class="dp-grip" title="ドラッグで幅を変える（ダブルクリックで元の幅）" aria-hidden="true"></div><div class="sheet dpanel" role="dialog" aria-modal="true" aria-label="${esc(x.t)}"><div class="wrap" id="ytIn">${ytDetailHtml(x)}</div></div>`;
+  syncDhh();
   markSel();
 }
 function ytRefresh() {
@@ -108,6 +110,7 @@ function ytRefresh() {
   /* 描き直すと詳細の中の編集画面も消えるので、編集中の状態も終わりにする */
   if (yform && yform.inline) yform = null;
   el.innerHTML = ytDetailHtml(x);
+  syncDhh();
 }
 async function ytSave(id, patch, msg) {
   const o = { ...(ytOver[id] || {}), ...patch, _at: Date.now() };

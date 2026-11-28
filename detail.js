@@ -221,9 +221,40 @@ const CHEV = d => `<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="
 function syncDhh() {
   const sh = $("#layer .sheet"),
     hd = sh && sh.querySelector(".dhead");
+  fitTitle();
   if (hd) sh.style.setProperty("--dhh", hd.offsetHeight + "px");
 }
+/* 詳細のタイトルが長いとき：3行を超えたら文字を小さくして2行に収める。15px より小さくなるなら、13px までで3行に収める。
+   言葉の切れ目だけでは入らないときは、言葉の途中でも折り返して（.jbrx）3行に詰める。それでも入りきらないときは 13px の3行で切る
+   （全文はコピーのボタンで取れる）。作品の詳細・YouTube の詳細で共通 */
+const TITLE_MIN2 = 15,
+  TITLE_MIN3 = 13;
+function fitTitle() {
+  const h = $("#layer .sheet .dhx h3");
+  if (!h || !h.offsetParent) return;
+  h.style.fontSize = "";
+  h.classList.remove("clamp3", "jbrx");
+  const lines = () => Math.round(h.getBoundingClientRect().height / (parseFloat(getComputedStyle(h).lineHeight) || 1));
+  if (lines() <= 3) return;
+  const base = Math.round(parseFloat(getComputedStyle(h).fontSize));
+  const tries = [
+    [2, TITLE_MIN2, false],
+    [3, TITLE_MIN3, false],
+    [3, TITLE_MIN3, true],
+  ];
+  for (const [max, min, any] of tries) {
+    h.classList.toggle("jbrx", any);
+    for (let fs = base - 1; fs >= min; fs--) {
+      h.style.fontSize = fs + "px";
+      if (lines() <= max) return;
+    }
+  }
+  h.style.fontSize = TITLE_MIN3 + "px";
+  h.classList.add("clamp3");
+}
 addEventListener("resize", () => syncDhh());
+/* 書体の読み込みが終わったら、タイトルの大きさを合わせ直す（読み込み前の書体で測るとずれるため） */
+if (document.fonts) document.fonts.ready.then(() => syncDhh());
 function renderDetail(it) {
   const cs = coursOf(it);
   const stv = mediaLabels(it);

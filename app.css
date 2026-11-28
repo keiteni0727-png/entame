@@ -1890,10 +1890,12 @@ html[data-gsz="s"] .pgrid{--gc:3}
 .sersub small{font-size:var(--fs-xs);font-weight:600}
 .sersub>span:first-child,.sersub small{white-space:nowrap}
 .sersub .fic{margin-left:auto}
-/* アプリ／AniList の切り替え（リスト／グリッドの切り替えと同じ形。文字のボタン）。たたむ矢印の左 */
+/* アプリ／AniList の切り替え（リスト／グリッドの切り替えと同じ形の小さい版。文字のボタン）。たたむ矢印の左 */
 .sersub .vtog{margin-left:auto}
 .sersub .vtog+.fic{margin-left:4px}
-.vtog.vtx button{width:auto;padding:0 8px;font:700 var(--fs-xs)/1 var(--u-f)}
+.vtog.vtx{border-width:1.5px;border-radius:9px;padding:1px}
+.vtog.vtx button{width:auto;height:20px;padding:0 7px;border-radius:7px;font:700 var(--fs-xs)/1 var(--u-f)}
+.vtog.vtx button[aria-pressed="true"]{box-shadow:inset 0 0 0 1.5px var(--k)}
 .sermsg{margin:6px 0 2px;font-size:var(--fs-s);color:var(--u-sub);display:flex;align-items:center;flex-wrap:wrap;gap:8px}
 .sertl{position:relative;padding-left:20px}
 .sertl::before{content:"";position:absolute;left:6px;top:10px;bottom:10px;width:2px;background:var(--u-line)}
@@ -1997,6 +1999,8 @@ html[data-gsz="s"] .pgrid{--gc:3}
 .dhx .dmeta{margin:0}
 .dhx .wnn{margin:0}
 .dhx h3{font-size:var(--fs-xl);line-height:1.35;margin:0}
+.dhx h3.jbrx{word-break:normal}
+.dhx h3.clamp3{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .dhx .dtimg{width:116px;margin:4px 0 0 4px;border:2px solid var(--k);border-radius:16px;box-shadow:5px 5px 0 var(--ks);transform:rotate(-3deg)}
 .dhx .dtimg.none{background:var(--u-surface)}
 /* 配信・公式サイトのボタン（縦に並べる） */
