@@ -479,7 +479,8 @@ input[type=date]{-webkit-appearance:none;appearance:none;min-width:0;max-width:1
 input[type=date]::-webkit-date-and-time-value{text-align:left}
 .field input[type=date]{min-height:var(--h-in)}
 .cours .tag::after{content:" ✕"}
-.cours .none{font-size:var(--fs-m);color:var(--u-sub)}
+/* 放送クールの「未選択」はほかのプルダウンの「未選択」（.fdd-ph）と同じ見た目 */
+.cours .none{font-size:var(--fs-base);font-weight:500;color:var(--u-sub)}
 
 .yr{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:var(--fs-base)}
 .yr input{width:20px;height:20px;accent-color:var(--u-accent)}
@@ -537,6 +538,7 @@ input[type=date]::-webkit-date-and-time-value{text-align:left}
 .svform input,.svrow input{flex:1;min-width:120px;height:var(--h-in);box-sizing:border-box;border:1px solid var(--u-line);background:var(--u-bg);color:var(--u-ink);border-radius:var(--r-m);padding:0 12px;font:inherit;font-size:var(--fs-base)}
 .svform .hint{flex-basis:100%;font-size:var(--fs-xs);color:var(--u-sub)}
 .svbtn{white-space:nowrap}
+.svnone{grid-column:1/-1;margin:2px 0 4px;font-size:var(--fs-s);color:var(--u-sub)}
 .svbtn.pri{background:var(--accent);border-color:var(--accent);color:var(--u-surface)}
 .svrow{display:flex;gap:4px;align-items:center;margin-bottom:6px;flex-wrap:wrap}
 .svrow .svbtn{padding:6px 8px}
@@ -1552,7 +1554,8 @@ select#arcJump{cursor:pointer;-webkit-appearance:none;appearance:none;padding-ri
 .ftbl .fgrid{display:block;margin:0 -14px -12px}
 .ftbl .frow3{display:contents}
 .ftbl .fgrid>.field,.ftbl .frow3>.field{display:grid;grid-template-columns:128px minmax(0,1fr);align-items:center;column-gap:8px;row-gap:2px;padding:5px 14px;border-top:1px solid var(--u-line);margin:0}
-.ftbl .fgrid>.field>span:first-child,.ftbl .frow3>.field>span:first-child,.ftbl .field>label.field>span{font-size:var(--fs-s);font-weight:700;color:var(--u-sub);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* 項目名は言葉の途中で折り返さない（「開始日（第1話）」は「開始日／（第1話）」で折り返す） */
+.ftbl .fgrid>.field>span:first-child,.ftbl .frow3>.field>span:first-child,.ftbl .field>label.field>span{font-size:var(--fs-s);font-weight:700;color:var(--u-sub);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;word-break:keep-all;overflow-wrap:anywhere}
 .ftbl .field>label.field{display:block;padding:0;border:0;margin:0}
 .ftbl .field input:not([type=checkbox]),.ftbl .field select{height:var(--h-in);box-sizing:border-box;border-color:transparent;background:transparent;padding:0 12px;font-size:var(--fs-base)}
 .ftbl .field input:not([type=checkbox]):focus{border-color:var(--u-accent);background:var(--u-surface)}
@@ -1761,7 +1764,8 @@ html[data-gsz="s"] .pgrid{--gc:3}
 .pcell:active .pimg{opacity:.85}
 /* PCの右のパネルで開いている作品：オレンジの影＋外側のオレンジ線 */
 .pcell.sel .pimg{box-shadow:4px 4px 0 var(--u-accent);outline:3px solid var(--u-accent);outline-offset:3px}
-.slot.sel{box-shadow:inset 0 0 0 3px var(--u-accent)}
+/* 選んでいる行は行ぜんたいを囲む（YouTube の行の右の「再生」も含める） */
+.row:has(>.slot.sel){outline:3px solid var(--u-accent);outline-offset:-3px}
 .cgroup .pgrid{margin-top:4px}
 /* YouTube：一覧のサムネは横長、グリッドも横長 */
 .row.thr.yrow .slot{grid-template-columns:48px 64px minmax(0,1fr) auto!important}

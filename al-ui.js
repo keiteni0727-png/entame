@@ -140,7 +140,7 @@ function alBoxHtml() {
   const swap = form.k === "a" ? `<div class="alx-swap">${alSwapBtn(S.idKey, "data-alswap", "探す")}</div>` : "";
   if (S.idKey === "tm" && !TM.hasKey()) return `<div class="alx" id="alBox"><p class="alx-msg">${TM_NOKEY}</p>${swap}</div>`;
   return `<div class="alx" id="alBox"><div class="alx-row"><input id="alQ" class="u-input" type="search" enterkeyhint="search" autocomplete="off" placeholder="${S.ph}" value="${esc(alS.q)}"><button type="button" class="u-btn sm pri" data-alsearch>${alS.busy === "q" ? "検索中…" : "検索"}</button></div>
-    ${alS.busy === "p" ? `<p class="alx-msg">作品の情報を取得しています…</p>` : ""}${alS.err ? `<p class="alx-msg err">${esc(alS.err)}</p>` : ""}${alS.busy || !alS.res ? "" : alResHtml(alS.res, "data-alpick")}${alS.busy ? "" : swap}</div>`;
+    ${alS.busy === "p" ? `<p class="alx-msg">作品の情報を取得しています…</p>` : ""}${alS.err ? `<p class="alx-msg err">${esc(alS.err)}</p>` : ""}${alS.busy || !alS.res ? "" : alResHtml(alS.res, "data-alpick")}${alS.busy || !(alS.res || alS.err) ? "" : swap}</div>`;
 }
 function alRedrawBox() {
   const b = $("#alBox");

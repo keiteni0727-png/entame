@@ -140,7 +140,7 @@ function svPanelHtml() {
       )
       .join("")}</div></div>`;
   }
-  return `<div class="fgroup">${head}<div class="chips">${l.map(f => `<button type="button" data-svapply="${esc(f.id)}" aria-pressed="${f === cur}">★ ${esc(f.name)}</button>`).join("")}${cur || svEmpty() ? "" : `<button type="button" class="u-chip add svadd" data-svnew="1">＋今の条件を保存</button>`}${l.length ? `<button type="button" class="u-btn sm txt svedit" data-svedit="1">編集</button>` : ""}</div></div>`;
+  return `<div class="fgroup">${head}<div class="chips">${l.map(f => `<button type="button" data-svapply="${esc(f.id)}" aria-pressed="${f === cur}">★ ${esc(f.name)}</button>`).join("")}${cur || svEmpty() ? "" : `<button type="button" class="u-chip add svadd" data-svnew="1">＋今の条件を保存</button>`}${l.length ? `<button type="button" class="u-btn sm txt svedit" data-svedit="1">編集</button>` : ""}</div>${!l.length && svEmpty() ? `<p class="svnone">保存したフィルタはまだありません。絞り込みか並び順を選ぶと、今の条件を保存できます</p>` : ""}</div>`;
 }
 function svSubmit() {
   const inp = $("#svName");

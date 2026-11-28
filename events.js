@@ -515,7 +515,20 @@ const KEY_ACTIONS = [
       const open = state.mode === "yt" ? yst.fp === "all" : state.mode === "sr" || state.mode === "mu" ? lui.fp === "all" : state.fOpen === "all";
       if (e.key !== "Escape" || !open || $("#layer").innerHTML) return false;
       e.preventDefault();
-      document.querySelector(document.querySelector(".fsh-sub") ? ".fsh-back" : ".fsh-x")?.click();
+      /* スマホは項目の中から一覧へ戻る。PCは左右に並べていて「戻る」が隠れているので、そのまま閉じる */
+      const back = document.querySelector(".fsh-sub .fsh-back");
+      (back && back.offsetParent ? back : document.querySelector(".fsh-x"))?.click();
+      return true;
+    },
+  ],
+  /* 並び替え・保存フィルタの小さな画面：Esc で「完了」と同じく閉じる（入力中の保存フィルタ名は Esc で取り消しのまま） */
+  [
+    null,
+    (t, e) => {
+      const done = e.key === "Escape" && !$("#layer").innerHTML && !t.closest("input") && $(".fsdrop.fpop .fpop-h .u-btn");
+      if (!done) return false;
+      e.preventDefault();
+      done.click();
       return true;
     },
   ],
