@@ -306,7 +306,7 @@ function weekEpLine(i, e, onAir) {
   }
   if (!e) return `<span class="wc-ep">${eps.length ? "放送予定の話はありません" : "話数未登録"}</span>`;
   const pre = onAir ? "放送中" : !aired(e) ? "次回" : e.w ? "放送済" : "未視聴";
-  return `<span class="wc-ep"><em class="p-${pre}">${pre}：</em>${esc(e.n)}${e.sub ? `「${esc(e.sub)}」` : ""}</span>`;
+  return `<span class="wc-ep"><em class="p-${pre}">${pre}：</em>${esc(e.n)}</span>`;
 }
 function weekCard(i, dayKey, isNext, onAir) {
   const eps = episodes(i);
